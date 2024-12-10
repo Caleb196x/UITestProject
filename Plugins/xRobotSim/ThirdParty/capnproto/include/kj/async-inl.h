@@ -31,7 +31,7 @@
 #include "async.h"  // help IDE parse this file
 #endif
 
-#if _MSC_VER && KJ_HAS_COROUTINE
+#if defined(_MSC_VER) && defined(KJ_HAS_COROUTINE)
 #include <intrin.h>
 #endif
 
@@ -50,9 +50,9 @@ public:
   ExceptionOrValue(bool, Exception&& exception): exception(kj::mv(exception)) {}
   KJ_DISALLOW_COPY(ExceptionOrValue);
 
-  void addException(Exception&& exception) {
+  void addException(Exception&& inexception) {
     if (this->exception == nullptr) {
-      this->exception = kj::mv(exception);
+      this->exception = kj::mv(inexception);
     }
   }
 
@@ -554,7 +554,7 @@ private:
 
 // -------------------------------------------------------------------
 
-#if __GNUC__ >= 8 && !__clang__
+#if defined(__GNUC__) &&  __GNUC__ >= 8 && !defined(__clang__)
 // GCC 8's class-memaccess warning rightly does not like the memcpy()'s below, but there's no
 // "legal" way for us to extract the content of a PTMF so too bad.
 #pragma GCC diagnostic push
@@ -591,7 +591,7 @@ class PtmfHelper {
   template <typename T, typename ReturnType, typename... ParamTypes>
   friend void* getMethodStartAddress(const T& obj, ReturnType (T::*method)(ParamTypes...) const);
 
-#if __GNUG__
+#if defined(__GNUG__)
 
   void* ptr;
   ptrdiff_t adj;
@@ -645,7 +645,7 @@ class PtmfHelper {
 #undef BODY
 };
 
-#if __GNUC__ >= 8 && !__clang__
+#if defined(__GNUC__) && __GNUC__ >= 8 && !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
 
@@ -1995,7 +1995,7 @@ public:
   }
   bool isWaiting() const override {
     KJ_IF_MAYBE(t, target) {
-#if _MSC_VER && !__clang__
+#if defined(_MSC_VER) && !defined(__clang__)
       // Just assume 1-byte loads are atomic... on what kind of absurd platform would they not be?
       return t->state == XThreadPaf::WAITING;
 #else
@@ -2031,7 +2031,7 @@ PromiseCrossThreadFulfillerPair<T> newPromiseAndCrossThreadFulfiller() {
 
 }  // namespace kj
 
-#if KJ_HAS_COROUTINE
+#if defined(KJ_HAS_COROUTINE)
 
 // =======================================================================================
 // Coroutines TS integration with kj::Promise<T>.

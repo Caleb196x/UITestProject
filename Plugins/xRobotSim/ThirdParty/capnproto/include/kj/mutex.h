@@ -30,11 +30,11 @@
 
 KJ_BEGIN_HEADER
 
-#if __linux__ && !defined(KJ_USE_FUTEX)
+#if defined(__linux__) && !defined(KJ_USE_FUTEX)
 #define KJ_USE_FUTEX 1
 #endif
 
-#if !KJ_USE_FUTEX && !_WIN32 && !__CYGWIN__
+#if defined(KJ_USE_FUTEX) && !KJ_USE_FUTEX && !_WIN32 && !__CYGWIN__
 // We fall back to pthreads when we don't have a better platform-specific primitive. pthreads
 // mutexes are bloated, though, so we like to avoid them. Hence on Linux we use futex(), and on
 // Windows we use SRW locks and friends. On Cygwin we prefer the Win32 primitives both because they
@@ -53,18 +53,18 @@ KJ_BEGIN_HEADER
 // currently holding the lock.
 // KJ_TRACK_LOCK_ACQUISITION is automatically enabled by either one of them.
 
-#if KJ_TRACK_LOCK_BLOCKING
+#if defined(KJ_TRACK_LOCK_BLOCKING) && KJ_TRACK_LOCK_BLOCKING
 // Lock tracking is required to keep track of what blocked.
 #define KJ_TRACK_LOCK_ACQUISITION 1
 #endif
 
-#if KJ_SAVE_ACQUIRED_LOCK_INFO
+#if defined(KJ_SAVE_ACQUIRED_LOCK_INFO) && KJ_SAVE_ACQUIRED_LOCK_INFO
 #define KJ_TRACK_LOCK_ACQUISITION 1
 #include <unistd.h>
 #endif
 
 namespace kj {
-#if KJ_TRACK_LOCK_ACQUISITION
+#if defined(KJ_TRACK_LOCK_ACQUISITION) && KJ_TRACK_LOCK_ACQUISITION
 #if !KJ_USE_FUTEX
 #error Lock tracking is only currently supported for futex-based mutexes.
 #endif
@@ -93,7 +93,7 @@ class Exception;
 
 namespace _ {  // private
 
-#if KJ_SAVE_ACQUIRED_LOCK_INFO
+#if defined(KJ_SAVE_ACQUIRED_LOCK_INFO) && KJ_SAVE_ACQUIRED_LOCK_INFO
 class HoldingExclusively {
   // The lock is being held in exclusive mode.
 public:
@@ -135,6 +135,11 @@ public:
     EXCLUSIVE,
     SHARED
   };
+  
+  class Predicate {
+  public:
+    virtual bool predicate_check() = 0;
+  };
 
   bool lock(Exclusivity exclusivity, Maybe<Duration> timeout, LockSourceLocationArg location);
   void unlock(Exclusivity exclusivity, Waiter* waiterToSkip = nullptr);
@@ -143,11 +148,6 @@ public:
   // In debug mode, assert that the mutex is locked by the calling thread, or if that is
   // non-trivial, assert that the mutex is locked (which should be good enough to catch problems
   // in unit tests).  In non-debug builds, do nothing.
-
-  class Predicate {
-  public:
-    virtual bool check() = 0;
-  };
 
   void wait(Predicate& predicate, Maybe<Duration> timeout, LockSourceLocationArg location);
   // If predicate.check() returns false, unlock the mutex until predicate.check() returns true, or
@@ -161,14 +161,14 @@ public:
   // are waiting for a wait() condition. Assuming correct implementation, all those threads
   // should immediately go back to sleep.
 
-#if KJ_USE_FUTEX
+#if defined(KJ_USE_FUTEX) && KJ_USE_FUTEX
   uint numReadersWaitingForTest() const;
   // The number of reader locks that are currently blocked on this lock (must be called while
   // holding the writer lock). This is really only a utility method for mutex-test.c++ so it can
   // validate certain invariants.
 #endif
 
-#if KJ_SAVE_ACQUIRED_LOCK_INFO
+#if defined(KJ_SAVE_ACQUIRED_LOCK_INFO) && KJ_USE_FUTEX
   using AcquiredMetadata = kj::OneOf<HoldingExclusively, HoldingShared>;
   KJ_DISABLE_TSAN AcquiredMetadata lockedInfo() const;
   // Returns metadata about this lock when its held. This method is async signal safe. It must also
@@ -178,7 +178,7 @@ public:
 #endif
 
 private:
-#if KJ_USE_FUTEX
+#if defined(KJ_USE_FUTEX) && KJ_USE_FUTEX
   uint futex;
   // bit 31 (msb) = set if exclusive lock held
   // bit 30 (msb) = set if threads are waiting for exclusive lock
@@ -201,7 +201,7 @@ private:
   mutable pthread_rwlock_t mutex;
 #endif
 
-#if KJ_SAVE_ACQUIRED_LOCK_INFO
+#if defined(KJ_SAVE_ACQUIRED_LOCK_INFO)
   pid_t lockedExclusivelyByThread = 0;
   SourceLocation lockAcquiredLocation;
 
@@ -230,7 +230,7 @@ private:
     kj::Maybe<Waiter&>* prev;
     Predicate& predicate;
     Maybe<Own<Exception>> exception;
-#if KJ_USE_FUTEX
+#if defined(KJ_USE_FUTEX) && KJ_USE_FUTEX
     uint futex;
     bool hasTimeout;
 #elif _WIN32 || __CYGWIN__
@@ -261,7 +261,7 @@ class Once {
   // Internal implementation details.  See `Lazy<T>`.
 
 public:
-#if KJ_USE_FUTEX
+#if defined(KJ_USE_FUTEX) && KJ_USE_FUTEX
   inline Once(bool startInitialized = false)
       : futex(startInitialized ? INITIALIZED : UNINITIALIZED) {}
 #else
@@ -297,7 +297,7 @@ public:
   // another thread.
 
 private:
-#if KJ_USE_FUTEX
+#if defined(KJ_USE_FUTEX) && KJ_USE_FUTEX
   uint futex;
 
   enum State {
@@ -376,15 +376,15 @@ public:
     static_assert(!isConst<T>(), "cannot wait() on shared lock");
 
     struct PredicateImpl final: public _::Mutex::Predicate {
-      bool check() override {
-        return condition(value);
-      }
-
       Cond&& condition;
       const T& value;
 
       PredicateImpl(Cond&& condition, const T& value)
           : condition(kj::fwd<Cond>(condition)), value(value) {}
+      
+      bool predicate_check()  {
+        return condition(value);
+      }
     };
 
     PredicateImpl impl(kj::fwd<Cond>(condition), *ptr);
@@ -402,7 +402,7 @@ private:
   template <typename U>
   friend class ExternalMutexGuarded;
 
-#if KJ_MUTEX_TEST
+#if defined(KJ_MUTEX_TEST) && KJ_MUTEX_TEST
 public:
 #endif
   void induceSpuriousWakeupForTest() { mutex->induceSpuriousWakeupForTest(); }
@@ -726,7 +726,7 @@ inline const T& Lazy<T>::get(Func&& init, LockSourceLocationArg location) const 
   return *value;
 }
 
-#if KJ_TRACK_LOCK_BLOCKING
+#if defined(KJ_TRACK_LOCK_BLOCKING) && KJ_TRACK_LOCK_BLOCKING
 struct BlockedOnMutexAcquisition {
   const _::Mutex& mutex;
   // The mutex we are blocked on.

@@ -145,9 +145,9 @@ struct RawBrandedSchema {
     // is required in particular when traversing the dependency list.  RawSchemas for compiled-in
     // types are always initialized; only dynamically-loaded schemas may be lazy.
 
-#if __GNUC__ || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
     const Initializer* i = __atomic_load_n(&lazyInitializer, __ATOMIC_ACQUIRE);
-#elif _MSC_VER
+#elif defined(_MSC_VER)
     const Initializer* i = *static_cast<Initializer const* const volatile*>(&lazyInitializer);
     std::atomic_thread_fence(std::memory_order_acquire);
 #else
@@ -211,9 +211,9 @@ struct RawSchema {
     // is required in particular when traversing the dependency list.  RawSchemas for compiled-in
     // types are always initialized; only dynamically-loaded schemas may be lazy.
 
-#if __GNUC__ || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
     const Initializer* i = __atomic_load_n(&lazyInitializer, __ATOMIC_ACQUIRE);
-#elif _MSC_VER
+#elif defined(_MSC_VER)
     const Initializer* i = *static_cast<Initializer const* const volatile*>(&lazyInitializer);
     std::atomic_thread_fence(std::memory_order_acquire);
 #else

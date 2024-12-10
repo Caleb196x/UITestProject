@@ -1,10 +1,9 @@
-@0xbbe893163cfc778c
+@0xbbe893163cfc778c;
 
-interface UELog 
-{
+interface UELog {
     debug @0 (message: Text) -> ();
-    info @0 (message: Text) -> ();
-    warn @1 (message: Text) -> ();
-    error @2 (message: Text) -> ();
-    fatal @3 (message: Text) -> ();
+    info @1 (message: Text) -> ();
+    warn @2 (message: Text) -> ();
+    error @3 (message: Text) -> ();
+    fatal @4 (message: Text) -> ();
 }

@@ -78,7 +78,7 @@ class BuilderArena;
 
 // =============================================================================
 
-#if CAPNP_DEBUG_TYPES
+#if defined(CAPNP_DEBUG_TYPES)
 typedef kj::UnitRatio<kj::Bounded<64, uint>, BitLabel, ElementLabel> BitsPerElementTableType;
 #else
 typedef uint BitsPerElementTableType;
@@ -257,7 +257,7 @@ inline Mask<T> mask(T value, Mask<T> mask) {
 
 template <>
 inline uint32_t mask<float>(float value, uint32_t mask) {
-#if CAPNP_CANONICALIZE_NAN
+#if defined(CAPNP_CANONICALIZE_NAN)
   if (value != value) {
     return 0x7fc00000u ^ mask;
   }
@@ -271,7 +271,7 @@ inline uint32_t mask<float>(float value, uint32_t mask) {
 
 template <>
 inline uint64_t mask<double>(double value, uint64_t mask) {
-#if CAPNP_CANONICALIZE_NAN
+#if defined(CAPNP_CANONICALIZE_NAN)
   if (value != value) {
     return 0x7ff8000000000000ull ^ mask;
   }
@@ -1035,7 +1035,7 @@ inline void StructBuilder::setDataField(StructDataOffset offset, kj::NoInfer<T> 
   reinterpret_cast<WireValue<T>*>(data)[unbound(offset / ELEMENTS)].set(value);
 }
 
-#if CAPNP_CANONICALIZE_NAN
+#if defined(CAPNP_CANONICALIZE_NAN)
 // Use mask() on floats and doubles to make sure we canonicalize NaNs.
 template <>
 inline void StructBuilder::setDataField<float>(StructDataOffset offset, float value) {
@@ -1172,7 +1172,7 @@ inline void ListBuilder::setDataElement(ElementCount index, kj::NoInfer<T> value
       ptr + upgradeBound<uint64_t>(index) * step / BITS_PER_BYTE)->set(value);
 }
 
-#if CAPNP_CANONICALIZE_NAN
+#if defined(CAPNP_CANONICALIZE_NAN)
 // Use mask() on floats and doubles to make sure we canonicalize NaNs.
 template <>
 inline void ListBuilder::setDataElement<float>(ElementCount index, float value) {

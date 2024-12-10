@@ -174,7 +174,7 @@ Own<RefcountedWrapper<Own<T>>> refcountedWrapper(Own<T>&& wrapped) {
 // Warning: Atomic ops are SLOW.
 
 #if _MSC_VER && !defined(__clang__)
-#if _M_ARM
+#if defined(_M_ARM)
 #define KJ_MSVC_INTERLOCKED(OP, MEM) _Interlocked##OP##_##MEM
 #else
 #define KJ_MSVC_INTERLOCKED(OP, MEM) _Interlocked##OP

@@ -30,7 +30,7 @@
 #include <kj/memory.h>
 #include <kj/windows-sanity.h>  // work-around macro conflict with `VOID`
 
-#if CAPNP_DEBUG_TYPES
+#if defined(CAPNP_DEBUG_TYPES)
 #include <kj/units.h>
 #endif
 
@@ -57,7 +57,7 @@ namespace capnp {
 #define CAPNP_LITE 0
 #endif
 
-#if CAPNP_TESTING_CAPNP  // defined in Cap'n Proto's own unit tests; others should not define this
+#if defined(CAPNP_TESTING_CAPNP)  // defined in Cap'n Proto's own unit tests; others should not define this
 #define CAPNP_DEPRECATED(reason)
 #else
 #define CAPNP_DEPRECATED KJ_DEPRECATED
@@ -356,7 +356,7 @@ public:
   word() = default;
 private:
   uint64_t content KJ_UNUSED_MEMBER;
-#if __GNUC__ < 8 || __clang__
+#if (defined(__GNUC__) && __GNUC__ < 8) || defined(__clang__)
   // GCC 8's -Wclass-memaccess complains whenever we try to memcpy() a `word` if we've disallowed
   // the copy constructor. We don't want to disable the warning because it's a useful warning and
   // we'd have to disable it for all applications that include this header. Instead we allow `word`
@@ -368,7 +368,7 @@ private:
 static_assert(sizeof(byte) == 1, "uint8_t is not one byte?");
 static_assert(sizeof(word) == 8, "uint64_t is not 8 bytes?");
 
-#if CAPNP_DEBUG_TYPES
+#if defined(CAPNP_DEBUG_TYPES)
 // Set CAPNP_DEBUG_TYPES to 1 to use kj::Quantity for "count" types.  Otherwise, plain integers are
 // used.  All the code should still operate exactly the same, we just lose compile-time checking.
 // Note that this will also change symbol names, so it's important that the library and any clients

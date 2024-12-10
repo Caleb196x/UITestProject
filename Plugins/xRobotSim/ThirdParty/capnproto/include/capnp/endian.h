@@ -58,7 +58,7 @@ namespace _ {  // private
 #endif
 #endif
 
-#if CAPNP_REVERSE_ENDIAN
+#if defined(CAPNP_REVERSE_ENDIAN)
 #define CAPNP_WIRE_BYTE_ORDER __ORDER_BIG_ENDIAN__
 #define CAPNP_OPPOSITE_OF_WIRE_BYTE_ORDER __ORDER_LITTLE_ENDIAN__
 #else
@@ -68,7 +68,7 @@ namespace _ {  // private
 
 #if defined(__BYTE_ORDER__) && \
     __BYTE_ORDER__ == CAPNP_WIRE_BYTE_ORDER && \
-    !CAPNP_DISABLE_ENDIAN_DETECTION
+    !defined(CAPNP_DISABLE_ENDIAN_DETECTION)
 // CPU is little-endian.  We can just read/write the memory directly.
 
 template <typename T>

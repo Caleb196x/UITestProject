@@ -122,7 +122,7 @@ KJ_BEGIN_HEADER
 
 namespace kj {
 
-#if KJ_MSVC_TRADITIONAL_CPP
+#if defined(KJ_MSVC_TRADITIONAL_CPP)
 // MSVC does __VA_ARGS__ differently from GCC:
 // - A trailing comma before an empty __VA_ARGS__ is removed automatically, whereas GCC wants
 //   you to request this behavior with "##__VA_ARGS__".
@@ -640,7 +640,7 @@ inline String Debug::makeDescription<>(const char* macroArgs) {
 // about disabling (a warning about `<<` precedence not applying specifically to overloads) and
 // also created ambiguous overload errors in the KJ units code.
 
-#if __clang__
+#if defined(__clang__)
 // We intentionally overload operator << for the specific purpose of evaluating it before
 // evaluating comparison expressions, so stop Clang from warning about it. Unfortunately this means
 // eliminating a warning that would otherwise be useful for people using iostreams... sorry.

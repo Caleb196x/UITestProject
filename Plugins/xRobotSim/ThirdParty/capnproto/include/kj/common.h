@@ -90,7 +90,7 @@ KJ_BEGIN_HEADER
     #endif
   #else
     #if __GNUC__ < 5
-      #warning "This library requires at least GCC 5.0."
+      // #warning "This library requires at least GCC 5.0."
     #endif
   #endif
 #elif defined(_MSC_VER)
@@ -109,7 +109,7 @@ KJ_BEGIN_HEADER
 #include <initializer_list>
 #include <string.h>
 
-#if __linux__ && KJ_CPP_STD > 201200L
+#if defined(__linux__) && KJ_CPP_STD > 201200L
 // Hack around stdlib bug with C++14 that exists on some Linux systems.
 // Apparently in this mode the C library decides not to define gets() but the C++ library still
 // tries to import it into the std namespace. This bug has been fixed at the source but is still
@@ -219,7 +219,7 @@ typedef unsigned char byte;
 #define KJ_UNLIKELY(condition) (condition)
 #endif
 
-#if defined(KJ_DEBUG) || __NO_INLINE__
+#if defined(KJ_DEBUG) || defined(__NO_INLINE__)
 #define KJ_ALWAYS_INLINE(...) inline __VA_ARGS__
 // Don't force inline in debug mode.
 #else
@@ -237,7 +237,7 @@ typedef unsigned char byte;
 #define KJ_NOINLINE __attribute__((noinline))
 #endif
 
-#if defined(_MSC_VER) && !__clang__
+#if defined(_MSC_VER) && !defined(__clang__)
 #define KJ_NORETURN(prototype) __declspec(noreturn) prototype
 #define KJ_UNUSED
 #define KJ_WARN_UNUSED_RESULT
@@ -273,7 +273,7 @@ typedef unsigned char byte;
 // by allowing a syntax like `[[clang::lifetimebound(*this)]]`.
 // https://clang.llvm.org/docs/AttributeReference.html#lifetimebound
 
-#if __clang__
+#if defined(__clang__)
 #define KJ_UNUSED_MEMBER __attribute__((unused))
 // Inhibits "unused" warning for member variables.  Only Clang produces such a warning, while GCC
 // complains if the attribute is set on members.
@@ -295,12 +295,12 @@ typedef unsigned char byte;
 #define KJ_DISABLE_TSAN
 #endif
 
-#if __clang__
+#if defined(__clang__)
 #define KJ_DEPRECATED(reason) \
     __attribute__((deprecated(reason)))
 #define KJ_UNAVAILABLE(reason) \
     __attribute__((unavailable(reason)))
-#elif __GNUC__
+#elif defined(__GNUC__)
 #define KJ_DEPRECATED(reason) \
     __attribute__((deprecated))
 #define KJ_UNAVAILABLE(reason) = delete
@@ -314,7 +314,7 @@ typedef unsigned char byte;
 // TODO(msvc): Again, here, MSVC prefers a prefix, __declspec(deprecated).
 #endif
 
-#if KJ_TESTING_KJ  // defined in KJ's own unit tests; others should not define this
+#if defined(KJ_TESTING_KJ) // defined in KJ's own unit tests; others should not define this
 #undef KJ_DEPRECATED
 #define KJ_DEPRECATED(reason)
 #endif
@@ -361,13 +361,13 @@ KJ_NORETURN(void unreachable());
 // Put this on code paths that cannot be reached to suppress compiler warnings about missing
 // returns.
 
-#if __clang__
+#if defined(__clang__)
 #define KJ_CLANG_KNOWS_THIS_IS_UNREACHABLE_BUT_GCC_DOESNT
 #else
 #define KJ_CLANG_KNOWS_THIS_IS_UNREACHABLE_BUT_GCC_DOESNT KJ_UNREACHABLE
 #endif
 
-#if __clang__
+#if defined(__clang__)
 #define KJ_KNOWN_UNREACHABLE(code) \
     do { \
       _Pragma("clang diagnostic push") \
@@ -393,7 +393,7 @@ KJ_NORETURN(void unreachable());
 // variable-sized arrays.  For other compilers we could just use a fixed-size array.  `minStack`
 // is the stack array size to use if variable-width arrays are not supported.  `maxStack` is the
 // maximum stack array size if variable-width arrays *are* supported.
-#if __GNUC__ && !__clang__
+#if defined(__GNUC__) && !defined(__clang__)
 #define KJ_STACK_ARRAY(type, name, size, minStack, maxStack) \
   size_t name##_size = (size); \
   bool name##_isOnStack = name##_size <= (maxStack); \
@@ -449,7 +449,7 @@ KJ_NORETURN(void unreachable());
 // Template metaprogramming helpers.
 
 #define KJ_HAS_TRIVIAL_CONSTRUCTOR __is_trivially_constructible
-#if __GNUC__ && !__clang__
+#if defined(__GNUC__) && !defined(__clang__)
 #define KJ_HAS_NOTHROW_CONSTRUCTOR __has_nothrow_constructor
 #define KJ_HAS_TRIVIAL_DESTRUCTOR __has_trivial_destructor
 #else
@@ -516,7 +516,7 @@ struct DisallowConstCopy {
   // type that contains or inherits from a type that disallows const copies will also automatically
   // disallow const copies.  Hey, cool, that's exactly what we want.
 
-#if CAPNP_DEBUG_TYPES
+#if defined(CAPNP_DEBUG_TYPES)
   // Alas! Declaring a defaulted non-const copy constructor tickles a bug which causes GCC and
   // Clang to disagree on ABI, using different calling conventions to pass this type, leading to
   // immediate segfaults. See:
@@ -633,7 +633,7 @@ constexpr bool canConvert() {
   return sizeof(CanConvert_<U>::sfinae(instance<T>())) == sizeof(int);
 }
 
-#if __GNUC__ && !__clang__ && __GNUC__ < 5
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 5
 template <typename T>
 constexpr bool canMemcpy() {
   // Returns true if T can be copied using memcpy instead of using the copy constructor or
@@ -822,7 +822,7 @@ struct ThrowOverflow {
   [[noreturn]] void operator()() const;
 };
 
-#if __GNUC__ || __clang__ || _MSC_VER
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
 inline constexpr float inf() { return __builtin_huge_valf(); }
 inline constexpr float nan() { return __builtin_nanf(""); }
 
@@ -1321,7 +1321,7 @@ inline T* readMaybe(T* ptr) { return ptr; }
 
 #define KJ_IF_MAYBE(name, exp) if (auto name = ::kj::_::readMaybe(exp))
 
-#if __GNUC__ || __clang__
+#if defined(__GNUC__) || defined(__clang__)
 // These two macros provide a friendly syntax to extract the value of a Maybe or return early.
 //
 // Use KJ_UNWRAP_OR_RETURN if you just want to return a simple value when the Maybe is null:
@@ -1711,7 +1711,7 @@ public:
     return *this;
   }
 
-#if __GNUC__ && !__clang__ && __GNUC__ >= 9
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 9
 // GCC 9 added a warning when we take an initializer_list as a constructor parameter and save a
 // pointer to its content in a class member. GCC apparently imagines we're going to do something
 // dumb like this:
@@ -1736,7 +1736,7 @@ public:
   inline KJ_CONSTEXPR() ArrayPtr(
       ::std::initializer_list<RemoveConstOrDisable<T>> init KJ_LIFETIMEBOUND)
       : ptr(init.begin()), size_(init.size()) {}
-#if __GNUC__ && !__clang__ && __GNUC__ >= 9
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 9
 #pragma GCC diagnostic pop
 #endif
 

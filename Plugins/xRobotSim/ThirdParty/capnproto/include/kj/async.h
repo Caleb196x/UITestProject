@@ -28,7 +28,7 @@
 KJ_BEGIN_HEADER
 
 #ifndef KJ_USE_FIBERS
-  #if __BIONIC__ || __FreeBSD__ || __OpenBSD__ || KJ_NO_EXCEPTIONS
+  #if defined(__BIONIC__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(KJ_NO_EXCEPTIONS)
     // These platforms don't support fibers.
     #define KJ_USE_FIBERS 0
   #else
@@ -611,7 +611,7 @@ inline CaptureByMove<Func, Decay<MovedParam>> mvCapture(MovedParam&& param, Func
 // =======================================================================================
 // Hack for safely using a lambda as a coroutine.
 
-#if KJ_HAS_COROUTINE
+#if defined(KJ_HAS_COROUTINE)
 
 namespace _ {
 

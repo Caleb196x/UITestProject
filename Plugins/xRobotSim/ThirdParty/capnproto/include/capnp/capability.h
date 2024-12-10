@@ -21,7 +21,7 @@
 
 #pragma once
 
-#if CAPNP_LITE
+#if defined(CAPNP_LITE) && CAPNP_LITE
 #error "RPC APIs, including this header, are not available in lite mode."
 #endif
 
