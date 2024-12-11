@@ -35,24 +35,38 @@ public class xRobotRpc : ModuleRules
         // add capnproto library
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
-            PublicAdditionalLibraries.AddRange(new string[]
+            if (Target.Configuration == UnrealTargetConfiguration.Debug ||
+                Target.Configuration == UnrealTargetConfiguration.DebugGame)
             {
-                Path.Combine(capnprotoPath, "lib", "Win64", "capnp.lib"),
-                Path.Combine(capnprotoPath, "lib", "Win64", "capnpc.lib"),
-                Path.Combine(capnprotoPath, "lib", "Win64", "capnp-json.lib"),
-                Path.Combine(capnprotoPath, "lib", "Win64", "capnp-rpc.lib"),
-                Path.Combine(capnprotoPath, "lib", "Win64", "capnp-websocket.lib"),
-                Path.Combine(capnprotoPath, "lib", "Win64", "kj.lib"),
-                Path.Combine(capnprotoPath, "lib", "Win64", "kj-async.lib"),
-                Path.Combine(capnprotoPath, "lib", "Win64", "kj-http.lib"),
-                Path.Combine(capnprotoPath, "lib", "Win64", "kj-test.lib"),
-            });
-            
-            // PublicDefinitions.Add("__clang__=0");
-            // PublicDefinitions.Add("__linux__=0");
-            // PublicDefinitions.Add("__GNUC__=0");
-            // PublicDefinitions.Add("_MSC_VER=1930");
-            // PublicDefinitions.Add("warning=pragma message");
+                PublicAdditionalLibraries.AddRange(new string[]
+                {
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Debug", "capnp.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Debug", "capnpc.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Debug", "capnp-json.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Debug", "capnp-rpc.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Debug", "capnp-websocket.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Debug", "kj.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Debug", "kj-async.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Debug", "kj-http.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Debug", "kj-test.lib"),
+                });
+            }
+            else if (Target.Configuration == UnrealTargetConfiguration.Development ||
+                     Target.Configuration == UnrealTargetConfiguration.Shipping)
+            {
+                PublicAdditionalLibraries.AddRange(new string[]
+                {
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Release", "capnp.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Release", "capnpc.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Release", "capnp-json.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Release", "capnp-rpc.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Release", "capnp-websocket.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Release", "kj.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Release", "kj-async.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Release", "kj-http.lib"),
+                    Path.Combine(capnprotoPath, "lib", "Win64", "Release", "kj-test.lib"),
+                });
+            }
             bUseRTTI = true;
         }
     }
