@@ -73,8 +73,7 @@ public:
 		auto p0 = context.getParams().getP0();
 		auto p1 = context.getParams().getP1();
 		UE_LOG(LogTemp, Display, TEXT("Rpc: %d / %d = %d"), p0, p1, p0 / p1);
-		auto ObjPtr = context.getParams().getObj();
-		auto reader = ObjPtr.getAs<Unreal::MyObject>();
+
 		
 		return kj::READY_NOW;
 	}

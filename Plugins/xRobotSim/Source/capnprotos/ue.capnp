@@ -48,5 +48,5 @@ interface Unreal {
         }
     }
 
-    NewObject @0 (UEClass :Class) -> (obj :AnyPointer); 
+    newObject @0 (ueClass :Class) -> (object :AnyPointer); 
 }

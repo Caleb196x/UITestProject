@@ -22,6 +22,7 @@ namespace capnp {
 namespace schemas {
 
 CAPNP_DECLARE_SCHEMA(f073e869a6974458);
+CAPNP_DECLARE_SCHEMA(9ff6bdbfcaafa91f);
 CAPNP_DECLARE_SCHEMA(f8804e550c52fd12);
 CAPNP_DECLARE_SCHEMA(e7ab8fd439cafe9f);
 CAPNP_DECLARE_SCHEMA(919a273a332ba017);
@@ -82,6 +83,8 @@ CAPNP_DECLARE_SCHEMA(aa70b416df2280c7);
 CAPNP_DECLARE_SCHEMA(e23ae35e794f945a);
 CAPNP_DECLARE_SCHEMA(c39bb1a1de9547a1);
 CAPNP_DECLARE_SCHEMA(feda5980aa48ea2c);
+CAPNP_DECLARE_SCHEMA(8754b8ac41e17d9d);
+CAPNP_DECLARE_SCHEMA(ae118b0c0b204964);
 
 }  // namespace schemas
 }  // namespace capnp
@@ -95,9 +98,12 @@ struct Unreal {
   class Server;
 #endif  // !CAPNP_LITE
 
+  struct Pointer;
   struct Object;
   struct Class;
   struct MyObject;
+  struct NewObjectParams;
+  struct NewObjectResults;
 
   #if !CAPNP_LITE
   struct _capnpPrivate {
@@ -105,6 +111,21 @@ struct Unreal {
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
   };
   #endif  // !CAPNP_LITE
+};
+
+struct Unreal::Pointer {
+  Pointer() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(9ff6bdbfcaafa91f, 1, 0)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
 };
 
 struct Unreal::Object {
@@ -1070,6 +1091,36 @@ struct Unreal::MyObject::LoadResults {
   };
 };
 
+struct Unreal::NewObjectParams {
+  NewObjectParams() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(8754b8ac41e17d9d, 0, 1)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+struct Unreal::NewObjectResults {
+  NewObjectResults() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(ae118b0c0b204964, 0, 1)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
 // =======================================================================================
 
 #if !CAPNP_LITE
@@ -1091,6 +1142,8 @@ public:
   Client& operator=(Client& other);
   Client& operator=(Client&& other);
 
+  ::capnp::Request< ::Unreal::NewObjectParams,  ::Unreal::NewObjectResults> newObjectRequest(
+      ::kj::Maybe< ::capnp::MessageSize> sizeHint = nullptr);
 
 protected:
   Client() = default;
@@ -1107,6 +1160,10 @@ public:
       override;
 
 protected:
+  typedef  ::Unreal::NewObjectParams NewObjectParams;
+  typedef  ::Unreal::NewObjectResults NewObjectResults;
+  typedef ::capnp::CallContext<NewObjectParams, NewObjectResults> NewObjectContext;
+  virtual ::kj::Promise<void> newObject(NewObjectContext context);
 
   inline  ::Unreal::Client thisCap() {
     return ::capnp::Capability::Server::thisCap()
@@ -1116,6 +1173,82 @@ protected:
   ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
       uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
+};
+#endif  // !CAPNP_LITE
+
+class Unreal::Pointer::Reader {
+public:
+  typedef Pointer Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline  ::uint64_t getAddr() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class Unreal::Pointer::Builder {
+public:
+  typedef Pointer Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline  ::uint64_t getAddr();
+  inline void setAddr( ::uint64_t value);
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class Unreal::Pointer::Pipeline {
+public:
+  typedef Pointer Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
 };
 #endif  // !CAPNP_LITE
 
@@ -4926,7 +5059,7 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasObj() const;
-  inline ::capnp::AnyPointer::Reader getObj() const;
+  inline  ::Unreal::Pointer::Reader getObj() const;
 
   inline  ::int32_t getP0() const;
 
@@ -4961,8 +5094,11 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasObj();
-  inline ::capnp::AnyPointer::Builder getObj();
-  inline ::capnp::AnyPointer::Builder initObj();
+  inline  ::Unreal::Pointer::Builder getObj();
+  inline void setObj( ::Unreal::Pointer::Reader value);
+  inline  ::Unreal::Pointer::Builder initObj();
+  inline void adoptObj(::capnp::Orphan< ::Unreal::Pointer>&& value);
+  inline ::capnp::Orphan< ::Unreal::Pointer> disownObj();
 
   inline  ::int32_t getP0();
   inline void setP0( ::int32_t value);
@@ -4988,6 +5124,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
+  inline  ::Unreal::Pointer::Pipeline getObj();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -5090,7 +5227,7 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasObj() const;
-  inline ::capnp::AnyPointer::Reader getObj() const;
+  inline  ::Unreal::Pointer::Reader getObj() const;
 
   inline  ::int32_t getP0() const;
 
@@ -5125,8 +5262,11 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasObj();
-  inline ::capnp::AnyPointer::Builder getObj();
-  inline ::capnp::AnyPointer::Builder initObj();
+  inline  ::Unreal::Pointer::Builder getObj();
+  inline void setObj( ::Unreal::Pointer::Reader value);
+  inline  ::Unreal::Pointer::Builder initObj();
+  inline void adoptObj(::capnp::Orphan< ::Unreal::Pointer>&& value);
+  inline ::capnp::Orphan< ::Unreal::Pointer> disownObj();
 
   inline  ::int32_t getP0();
   inline void setP0( ::int32_t value);
@@ -5152,6 +5292,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
+  inline  ::Unreal::Pointer::Pipeline getObj();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -5254,7 +5395,7 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasObj() const;
-  inline ::capnp::AnyPointer::Reader getObj() const;
+  inline  ::Unreal::Pointer::Reader getObj() const;
 
   inline  ::int32_t getP0() const;
 
@@ -5289,8 +5430,11 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasObj();
-  inline ::capnp::AnyPointer::Builder getObj();
-  inline ::capnp::AnyPointer::Builder initObj();
+  inline  ::Unreal::Pointer::Builder getObj();
+  inline void setObj( ::Unreal::Pointer::Reader value);
+  inline  ::Unreal::Pointer::Builder initObj();
+  inline void adoptObj(::capnp::Orphan< ::Unreal::Pointer>&& value);
+  inline ::capnp::Orphan< ::Unreal::Pointer> disownObj();
 
   inline  ::int32_t getP0();
   inline void setP0( ::int32_t value);
@@ -5316,6 +5460,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
+  inline  ::Unreal::Pointer::Pipeline getObj();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -5418,7 +5563,7 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasObj() const;
-  inline ::capnp::AnyPointer::Reader getObj() const;
+  inline  ::Unreal::Pointer::Reader getObj() const;
 
   inline  ::int32_t getP0() const;
 
@@ -5453,8 +5598,11 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasObj();
-  inline ::capnp::AnyPointer::Builder getObj();
-  inline ::capnp::AnyPointer::Builder initObj();
+  inline  ::Unreal::Pointer::Builder getObj();
+  inline void setObj( ::Unreal::Pointer::Reader value);
+  inline  ::Unreal::Pointer::Builder initObj();
+  inline void adoptObj(::capnp::Orphan< ::Unreal::Pointer>&& value);
+  inline ::capnp::Orphan< ::Unreal::Pointer> disownObj();
 
   inline  ::int32_t getP0();
   inline void setP0( ::int32_t value);
@@ -5480,6 +5628,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
+  inline  ::Unreal::Pointer::Pipeline getObj();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -6070,6 +6219,170 @@ private:
 };
 #endif  // !CAPNP_LITE
 
+class Unreal::NewObjectParams::Reader {
+public:
+  typedef NewObjectParams Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline bool hasUeClass() const;
+#if !CAPNP_LITE
+  inline  ::Unreal::Class::Client getUeClass() const;
+#endif  // !CAPNP_LITE
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class Unreal::NewObjectParams::Builder {
+public:
+  typedef NewObjectParams Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline bool hasUeClass();
+#if !CAPNP_LITE
+  inline  ::Unreal::Class::Client getUeClass();
+  inline void setUeClass( ::Unreal::Class::Client&& value);
+  inline void setUeClass( ::Unreal::Class::Client& value);
+  inline void adoptUeClass(::capnp::Orphan< ::Unreal::Class>&& value);
+  inline ::capnp::Orphan< ::Unreal::Class> disownUeClass();
+#endif  // !CAPNP_LITE
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class Unreal::NewObjectParams::Pipeline {
+public:
+  typedef NewObjectParams Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+  inline  ::Unreal::Class::Client getUeClass();
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class Unreal::NewObjectResults::Reader {
+public:
+  typedef NewObjectResults Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline bool hasObject() const;
+  inline ::capnp::AnyPointer::Reader getObject() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class Unreal::NewObjectResults::Builder {
+public:
+  typedef NewObjectResults Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline bool hasObject();
+  inline ::capnp::AnyPointer::Builder getObject();
+  inline ::capnp::AnyPointer::Builder initObject();
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class Unreal::NewObjectResults::Pipeline {
+public:
+  typedef NewObjectResults Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
 // =======================================================================================
 
 #if !CAPNP_LITE
@@ -6096,6 +6409,20 @@ inline  ::Unreal::Client& Unreal::Client::operator=(Client&& other) {
 }
 
 #endif  // !CAPNP_LITE
+inline  ::uint64_t Unreal::Pointer::Reader::getAddr() const {
+  return _reader.getDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+
+inline  ::uint64_t Unreal::Pointer::Builder::getAddr() {
+  return _builder.getDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+inline void Unreal::Pointer::Builder::setAddr( ::uint64_t value) {
+  _builder.setDataField< ::uint64_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
 #if !CAPNP_LITE
 inline Unreal::Object::Client::Client(decltype(nullptr))
     : ::capnp::Capability::Client(nullptr) {}
@@ -7369,19 +7696,35 @@ inline bool Unreal::MyObject::AddParams::Builder::hasObj() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline ::capnp::AnyPointer::Reader Unreal::MyObject::AddParams::Reader::getObj() const {
-  return ::capnp::AnyPointer::Reader(_reader.getPointerField(
+inline  ::Unreal::Pointer::Reader Unreal::MyObject::AddParams::Reader::getObj() const {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline ::capnp::AnyPointer::Builder Unreal::MyObject::AddParams::Builder::getObj() {
-  return ::capnp::AnyPointer::Builder(_builder.getPointerField(
+inline  ::Unreal::Pointer::Builder Unreal::MyObject::AddParams::Builder::getObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline ::capnp::AnyPointer::Builder Unreal::MyObject::AddParams::Builder::initObj() {
-  auto result = ::capnp::AnyPointer::Builder(_builder.getPointerField(
+#if !CAPNP_LITE
+inline  ::Unreal::Pointer::Pipeline Unreal::MyObject::AddParams::Pipeline::getObj() {
+  return  ::Unreal::Pointer::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void Unreal::MyObject::AddParams::Builder::setObj( ::Unreal::Pointer::Reader value) {
+  ::capnp::_::PointerHelpers< ::Unreal::Pointer>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::Unreal::Pointer::Builder Unreal::MyObject::AddParams::Builder::initObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
-  result.clear();
-  return result;
+}
+inline void Unreal::MyObject::AddParams::Builder::adoptObj(
+    ::capnp::Orphan< ::Unreal::Pointer>&& value) {
+  ::capnp::_::PointerHelpers< ::Unreal::Pointer>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::Unreal::Pointer> Unreal::MyObject::AddParams::Builder::disownObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
 inline  ::int32_t Unreal::MyObject::AddParams::Reader::getP0() const {
@@ -7434,19 +7777,35 @@ inline bool Unreal::MyObject::SubParams::Builder::hasObj() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline ::capnp::AnyPointer::Reader Unreal::MyObject::SubParams::Reader::getObj() const {
-  return ::capnp::AnyPointer::Reader(_reader.getPointerField(
+inline  ::Unreal::Pointer::Reader Unreal::MyObject::SubParams::Reader::getObj() const {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline ::capnp::AnyPointer::Builder Unreal::MyObject::SubParams::Builder::getObj() {
-  return ::capnp::AnyPointer::Builder(_builder.getPointerField(
+inline  ::Unreal::Pointer::Builder Unreal::MyObject::SubParams::Builder::getObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline ::capnp::AnyPointer::Builder Unreal::MyObject::SubParams::Builder::initObj() {
-  auto result = ::capnp::AnyPointer::Builder(_builder.getPointerField(
+#if !CAPNP_LITE
+inline  ::Unreal::Pointer::Pipeline Unreal::MyObject::SubParams::Pipeline::getObj() {
+  return  ::Unreal::Pointer::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void Unreal::MyObject::SubParams::Builder::setObj( ::Unreal::Pointer::Reader value) {
+  ::capnp::_::PointerHelpers< ::Unreal::Pointer>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::Unreal::Pointer::Builder Unreal::MyObject::SubParams::Builder::initObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
-  result.clear();
-  return result;
+}
+inline void Unreal::MyObject::SubParams::Builder::adoptObj(
+    ::capnp::Orphan< ::Unreal::Pointer>&& value) {
+  ::capnp::_::PointerHelpers< ::Unreal::Pointer>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::Unreal::Pointer> Unreal::MyObject::SubParams::Builder::disownObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
 inline  ::int32_t Unreal::MyObject::SubParams::Reader::getP0() const {
@@ -7499,19 +7858,35 @@ inline bool Unreal::MyObject::MulParams::Builder::hasObj() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline ::capnp::AnyPointer::Reader Unreal::MyObject::MulParams::Reader::getObj() const {
-  return ::capnp::AnyPointer::Reader(_reader.getPointerField(
+inline  ::Unreal::Pointer::Reader Unreal::MyObject::MulParams::Reader::getObj() const {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline ::capnp::AnyPointer::Builder Unreal::MyObject::MulParams::Builder::getObj() {
-  return ::capnp::AnyPointer::Builder(_builder.getPointerField(
+inline  ::Unreal::Pointer::Builder Unreal::MyObject::MulParams::Builder::getObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline ::capnp::AnyPointer::Builder Unreal::MyObject::MulParams::Builder::initObj() {
-  auto result = ::capnp::AnyPointer::Builder(_builder.getPointerField(
+#if !CAPNP_LITE
+inline  ::Unreal::Pointer::Pipeline Unreal::MyObject::MulParams::Pipeline::getObj() {
+  return  ::Unreal::Pointer::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void Unreal::MyObject::MulParams::Builder::setObj( ::Unreal::Pointer::Reader value) {
+  ::capnp::_::PointerHelpers< ::Unreal::Pointer>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::Unreal::Pointer::Builder Unreal::MyObject::MulParams::Builder::initObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
-  result.clear();
-  return result;
+}
+inline void Unreal::MyObject::MulParams::Builder::adoptObj(
+    ::capnp::Orphan< ::Unreal::Pointer>&& value) {
+  ::capnp::_::PointerHelpers< ::Unreal::Pointer>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::Unreal::Pointer> Unreal::MyObject::MulParams::Builder::disownObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
 inline  ::int32_t Unreal::MyObject::MulParams::Reader::getP0() const {
@@ -7564,19 +7939,35 @@ inline bool Unreal::MyObject::DivParams::Builder::hasObj() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline ::capnp::AnyPointer::Reader Unreal::MyObject::DivParams::Reader::getObj() const {
-  return ::capnp::AnyPointer::Reader(_reader.getPointerField(
+inline  ::Unreal::Pointer::Reader Unreal::MyObject::DivParams::Reader::getObj() const {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline ::capnp::AnyPointer::Builder Unreal::MyObject::DivParams::Builder::getObj() {
-  return ::capnp::AnyPointer::Builder(_builder.getPointerField(
+inline  ::Unreal::Pointer::Builder Unreal::MyObject::DivParams::Builder::getObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline ::capnp::AnyPointer::Builder Unreal::MyObject::DivParams::Builder::initObj() {
-  auto result = ::capnp::AnyPointer::Builder(_builder.getPointerField(
+#if !CAPNP_LITE
+inline  ::Unreal::Pointer::Pipeline Unreal::MyObject::DivParams::Pipeline::getObj() {
+  return  ::Unreal::Pointer::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void Unreal::MyObject::DivParams::Builder::setObj( ::Unreal::Pointer::Reader value) {
+  ::capnp::_::PointerHelpers< ::Unreal::Pointer>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::Unreal::Pointer::Builder Unreal::MyObject::DivParams::Builder::initObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
-  result.clear();
-  return result;
+}
+inline void Unreal::MyObject::DivParams::Builder::adoptObj(
+    ::capnp::Orphan< ::Unreal::Pointer>&& value) {
+  ::capnp::_::PointerHelpers< ::Unreal::Pointer>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::Unreal::Pointer> Unreal::MyObject::DivParams::Builder::disownObj() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Pointer>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
 inline  ::int32_t Unreal::MyObject::DivParams::Reader::getP0() const {
@@ -7844,6 +8235,68 @@ inline ::capnp::Orphan< ::Unreal::Object> Unreal::MyObject::LoadResults::Builder
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #endif  // !CAPNP_LITE
+
+inline bool Unreal::NewObjectParams::Reader::hasUeClass() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool Unreal::NewObjectParams::Builder::hasUeClass() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+#if !CAPNP_LITE
+inline  ::Unreal::Class::Client Unreal::NewObjectParams::Reader::getUeClass() const {
+  return ::capnp::_::PointerHelpers< ::Unreal::Class>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::Unreal::Class::Client Unreal::NewObjectParams::Builder::getUeClass() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Class>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::Unreal::Class::Client Unreal::NewObjectParams::Pipeline::getUeClass() {
+  return  ::Unreal::Class::Client(_typeless.getPointerField(0).asCap());
+}
+inline void Unreal::NewObjectParams::Builder::setUeClass( ::Unreal::Class::Client&& cap) {
+  ::capnp::_::PointerHelpers< ::Unreal::Class>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(cap));
+}
+inline void Unreal::NewObjectParams::Builder::setUeClass( ::Unreal::Class::Client& cap) {
+  ::capnp::_::PointerHelpers< ::Unreal::Class>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), cap);
+}
+inline void Unreal::NewObjectParams::Builder::adoptUeClass(
+    ::capnp::Orphan< ::Unreal::Class>&& value) {
+  ::capnp::_::PointerHelpers< ::Unreal::Class>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::Unreal::Class> Unreal::NewObjectParams::Builder::disownUeClass() {
+  return ::capnp::_::PointerHelpers< ::Unreal::Class>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+#endif  // !CAPNP_LITE
+
+inline bool Unreal::NewObjectResults::Reader::hasObject() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool Unreal::NewObjectResults::Builder::hasObject() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline ::capnp::AnyPointer::Reader Unreal::NewObjectResults::Reader::getObject() const {
+  return ::capnp::AnyPointer::Reader(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline ::capnp::AnyPointer::Builder Unreal::NewObjectResults::Builder::getObject() {
+  return ::capnp::AnyPointer::Builder(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline ::capnp::AnyPointer::Builder Unreal::NewObjectResults::Builder::initObject() {
+  auto result = ::capnp::AnyPointer::Builder(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+  result.clear();
+  return result;
+}
 
 
 CAPNP_END_HEADER
