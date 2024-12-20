@@ -66,8 +66,8 @@ public:
 
 uint32 FRpcServerRunnable::Run()
 {
-	do
-	{
+	// do
+	// {
 		auto IoContext = kj::setupAsyncIo();
 		kj::Network& Network = IoContext.provider->getNetwork();
 		kj::Own<kj::NetworkAddress> Addr = Network.parseAddress("127.0.0.1:6003").wait(IoContext.waitScope);
@@ -79,7 +79,7 @@ uint32 FRpcServerRunnable::Run()
 		UE_LOG(LogTemp, Display, TEXT("Listening on %s"), *AddrStr);
 		Server.listen(*Listener).wait(IoContext.waitScope);
 		
-	} while(bRunningServer);
+	// } while(bRunningServer);
 
 	return 0;
 }
@@ -87,12 +87,14 @@ uint32 FRpcServerRunnable::Run()
 void FRpcServerRunnable::Exit()
 {
 	bRunningServer = false;
+	Listener.attach();
 	Listener = nullptr;
 }
 
 void FRpcServerRunnable::Stop()
 {
 	bRunningServer = false;
+	Listener.attach();
 	Listener = nullptr;
 }
 
