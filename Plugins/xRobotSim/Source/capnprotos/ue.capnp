@@ -6,7 +6,7 @@ interface Unreal {
     }
 
     interface Object {
-        constructor @0 (outer :Object, name :Text, objectFlags :UInt32) ->();
+        loadAl578a947201922d @0 (inName :Text) -> (object :Object);
         createDefaultSubobject @1 (p0 :Text, p1 :Class, p2 :Class, p3 :Bool, p4 :Bool) -> (object :Object);
         executeUbergraph @2 (entryPoint :Int32) -> ();
         getClass @3 () -> (class :Class);
@@ -26,18 +26,17 @@ interface Unreal {
     }
 
     interface Class {
-        constructor @0 (outer :Object, name :Text, objectFlags :UInt32) ->();
-        staticClass @1 () -> (class :Class);
-        find @2 (originInName :Text, outer :Object) -> (object :Object);
-        load @3 (inName :Text) -> (object :Object);
+        staticClass @0 () -> (class :Class);
+        find @1 (originInName :Text, outer :Object) -> (object :Object);
+        load @2 (inName :Text) -> (object :Object);
     }
 
     interface MyObject extends(Object) {
-        constructor @0 ();
-        add @1 (obj :Pointer, p0 :Int32, p1 :Int32) -> (res :Int32);
-        sub @2 (obj :Pointer, p0 :Int32, p1 :Int32) -> (res :Int32);
-        mul @3 (obj :Pointer, p0 :Int32, p1 :Int32) -> (res :Int32);
-        div @4 (obj :Pointer, p0 :Int32, p1 :Int32) -> (res :Int32);
+        printf8a87dbfe30d69b66Static @0 (p0 :Text) -> ();
+        add @1 (p0 :Int32, p1 :Int32) -> (res :Int32);
+        sub @2 (p0 :Int32, p1 :Int32) -> (res :Int32);
+        mul @3 (p0 :Int32, p1 :Int32) -> (res :Int32);
+        div @4 (p0 :Int32, p1 :Int32) -> (res :Int32);
 
         staticClass @5 () -> (class :Class);
         find @6 (originInName :Text, outer :Object) -> (object :Object);
@@ -48,5 +47,8 @@ interface Unreal {
         }
     }
 
-    newObject @0 (ueClass :Class) -> (object :AnyPointer); 
+    newUEObject @0 (className :Text) -> (object :Pointer);
+    createMyObject @1 () -> (object :MyObject);
+    createClass @2 () -> (object :Class);
+    createObject @3 () -> (object :Object);
 }
