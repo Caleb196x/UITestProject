@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using UnrealBuildTool;
-
 public class xRobotRpc : ModuleRules
 {
     public xRobotRpc(ReadOnlyTargetRules Target) : base(Target)
@@ -75,8 +74,5 @@ public class xRobotRpc : ModuleRules
     {
         string CapnprotoPath = Path.Combine(ModuleDirectory, "ThirdParty", "capnproto");
         string CapnpCompilerPath = Path.Combine(CapnprotoPath, "bin", "Windows", "capnp.exe");
-        
-        
-        
     }
 }

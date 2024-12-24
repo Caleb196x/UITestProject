@@ -1,4 +1,8 @@
 #pragma once
+#include <memory>
+#include <vector>
+
+#include "PropertyWrapper.h"
 
 namespace xRobotRpc
 {
@@ -10,7 +14,9 @@ namespace xRobotRpc
 			Init(InFunction);
 		}
 
-		void Call();
+		void Call(UObject* CallObject, void* Params);
+
+		FString GetName() const { return Function->GetName(); }
 
 		bool IsStaticFunc() const
 		{
@@ -18,7 +24,7 @@ namespace xRobotRpc
 		}
 		
 	private:
-		void Init(UFunction* InFunction);
+		void Init(UFunction* InFunction, bool bIsDelegate = false);
 
 		void SlowCall();
 
@@ -33,6 +39,12 @@ namespace xRobotRpc
 		uint32 ParamsBufferSize;
 		
 		UFunction* Function;
+
+		void* ArgumentDefaultValues;
+
+		std::vector<std::unique_ptr<FPropertyWrapper>> Arguments;
+
+		std::unique_ptr<FPropertyWrapper> Return;
 	};
 }
 

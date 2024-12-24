@@ -7,31 +7,25 @@ namespace xRobotRpc
 	void FStructTypeContainer::Init()
 	{
 		// TODO: process native cpp type
-
-		// TODO: process properties
+		
+		for (TFieldIterator<FProperty> PropIter(Struct.Get(), EFieldIteratorFlags::ExcludeSuper); PropIter; ++PropIter)
+		{
+			CreatePropertyWrapper(*PropIter);
+		}
 
 		// 只有UClass才存在方法
 		if (const UClass* Class = Cast<UClass>(Struct.Get()))
 		{
 			for (TFieldIterator<UFunction> FuncIter(Class, EFieldIteratorFlags::ExcludeSuper); FuncIter; ++FuncIter)
 			{
-				UFunction* Function = *FuncIter;
-				FName FuncName = Function->GetFName();
-				// 判断是否已经在FunctionsMap已经存在
-				if (!FunctionsMap.Contains(FuncName))
-				{
-					continue;
-				}
-				
 				CreateFunctionWrapper(*FuncIter);
 			}
-			
 		}
 	}
 
 	UObject* FStructTypeContainer::New(FString Name, EObjectFlags ObjectFlags)
 	{
-		return nullptr;
+		ThrowRuntimeRpcException("Can not create UStruct directly, please create UScriptClass or UClass");
 	}
 
 	std::shared_ptr<FFunctionWrapper> FStructTypeContainer::FindFunction(FString FuncName)
