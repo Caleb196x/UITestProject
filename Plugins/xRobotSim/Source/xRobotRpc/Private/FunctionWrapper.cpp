@@ -154,10 +154,20 @@ namespace xRobotRpc
 		}
 	}
 
-	void FFunctionWrapper::Call()
+	void FFunctionWrapper::Call(UObject* CallObject, const std::vector<std::any>& Params, std::vector<std::any>& Outputs/*第0个元素是return的返回值*/)
 	{
-		
+		TWeakObjectPtr<UFunction> CallFuncPtr = !bIsInterfaceFunction ? Function : CallObject->GetClass()->FindFunctionByName(Function->GetFName());
+		void* CallStackParams = ParamsBufferSize > 0 ? FMemory_Alloca(ParamsBufferSize) : nullptr;
 	}
 
+	void FFunctionWrapper::CallStatic(const std::vector<std::any>& Params, std::vector<std::any>& Outputs)
+	{
+		if (!DefaultBindObject)
+		{
+			DefaultBindObject = Function->GetOuterUClass()->GetDefaultObject();
+		}
+
+		Call(DefaultBindObject, Params, Outputs);
+	}
 
 }

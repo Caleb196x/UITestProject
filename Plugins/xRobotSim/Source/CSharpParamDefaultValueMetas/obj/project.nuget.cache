@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "JYNXS0bS0GDutmztRpAM34i2Y0CbJCzBIvbKsg35MGPNoDabypW+QSuwUhH7pWq+gX6aXcqAUE/OD+4IdxTDfg==",
+  "success": true,
+  "projectFilePath": "D:\\WorkSpace\\UITestProject\\Plugins\\xRobotSim\\Source\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -71,7 +71,24 @@ public:
 
 		// 从对象列表中获取Uobject对象，并调用对象的函数
 		UObject* CorrObject = FObjectHolder::Get().GetUObject(this);
+		void* a = static_cast<void*>(&p0);
+		void* b = static_cast<void*>(&p1);
 		
+		
+		return kj::READY_NOW;
+	}
+
+	virtual kj::Promise<void> staticClass(StaticClassContext context) override
+	{
+		auto r0 = context.getResults();
+		r0.setClass(kj::heap<ClassImpl>());
+		return kj::READY_NOW;
+	}
+
+	virtual kj::Promise<void> find(FindContext context) override
+	{
+		auto p0 = context.getParams().getOuter();
+		auto p1 = context.getParams().getOriginInName();
 		
 		return kj::READY_NOW;
 	}
@@ -135,6 +152,8 @@ public:
 	virtual kj::Promise<void> createObject(CreateObjectContext context) override
 	{
 		context.getResults().setObject(kj::heap<ObjectImpl>());
+		context.getResults().setA("Text");
+		auto oa = context.getParams().getA();
 		return kj::READY_NOW;
 	}
 };

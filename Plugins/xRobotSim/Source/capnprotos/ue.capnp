@@ -23,6 +23,10 @@ interface Unreal {
         staticClass @13 () -> (class :Class);
         find @14 (originInName :Text, outer :Object) -> (object :Object);
         load @15 (inName :Text) -> (object :Object);
+
+        struct Properties {
+            name @0 :Text;
+        }
     }
 
     interface Class {
@@ -39,16 +43,12 @@ interface Unreal {
         div @4 (p0 :Int32, p1 :Int32) -> (res :Int32);
 
         staticClass @5 () -> (class :Class);
-        find @6 (originInName :Text, outer :Object) -> (object :Object);
+        find @6 (originInName :Text, outer :Object.Properties) -> (object :Object);
         load @7 (inName :Text) -> (object :Object);
-
-        struct Properties {
-            name @0 :Text;
-        }
     }
 
     newUEObject @0 (className :Text) -> (object :Pointer);
     createMyObject @1 () -> (object :MyObject);
     createClass @2 () -> (object :Class);
-    createObject @3 () -> (object :Object);
+    createObject @3 (a: Text) -> (object :Object, a: Text);
 }

@@ -21,4 +21,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Printf", ScriptName = "Printf"), Category="Test")
 	static void Printf(FString text);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "MTestArrayParam", ScriptName = "MTestArrayParam"), Category="Test")
+	void MTestArrayParam(UMyObject* array);
 };

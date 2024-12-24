@@ -12,6 +12,7 @@ public:
 
 	void RegisterToRetainer(void* GrpcObj, UObject* ObjectPtr)
 	{
+		ObjectPtr->AddToRoot();
 		UserObjectRetainer.Add(GrpcObj, ObjectPtr);
 	}
 
@@ -19,6 +20,8 @@ public:
 	{
 		UObject* ObjectPtr;
 		UserObjectRetainer.RemoveAndCopyValue(GrpcObj, ObjectPtr);
+		ObjectPtr->RemoveFromRoot();
+		
 		ObjectPtr = nullptr;
 	}
 

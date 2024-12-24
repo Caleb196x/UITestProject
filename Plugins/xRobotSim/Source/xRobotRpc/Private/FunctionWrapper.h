@@ -1,4 +1,5 @@
 #pragma once
+#include <any>
 #include <memory>
 #include <vector>
 
@@ -14,7 +15,9 @@ namespace xRobotRpc
 			Init(InFunction);
 		}
 
-		void Call(UObject* CallObject, void* Params);
+		void Call(UObject* CallObject, const std::vector<std::any>& Params, std::vector<std::any>& Outputs/*第0个元素是return的返回值*/);
+
+		void CallStatic(const std::vector<std::any>& Params, std::vector<std::any>& Outputs);
 
 		FString GetName() const { return Function->GetName(); }
 
@@ -39,6 +42,8 @@ namespace xRobotRpc
 		uint32 ParamsBufferSize;
 		
 		UFunction* Function;
+
+		UObject* DefaultBindObject;
 
 		void* ArgumentDefaultValues;
 
