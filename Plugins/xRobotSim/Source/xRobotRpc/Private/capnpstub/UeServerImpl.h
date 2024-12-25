@@ -40,7 +40,11 @@ public:
 
 	virtual kj::Promise<void> find(FindContext context) override;
 
-	virtual kj::Promise<void> load(LoadContext context) override;
+	virtual kj::Promise<void> load(LoadContext context) override
+	{
+		return kj::READY_NOW;
+	}
+
 };
 
 class ClassImpl final : public Unreal::Class::Server

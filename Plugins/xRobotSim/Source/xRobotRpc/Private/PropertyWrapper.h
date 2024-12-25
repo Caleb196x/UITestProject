@@ -33,11 +33,15 @@ namespace xRobotRpc
 		virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const = 0;
 
 		virtual bool UeValueToAny(const void* ValuePtr, std::any& OutValue) const = 0;
-
+		
 		virtual bool IsOutProperty() const
 		{
 			return bIsOut;
 		}
+
+		FORCEINLINE std::any Getter();
+		
+		FORCEINLINE void Setter(const std::any& InValue);
 
 		FORCEINLINE bool AnyToUeValueInContainer(const std::any& InValue, void* ContainerPtr) const
 		{
@@ -50,6 +54,16 @@ namespace xRobotRpc
 		}
 		
 		FORCEINLINE FProperty* GetProperty() const { return PropertyWeakPtr.Get(); }
+
+		FORCEINLINE bool IsPropertyValid() const
+		{
+			if (!PropertyWeakPtr.IsValid())
+			{
+				return false;
+			}
+
+			return true;
+		}
 	private:
 		union
 		{
