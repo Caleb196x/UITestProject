@@ -31,7 +31,7 @@ namespace xRobotRpc
 
 		void SlowCall();
 
-		void FastCall();
+		void FastCall(UObject* CallObject, UFunction* CallFunction, const std::vector<std::any>& Params, std::vector<std::any>& Outputs, void* StackParams);
 
 		bool bIsStatic;
 

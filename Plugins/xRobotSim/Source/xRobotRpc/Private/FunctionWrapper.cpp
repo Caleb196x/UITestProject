@@ -158,6 +158,8 @@ namespace xRobotRpc
 	{
 		TWeakObjectPtr<UFunction> CallFuncPtr = !bIsInterfaceFunction ? Function : CallObject->GetClass()->FindFunctionByName(Function->GetFName());
 		void* CallStackParams = ParamsBufferSize > 0 ? FMemory_Alloca(ParamsBufferSize) : nullptr;
+
+		FastCall(CallObject, CallFuncPtr.Get(), Params, Outputs, CallStackParams);
 	}
 
 	void FFunctionWrapper::CallStatic(const std::vector<std::any>& Params, std::vector<std::any>& Outputs)
@@ -170,4 +172,111 @@ namespace xRobotRpc
 		Call(DefaultBindObject, Params, Outputs);
 	}
 
+	void FFunctionWrapper::FastCall(
+		UObject* CallObject,
+		UFunction* CallFunction,
+		const std::vector<std::any>& Params,
+		std::vector<std::any>& Outputs,
+		void* StackParams)
+	{
+		if (StackParams)
+		{
+			FMemory::Memzero(StackParams, ParamsBufferSize);
+			if (Return)
+			{
+				Return->GetProperty()->InitializeValue_InContainer(StackParams);
+			}
+		}
+
+		FFrame NewStack(CallObject, CallFunction, StackParams, nullptr, CallFunction->ChildProperties);
+		checkSlow(NewStack.Locals || CallFunction->ParmsSize == 0);
+		FOutParmRec** LastOutParams = &NewStack.OutParms;
+		int ParamIndex = 0;
+		for (TFieldIterator<FProperty> PropIter(CallFunction); PropIter; ++PropIter)
+		{
+			FProperty* Property = *PropIter;
+			FOutParmRec* Out = nullptr;
+			if (Property->HasAnyPropertyFlags(CPF_OutParm))
+			{
+				CA_SUPPRESS(6263)
+				Out = static_cast<FOutParmRec*>(FMemory_Alloca(sizeof(FOutParmRec)));
+				Out->Property = Property;
+				if (*LastOutParams)
+				{
+					(*LastOutParams)->NextOutParm = Out;
+					LastOutParams = &(*LastOutParams)->NextOutParm;
+				}
+				else
+				{
+					*LastOutParams = Out;
+				}
+			}
+
+			if (Property->HasAnyPropertyFlags(CPF_ReturnParm))
+			{
+				if (Property->HasAnyPropertyFlags(CPF_OutParm))
+				{
+					Out->PropAddr = Property->ContainerPtrToValuePtr<uint8>(StackParams);
+				}
+
+				continue;
+			}
+
+			// TODO: handle default value
+
+			Property->InitializeValue_InContainer(StackParams);
+			if (Property->HasAnyPropertyFlags(CPF_OutParm))
+			{
+				
+			}
+			else
+			{
+				// set argument value to property
+			}
+
+			++ParamIndex;
+		}
+
+		if (CallFunction->HasAllFunctionFlags(FUNC_HasOutParms))
+		{
+			if (*LastOutParams)
+			{
+				(*LastOutParams)->NextOutParm = nullptr;
+			}
+		}
+
+		const bool bHasReturn = CallFunction->ReturnValueOffset != MAX_uint16;
+		uint8* ReturnValAddr = bHasReturn ? static_cast<uint8*>(StackParams + CallFunction->ReturnValueOffset) : nullptr;
+		CallFunction->Invoke(CallObject, NewStack, ReturnValAddr);
+
+		LastOutParams = &NewStack.OutParms;
+		for (int i = 0; i < Arguments.size(); ++i)
+		{
+			auto PropFlags = Arguments[i]->GetProperty()->PropertyFlags;
+			if (PropFlags & CPF_OutParm)
+			{
+				if (PropFlags & CPF_Parm &&
+					!(PropFlags & CPF_ConstParm) &&
+					!(PropFlags & CPF_ReturnParm))
+				{
+					auto PropAddr = (*LastOutParams)->PropAddr;
+					if (PropAddr >= static_cast<uint8*>(StackParams) &&
+						PropAddr < static_cast<uint8*>(StackParams + ParamsBufferSize))
+					{
+						// write outputs
+					}
+					else
+					{
+						LastOutParams = &(*LastOutParams)->NextOutParm;
+						continue;
+					}
+				}
+				
+				LastOutParams = &(*LastOutParams)->NextOutParm;
+			}
+			
+		}
+	}
+
+	
 }
