@@ -34,15 +34,19 @@ namespace xRobotRpc
 
 		virtual bool UeValueToAny(const void* ValuePtr, std::any& OutValue) const = 0;
 		
-		virtual bool IsOutProperty() const
+		virtual void Cleanup(void* ContainerPtr) const {}
+		
+		virtual ~FPropertyWrapper() {}
+
+		std::any Getter(UObject* Owner);
+		
+		void Setter(UObject* Owner, const std::any& InValue);
+
+		FORCEINLINE bool IsOutProperty() const
 		{
 			return bIsOut;
 		}
-
-		FORCEINLINE std::any Getter();
 		
-		FORCEINLINE void Setter(const std::any& InValue);
-
 		FORCEINLINE bool AnyToUeValueInContainer(const std::any& InValue, void* ContainerPtr) const
 		{
 			return AnyToUeValue(InValue, Property->ContainerPtrToValuePtr<void>(ContainerPtr));
@@ -61,15 +65,42 @@ namespace xRobotRpc
 			{
 				return false;
 			}
-
+			
 			return true;
 		}
-	private:
+
+		FORCEINLINE FString GetCppType() const { return Property->GetCPPType(); }
+		
+	protected:
+
+		// auto cast to different property type
 		union
 		{
 			FProperty* Property;
+			FNumericProperty* NumericProperty;
+			FIntProperty* IntProperty;
+			FEnumProperty* EnumProperty;
+			FBoolProperty* BoolProperty;
+			FObjectProperty* ObjectProperty;
+			FSoftObjectProperty* SoftObjectProperty;
+			FSoftClassProperty* SoftClassProperty;
+			FInterfaceProperty* InterfaceProperty;
+			FNameProperty* NameProperty;
+			FStrProperty* StrProperty;
+			FTextProperty* TextProperty;
+			FArrayProperty* ArrayProperty;
+			FMapProperty* MapProperty;
+			FSetProperty* SetProperty;
+			FStructProperty* StructProperty;
+			FDelegateProperty* DelegateProperty;
+			FMulticastDelegateProperty* MulticastDelegateProperty;
+			FClassProperty* ClassProperty;
+#if ENGINE_MAJOR_VERSION > 4 ||ENGINE_MAJOR_VERSION >= 25
+			FFieldPathProperty* FieldPathProperty;
+#endif
+			
 		};
-
+		
 		bool bOwnerIsClass;
 
 		bool bNeedLinkOuter;

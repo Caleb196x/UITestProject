@@ -44,7 +44,6 @@ public:
 	{
 		return kj::READY_NOW;
 	}
-
 };
 
 class ClassImpl final : public Unreal::Class::Server
@@ -70,8 +69,8 @@ public:
 
 	virtual kj::Promise<void> div(DivContext context) override
 	{
-		auto p0 = context.getParams().getP0();
-		auto p1 = context.getParams().getP1();
+		int32 p0 = context.getParams().getP0();
+		int32 p1 = context.getParams().getP1();
 
 		// 从对象列表中获取Uobject对象，并调用对象的函数
 		UObject* CorrObject = FObjectHolder::Get().GetUObject(this);
