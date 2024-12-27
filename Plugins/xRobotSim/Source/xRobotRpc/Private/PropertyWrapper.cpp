@@ -49,6 +49,7 @@ namespace xRobotRpc
 	
 	class FInt32PropertyWrapper : public FPropertyWrapper
 	{
+	public:
 		explicit FInt32PropertyWrapper(FProperty* InProperty) : FPropertyWrapper(InProperty) {}
 
 		virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const override
@@ -70,6 +71,7 @@ namespace xRobotRpc
 
 	class FUInt32PropertyWrapper : public FPropertyWrapper
 	{
+	public:
 		explicit FUInt32PropertyWrapper(FProperty* InProperty) : FPropertyWrapper(InProperty) { }
 
 		virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const override
@@ -91,6 +93,7 @@ namespace xRobotRpc
 
 	class FInt64PropertyWrapper : public FPropertyWrapper
 	{
+	public:
 		explicit FInt64PropertyWrapper(FProperty* InProperty) : FPropertyWrapper(InProperty) { }
 
 		virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const override
@@ -112,6 +115,7 @@ namespace xRobotRpc
 
 	class FUInt64PropertyWrapper : public FPropertyWrapper
 	{
+	public:
 		explicit FUInt64PropertyWrapper(FProperty* InProperty) : FPropertyWrapper(InProperty) { }
 
 		virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const override
@@ -133,6 +137,7 @@ namespace xRobotRpc
 
 	class FNumberPropertyWrapper : public FPropertyWrapper
 	{
+	public:
 		explicit FNumberPropertyWrapper(FProperty* InProperty) : FPropertyWrapper(InProperty) { }
 
 		virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const override
@@ -154,6 +159,7 @@ namespace xRobotRpc
 
 	class FBooleanPropertyWrapper : public FPropertyWrapper
 	{
+	public:
 		explicit FBooleanPropertyWrapper(FProperty* InProperty) : FPropertyWrapper(InProperty) { }
 
 		virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const override
@@ -175,6 +181,7 @@ namespace xRobotRpc
 
 	class FEnumPropertyWrapper : public FPropertyWrapper
 	{
+	public:
 		explicit FEnumPropertyWrapper(FProperty* InProperty) : FPropertyWrapper(InProperty) { }
 
 		virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const override
@@ -196,6 +203,7 @@ namespace xRobotRpc
 
 	class FPropertyWrapperWithDestructor : public FPropertyWrapper
 	{
+	public:
 		explicit FPropertyWrapperWithDestructor(FProperty* InProperty) : FPropertyWrapper(InProperty) {}
 
 		virtual void Cleanup(void* ContainerPtr) const override
@@ -206,6 +214,7 @@ namespace xRobotRpc
 
 	class FStringPropertyWrapper : public FPropertyWrapperWithDestructor
 	{
+	public:
 		explicit FStringPropertyWrapper(FProperty* InProperty) : FPropertyWrapperWithDestructor(InProperty) {}
 
 		virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const override
@@ -219,8 +228,71 @@ namespace xRobotRpc
 		virtual bool UeValueToAny(const void* ValuePtr, std::any& OutValue) const override
 		{
 			CATCH_ANY_CAST_EXCEPTION({
-				
+				FString Value = StrProperty->GetPropertyValue(ValuePtr);
+				OutValue = Value;
 			}, "FString")
+		}
+	};
+
+	class FNamePropertyWrapper : public FPropertyWrapperWithDestructor
+	{
+	public:
+		explicit FNamePropertyWrapper(FProperty* InProperty) : FPropertyWrapperWithDestructor(InProperty) {}
+
+		virtual bool UeValueToAny(const void* ValuePtr, std::any& OutValue) const override
+		{
+			CATCH_ANY_CAST_EXCEPTION({
+				const FName Value = NameProperty->GetPropertyValue(ValuePtr);
+				const FString StrVal = Value.ToString();
+				OutValue = StrVal;
+			}, "Name")
+		}
+
+		virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const override
+		{
+			CATCH_ANY_CAST_EXCEPTION({
+				const FString Value = std::any_cast<FString>(InValue);
+				const FName NameVal = FName(*Value);
+				NameProperty->SetPropertyValue(ValuePtr, NameVal);
+			}, "Name")
+		}
+	};
+
+	class FTextPropertyWrapper : public FPropertyWrapperWithDestructor
+	{
+	public:
+		explicit FTextPropertyWrapper(FProperty* InProperty) : FPropertyWrapperWithDestructor(InProperty) {}
+
+		virtual bool UeValueToAny(const void* ValuePtr, std::any& OutValue) const override
+		{
+			CATCH_ANY_CAST_EXCEPTION({
+				const FText TextVal = TextProperty->GetPropertyValue(ValuePtr);
+				const FString StrVal = TextVal.ToString();
+				OutValue = StrVal;
+			}, "Text")
+		}
+
+		virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const override
+		{
+			CATCH_ANY_CAST_EXCEPTION({
+				const FString Value = std::any_cast<FString>(InValue);
+				const FText TextVal = FText::FromString(Value);
+				TextProperty->SetPropertyValue(ValuePtr, TextVal);
+			}, "Text")
+		}
+	};
+
+	class FObjectPropertyWrapper : public FPropertyWrapperWithDestructor
+	{
+	public:
+		explicit FObjectPropertyWrapper(FProperty* InProperty) : FPropertyWrapperWithDestructor(InProperty) {}
+
+		virtual bool UeValueToAny(const void* ValuePtr, std::any& OutValue) const override
+		{
+			CATCH_ANY_CAST_EXCEPTION({
+				UObject* UEObj = ObjectProperty->GetObjectPropertyValue(ValuePtr);
+				
+			}, "Object")
 		}
 	};
 }
