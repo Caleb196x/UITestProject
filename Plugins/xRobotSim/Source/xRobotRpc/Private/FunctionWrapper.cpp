@@ -38,7 +38,11 @@ namespace xRobotRpc
 
 		ParamsBufferSize = InFunction->PropertiesSize > InFunction->ParmsSize ?
 			InFunction->PropertiesSize : InFunction->ParmsSize;
-
+		
+#if WITH_EDITOR
+		FunctionName = Function->GetFName();
+#endif
+		
 		if (!bIsDelegate)
 		{
 			UClass* OuterClass = InFunction->GetOuterUClass();
@@ -158,7 +162,13 @@ namespace xRobotRpc
 	{
 		TWeakObjectPtr<UFunction> CallFuncPtr = !bIsInterfaceFunction ? Function : CallObject->GetClass()->FindFunctionByName(Function->GetFName());
 		void* CallStackParams = ParamsBufferSize > 0 ? FMemory_Alloca(ParamsBufferSize) : nullptr;
-
+#if WITH_EDITOR
+		if (!CallFuncPtr.IsValid())
+		{
+			CallFuncPtr = CallObject->GetClass()->FindFunctionByName(FunctionName);
+			Init(CallFuncPtr.Get(), false);
+		}
+#endif
 		FastCall(CallObject, CallFuncPtr.Get(), Params, Outputs, CallStackParams);
 	}
 

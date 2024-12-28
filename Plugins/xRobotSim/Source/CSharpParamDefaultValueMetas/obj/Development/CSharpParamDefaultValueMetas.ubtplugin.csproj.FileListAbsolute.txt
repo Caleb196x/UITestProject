@@ -20,3 +20,14 @@ D:\WorkSpace\UITestProject\Plugins\xRobotSim\Source\CSharpParamDefaultValueMetas
 D:\WorkSpace\UITestProject\Plugins\xRobotSim\Source\CSharpParamDefaultValueMetas\obj\Development\refint\CSharpParamDefaultValueMetas.dll
 D:\WorkSpace\UITestProject\Plugins\xRobotSim\Source\CSharpParamDefaultValueMetas\obj\Development\CSharpParamDefaultValueMetas.pdb
 D:\WorkSpace\UITestProject\Plugins\xRobotSim\Source\CSharpParamDefaultValueMetas\obj\Development\CSharpParamDefaultValueMetas.ubtplugin.csproj.CopyComplete
+F:\AI_UI\UITestProject\Binaries\DotNET\UnrealBuildTool\Plugins\CSharpParamDefaultValueMetas\CSharpParamDefaultValueMetas.deps.json
+F:\AI_UI\UITestProject\Binaries\DotNET\UnrealBuildTool\Plugins\CSharpParamDefaultValueMetas\CSharpParamDefaultValueMetas.dll
+F:\AI_UI\UITestProject\Binaries\DotNET\UnrealBuildTool\Plugins\CSharpParamDefaultValueMetas\ref\CSharpParamDefaultValueMetas.dll
+F:\AI_UI\UITestProject\Binaries\DotNET\UnrealBuildTool\Plugins\CSharpParamDefaultValueMetas\CSharpParamDefaultValueMetas.pdb
+F:\AI_UI\UITestProject\Plugins\xRobotSim\Source\CSharpParamDefaultValueMetas\obj\Development\CSharpParamDefaultValueMetas.ubtplugin.csproj.AssemblyReference.cache
+F:\AI_UI\UITestProject\Plugins\xRobotSim\Source\CSharpParamDefaultValueMetas\obj\Development\CSharpParamDefaultValueMetas.ubtplugin.GeneratedMSBuildEditorConfig.editorconfig
+F:\AI_UI\UITestProject\Plugins\xRobotSim\Source\CSharpParamDefaultValueMetas\obj\Development\CSharpParamDefaultValueMetas.ubtplugin.csproj.CoreCompileInputs.cache
+F:\AI_UI\UITestProject\Plugins\xRobotSim\Source\CSharpParamDefaultValueMetas\obj\Development\CSharpParamDefaultValueMetas.ubtplugin.csproj.CopyComplete
+F:\AI_UI\UITestProject\Plugins\xRobotSim\Source\CSharpParamDefaultValueMetas\obj\Development\CSharpParamDefaultValueMetas.dll
+F:\AI_UI\UITestProject\Plugins\xRobotSim\Source\CSharpParamDefaultValueMetas\obj\Development\refint\CSharpParamDefaultValueMetas.dll
+F:\AI_UI\UITestProject\Plugins\xRobotSim\Source\CSharpParamDefaultValueMetas\obj\Development\CSharpParamDefaultValueMetas.pdb

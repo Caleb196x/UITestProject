@@ -38,7 +38,11 @@ namespace xRobotRpc
 		bool bSkipWorldContextInArg0;
 
 		bool bIsInterfaceFunction;
-
+		
+#if WITH_EDITOR
+		FName FunctionName;
+#endif
+		
 		uint32 ParamsBufferSize;
 		
 		UFunction* Function;

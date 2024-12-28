@@ -155,8 +155,6 @@ public:
 	virtual kj::Promise<void> createObject(CreateObjectContext context) override
 	{
 		context.getResults().setObject(kj::heap<ObjectImpl>());
-		context.getResults().setA("Text");
-		auto oa = context.getParams().getA();
 		return kj::READY_NOW;
 	}
 };
