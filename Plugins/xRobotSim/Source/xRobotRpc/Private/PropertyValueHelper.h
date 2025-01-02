@@ -1,11 +1,10 @@
 ﻿#pragma once
 
-namespace xRobotRpc
+
+class FPropertyValueHelper
 {
-	class FPropertyValueHelper
-	{
-	public:
-	
-	};
-}
+public:
+
+};
+
 

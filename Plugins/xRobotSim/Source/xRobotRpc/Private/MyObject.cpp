@@ -26,9 +26,5 @@ void UMyObject::Printf(FString text)
 	UE_LOG(LogTemp, Display, TEXT("%s"), *text)
 }
 
-void UMyObject::MTestArrayParam(TArray<int32>* array)
-{
-	
-}
 
 

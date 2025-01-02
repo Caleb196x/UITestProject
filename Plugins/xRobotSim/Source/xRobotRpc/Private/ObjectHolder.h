@@ -25,7 +25,7 @@ public:
 		ObjectPtr = nullptr;
 	}
 
-	UObject* GetUObject(void* GrpcObj)
+	UObject* GetUObject(const void* GrpcObj)
 	{
 		if (UserObjectRetainer.Contains(GrpcObj))
 		{
@@ -35,6 +35,11 @@ public:
 		{
 			return nullptr;
 		}
+	}
+
+	bool HasObject(const void* GrpcObj) const
+	{
+		return UserObjectRetainer.Contains(GrpcObj);
 	}
 	
 private:

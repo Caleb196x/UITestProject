@@ -3,7 +3,7 @@
 #include <capnp/rpc-twoparty.h>
 #include <kj/async-io.h>
 
-#include "CoreUtils.h"
+#include "..\CoreRpcUtils.h"
 #include "MyObject.h"
 #include "ObjectHolder.h"
 #include "RpcException.h"
@@ -144,7 +144,7 @@ public:
 			
 			return kj::READY_NOW;
 			
-		} catch (const xRobotRpc::FRuntimeRpcException& e)
+		} catch (const FRuntimeRpcException& e)
 		{
 			return kj::Promise<void>(kj::Exception(kj::Exception::Type::FAILED,
 				e.file(), e.line(), kj::str(e.what())));
