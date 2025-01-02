@@ -1,6 +1,8 @@
 #pragma once
 #include <any>
 #include <memory>
+#include <string>
+#include <map>
 #include <vector>
 
 #include "PropertyWrapper.h"
@@ -13,9 +15,9 @@ public:
 		Init(InFunction);
 	}
 
-	void Call(UObject* CallObject, const std::vector<std::any>& Params, std::vector<std::any>& Outputs/*第0个元素是return的返回值*/);
+	void Call(UObject* CallObject, const std::vector<void*>& Params, std::map<std::string, void*>& Outputs/*第0个元素是return的返回值*/);
 
-	void CallStatic(const std::vector<std::any>& Params, std::vector<std::any>& Outputs);
+	void CallStatic(const std::vector<void*>& Params, std::map<std::string, void*>& Outputs);
 
 	FString GetName() const { return Function->GetName(); }
 
@@ -29,7 +31,7 @@ private:
 
 	void SlowCall();
 
-	void FastCall(UObject* CallObject, UFunction* CallFunction, const std::vector<std::any>& Params, std::vector<std::any>& Outputs, void* StackParams);
+	void FastCall(UObject* CallObject, UFunction* CallFunction, const std::vector<void*>& Params, std::map<std::string, void*>& Outputs, void* StackParams);
 
 	bool bIsStatic;
 

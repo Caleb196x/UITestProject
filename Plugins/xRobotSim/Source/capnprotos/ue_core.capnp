@@ -29,15 +29,15 @@ interface UnrealCore
 
     struct Property
     {
-        class @0 : Class;
+        class @0 :Class;
         name @1 :Text;
         union {
-            boolValue @2 : Bool;
-            uintValue @3 : UInt64;
-            intValue @4 : Int64;
-            strValue @5 : Text;
-            floatValue @6 : Float64;
-            object @7 : Object;
+            boolValue @2 :Bool;
+            uintValue @3 :UInt64;
+            intValue @4 :Int64;
+            strValue @5 :Text;
+            floatValue @6 :Float64;
+            object @7 :Object;
         }
     }
 

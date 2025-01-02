@@ -156,7 +156,7 @@ void FFunctionWrapper::Init(UFunction* InFunction, bool bIsDelegate)
 	}
 }
 
-void FFunctionWrapper::Call(UObject* CallObject, const std::vector<std::any>& Params, std::vector<std::any>& Outputs/*第0个元素是return的返回值*/)
+void FFunctionWrapper::Call(UObject* CallObject, const std::vector<void*>& Params, std::map<std::string, void*>& Outputs/*第0个元素是return的返回值*/)
 {
 	TWeakObjectPtr<UFunction> CallFuncPtr = !bIsInterfaceFunction ? Function : CallObject->GetClass()->FindFunctionByName(Function->GetFName());
 	void* CallStackParams = ParamsBufferSize > 0 ? FMemory_Alloca(ParamsBufferSize) : nullptr;
@@ -170,7 +170,7 @@ void FFunctionWrapper::Call(UObject* CallObject, const std::vector<std::any>& Pa
 	FastCall(CallObject, CallFuncPtr.Get(), Params, Outputs, CallStackParams);
 }
 
-void FFunctionWrapper::CallStatic(const std::vector<std::any>& Params, std::vector<std::any>& Outputs)
+void FFunctionWrapper::CallStatic(const std::vector<void*>& Params, std::map<std::string, void*>& Outputs)
 {
 	if (!DefaultBindObject)
 	{
@@ -183,8 +183,8 @@ void FFunctionWrapper::CallStatic(const std::vector<std::any>& Params, std::vect
 void FFunctionWrapper::FastCall(
 	UObject* CallObject,
 	UFunction* CallFunction,
-	const std::vector<std::any>& Params,
-	std::vector<std::any>& Outputs,
+	const std::vector<void*>& Params,
+	std::map<std::string, void*>& Outputs,
 	void* StackParams)
 {
 	if (StackParams)
