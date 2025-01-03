@@ -11,55 +11,29 @@ public:
 	
 	virtual kj::Promise<void> callFunction(CallFunctionContext context) override;
 
-	virtual kj::Promise<void> callStaticFunction(CallStaticFunctionContext context) override
-	{
-		return kj::READY_NOW;
-	}
+	virtual kj::Promise<void> callStaticFunction(CallStaticFunctionContext context) override;
 
-	virtual kj::Promise<void> findClass(FindClassContext context) override
-	{
-		return kj::READY_NOW;
-	}
+	virtual kj::Promise<void> findClass(FindClassContext context) override;
 
-	virtual kj::Promise<void> loadClass(LoadClassContext context) override
-	{
-		return kj::READY_NOW;
-	}
+	virtual kj::Promise<void> loadClass(LoadClassContext context) override;
 
-	virtual kj::Promise<void> staticClass(StaticClassContext context) override
-	{
-		return kj::READY_NOW;
-	}
+	virtual kj::Promise<void> staticClass(StaticClassContext context) override;
 
-	virtual kj::Promise<void> bindDelegate(BindDelegateContext context) override
-	{
-		return kj::READY_NOW;
-	}
+	virtual kj::Promise<void> bindDelegate(BindDelegateContext context) override;
 
-	virtual kj::Promise<void> unbindDelegate(UnbindDelegateContext context) override
-	{
-		return kj::READY_NOW;
-	}
+	virtual kj::Promise<void> unbindDelegate(UnbindDelegateContext context) override;
 
-	virtual kj::Promise<void> addMultiDelegate(AddMultiDelegateContext context) override
-	{
-		return kj::READY_NOW;
-	}
+	virtual kj::Promise<void> addMultiDelegate(AddMultiDelegateContext context) override;
 
-	virtual kj::Promise<void> removeMultiDelegate(RemoveMultiDelegateContext context) override
-	{
-		return kj::READY_NOW;
-	}
+	virtual kj::Promise<void> removeMultiDelegate(RemoveMultiDelegateContext context) override;
 
-	virtual kj::Promise<void> registerOverrideClass(RegisterOverrideClassContext context) override
-	{
-		return kj::READY_NOW;
-	}
+	virtual kj::Promise<void> registerOverrideClass(RegisterOverrideClassContext context) override;
 
-	virtual kj::Promise<void> unregisterOverrideClass(UnregisterOverrideClassContext context) override
-	{
-		return kj::READY_NOW;
-	}
+	virtual kj::Promise<void> unregisterOverrideClass(UnregisterOverrideClassContext context) override;
+
+	virtual kj::Promise<void> setProperty(SetPropertyContext context) override;
+
+	virtual kj::Promise<void> getProperty(GetPropertyContext context) override;
 
 	virtual ~FUnrealCoreServerImpl() {}
 };
