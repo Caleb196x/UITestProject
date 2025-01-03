@@ -14,6 +14,7 @@ public:
 	{
 		ObjectPtr->AddToRoot();
 		UserObjectRetainer.Add(GrpcObj, ObjectPtr);
+		GrpcObjectRetainer.Add(ObjectPtr, GrpcObj);
 	}
 
 	void RemoveFromRetainer(void* GrpcObj)
@@ -21,6 +22,7 @@ public:
 		UObject* ObjectPtr;
 		UserObjectRetainer.RemoveAndCopyValue(GrpcObj, ObjectPtr);
 		ObjectPtr->RemoveFromRoot();
+		GrpcObjectRetainer.RemoveAndCopyValue(ObjectPtr, GrpcObj);
 		
 		ObjectPtr = nullptr;
 	}
@@ -31,10 +33,18 @@ public:
 		{
 			return *UserObjectRetainer.Find(GrpcObj);
 		}
-		else
+
+		return nullptr;
+	}
+
+	void* GetGrpcObject(const UObject* ObjectPtr)
+	{
+		if (GrpcObjectRetainer.Contains(ObjectPtr))
 		{
-			return nullptr;
+			return *GrpcObjectRetainer.Find(ObjectPtr);
 		}
+
+		return nullptr;
 	}
 
 	bool HasObject(const void* GrpcObj) const
@@ -44,4 +54,5 @@ public:
 	
 private:
 	TMap<void*, UObject*> UserObjectRetainer;
+	TMap<UObject*, void*> GrpcObjectRetainer;
 };

@@ -142,41 +142,42 @@ kj::Promise<void> FUnrealCoreServerImpl::callFunction(CallFunctionContext contex
 	std::map<std::string /* type name */, void*> OutParams;
 	FuncWrapper->Call(FoundObject, PassToParams, OutParams);
 	
-	auto InitRes = context.initResults().initResult(OutParams.size());
+	auto InitRet = context.getResults().initReturn();
+	auto InitOutParams = context.getResults().initOutParams(OutParams.size() - 1);
 
 	auto Iter = OutParams.begin();
-	for (int i = 0; i < OutParams.size() && Iter != OutParams.end(); ++i, ++Iter)
+	if (Iter != OutParams.end())
 	{
-		auto OutParam = *Iter;
-		auto TypeName = OutParam.first;
-		auto Value = OutParam.second;
+		auto ReturnTypeName = Iter->first;
+		auto ReturnValue = Iter->second;
+		InitRet.initClass().setTypeName(ReturnTypeName);
 
-		if (TypeName == "bool")
+		if (ReturnTypeName == "bool")
 		{
-			bool* Result = static_cast<bool*>(Value);
-			InitRes[i].setBoolValue(*Result);
+			bool* Result = static_cast<bool*>(ReturnValue);
+			InitRet.setBoolValue(*Result);
 		}
-		else if (TypeName == "int")
+		else if (ReturnTypeName == "int")
 		{
-			int64_t* Result = static_cast<int64_t*>(Value);
-			InitRes[i].setIntValue(*Result);
+			int64_t* Result = static_cast<int64_t*>(ReturnValue);
+			InitRet.setIntValue(*Result);
 		}
-		else if (TypeName == "uint")
+		else if (ReturnTypeName == "uint")
 		{
-			uint64_t* Result = static_cast<uint64_t*>(Value);
-			InitRes[i].setUintValue(*Result);
+			uint64_t* Result = static_cast<uint64_t*>(ReturnValue);
+			InitRet.setUintValue(*Result);
 		}
-		else if (TypeName == "double")
+		else if (ReturnTypeName == "double")
 		{
-			double* Result = static_cast<double*>(Value);
-			InitRes[i].setFloatValue(*Result);
+			double* Result = static_cast<double*>(ReturnValue);
+			InitRet.setFloatValue(*Result);
 		}
-		else if (TypeName == "str")
+		else if (ReturnTypeName == "str")
 		{
-			const char* Result = static_cast<const char*>(Value);
-			InitRes[i].setStrValue(Result);
+			const char* Result = static_cast<const char*>(ReturnValue);
+			InitRet.setStrValue(Result);
 		}
-		else if (TypeName == "object")
+		else if (ReturnTypeName == "object")
 		{
 			// auto Object =
 			// 如果返回值是当前函数调用分配的对象，在端侧该怎么处理？
@@ -184,7 +185,55 @@ kj::Promise<void> FUnrealCoreServerImpl::callFunction(CallFunctionContext contex
 			// 端侧有个对象类型UTestObject的一个函数声明： UMainActor* CreateOtherActor(FString Name);
 			// 调用时 UMainActor* test = obj->CreateOtherActor("Hello");
 			// 那这个test对象在端侧的内存地址如何传递到ue侧？
-			 
+
+			// 在then函数中传入端侧的test对象指针地址，并且将其存入ObjectHolder中
+			// 
+		}
+
+		++Iter;
+	}
+	
+	for (int i = 0; i < OutParams.size() && Iter != OutParams.end(); ++i, ++Iter)
+	{
+		auto OutParam = *Iter;
+		auto TypeName = OutParam.first;
+		auto Value = OutParam.second;
+
+		InitOutParams[i].initClass().setTypeName(TypeName);
+
+		if (TypeName == "bool")
+		{
+			bool* Result = static_cast<bool*>(Value);
+			InitOutParams[i].setBoolValue(*Result);
+		}
+		else if (TypeName == "int")
+		{
+			int64_t* Result = static_cast<int64_t*>(Value);
+			InitOutParams[i].setIntValue(*Result);
+		}
+		else if (TypeName == "uint")
+		{
+			uint64_t* Result = static_cast<uint64_t*>(Value);
+			InitOutParams[i].setUintValue(*Result);
+		}
+		else if (TypeName == "double")
+		{
+			double* Result = static_cast<double*>(Value);
+			InitOutParams[i].setFloatValue(*Result);
+		}
+		else if (TypeName == "str")
+		{
+			const char* Result = static_cast<const char*>(Value);
+			InitOutParams[i].setStrValue(Result);
+		}
+		else if (TypeName == "object")
+		{
+			// find outer object from ObjectHolder
+			auto OutObj = InitOutParams[i].initObject();
+
+			UObject* ResultPtr = static_cast<UObject*>(Value);
+			void* ObjPtr = FObjectHolder::Get().GetGrpcObject(ResultPtr);
+			OutObj.setAddress(reinterpret_cast<uint64_t>(ObjPtr));
 		}
 	}
 	

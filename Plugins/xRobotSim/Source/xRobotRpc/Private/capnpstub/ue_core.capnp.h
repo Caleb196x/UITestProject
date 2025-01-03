@@ -394,7 +394,7 @@ struct UnrealCore::CallFunctionResults {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(c1e269cbbf7a7e86, 0, 1)
+    CAPNP_DECLARE_STRUCT_HEADER(c1e269cbbf7a7e86, 0, 2)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -424,7 +424,7 @@ struct UnrealCore::CallStaticFunctionResults {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(e874d7934c0342a9, 0, 1)
+    CAPNP_DECLARE_STRUCT_HEADER(e874d7934c0342a9, 0, 2)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -2351,8 +2351,11 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool hasResult() const;
-  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader getResult() const;
+  inline bool hasReturn() const;
+  inline  ::UnrealCore::Argument::Reader getReturn() const;
+
+  inline bool hasOutParams() const;
+  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader getOutParams() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -2382,12 +2385,19 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool hasResult();
-  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder getResult();
-  inline void setResult( ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader value);
-  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder initResult(unsigned int size);
-  inline void adoptResult(::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>> disownResult();
+  inline bool hasReturn();
+  inline  ::UnrealCore::Argument::Builder getReturn();
+  inline void setReturn( ::UnrealCore::Argument::Reader value);
+  inline  ::UnrealCore::Argument::Builder initReturn();
+  inline void adoptReturn(::capnp::Orphan< ::UnrealCore::Argument>&& value);
+  inline ::capnp::Orphan< ::UnrealCore::Argument> disownReturn();
+
+  inline bool hasOutParams();
+  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder getOutParams();
+  inline void setOutParams( ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader value);
+  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder initOutParams(unsigned int size);
+  inline void adoptOutParams(::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>> disownOutParams();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -2407,6 +2417,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
+  inline  ::UnrealCore::Argument::Pipeline getReturn();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -2534,8 +2545,11 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool hasResult() const;
-  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader getResult() const;
+  inline bool hasReturn() const;
+  inline  ::UnrealCore::Argument::Reader getReturn() const;
+
+  inline bool hasOutParams() const;
+  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader getOutParams() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -2565,12 +2579,19 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool hasResult();
-  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder getResult();
-  inline void setResult( ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader value);
-  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder initResult(unsigned int size);
-  inline void adoptResult(::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>> disownResult();
+  inline bool hasReturn();
+  inline  ::UnrealCore::Argument::Builder getReturn();
+  inline void setReturn( ::UnrealCore::Argument::Reader value);
+  inline  ::UnrealCore::Argument::Builder initReturn();
+  inline void adoptReturn(::capnp::Orphan< ::UnrealCore::Argument>&& value);
+  inline ::capnp::Orphan< ::UnrealCore::Argument> disownReturn();
+
+  inline bool hasOutParams();
+  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder getOutParams();
+  inline void setOutParams( ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader value);
+  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder initOutParams(unsigned int size);
+  inline void adoptOutParams(::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>> disownOutParams();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -2590,6 +2611,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
+  inline  ::UnrealCore::Argument::Pipeline getReturn();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -5735,38 +5757,77 @@ inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::S
       ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
 
-inline bool UnrealCore::CallFunctionResults::Reader::hasResult() const {
+inline bool UnrealCore::CallFunctionResults::Reader::hasReturn() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool UnrealCore::CallFunctionResults::Builder::hasResult() {
+inline bool UnrealCore::CallFunctionResults::Builder::hasReturn() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader UnrealCore::CallFunctionResults::Reader::getResult() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
+inline  ::UnrealCore::Argument::Reader UnrealCore::CallFunctionResults::Reader::getReturn() const {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder UnrealCore::CallFunctionResults::Builder::getResult() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
+inline  ::UnrealCore::Argument::Builder UnrealCore::CallFunctionResults::Builder::getReturn() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void UnrealCore::CallFunctionResults::Builder::setResult( ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
+#if !CAPNP_LITE
+inline  ::UnrealCore::Argument::Pipeline UnrealCore::CallFunctionResults::Pipeline::getReturn() {
+  return  ::UnrealCore::Argument::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void UnrealCore::CallFunctionResults::Builder::setReturn( ::UnrealCore::Argument::Reader value) {
+  ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder UnrealCore::CallFunctionResults::Builder::initResult(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
+inline  ::UnrealCore::Argument::Builder UnrealCore::CallFunctionResults::Builder::initReturn() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void UnrealCore::CallFunctionResults::Builder::adoptResult(
-    ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
+inline void UnrealCore::CallFunctionResults::Builder::adoptReturn(
+    ::capnp::Orphan< ::UnrealCore::Argument>&& value) {
+  ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>> UnrealCore::CallFunctionResults::Builder::disownResult() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::UnrealCore::Argument> UnrealCore::CallFunctionResults::Builder::disownReturn() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline bool UnrealCore::CallFunctionResults::Reader::hasOutParams() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline bool UnrealCore::CallFunctionResults::Builder::hasOutParams() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader UnrealCore::CallFunctionResults::Reader::getOutParams() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder UnrealCore::CallFunctionResults::Builder::getOutParams() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline void UnrealCore::CallFunctionResults::Builder::setOutParams( ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder UnrealCore::CallFunctionResults::Builder::initOutParams(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), size);
+}
+inline void UnrealCore::CallFunctionResults::Builder::adoptOutParams(
+    ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>> UnrealCore::CallFunctionResults::Builder::disownOutParams() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
 inline bool UnrealCore::CallStaticFunctionParams::Reader::hasClass() const {
@@ -5876,38 +5937,77 @@ inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::S
       ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
 
-inline bool UnrealCore::CallStaticFunctionResults::Reader::hasResult() const {
+inline bool UnrealCore::CallStaticFunctionResults::Reader::hasReturn() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool UnrealCore::CallStaticFunctionResults::Builder::hasResult() {
+inline bool UnrealCore::CallStaticFunctionResults::Builder::hasReturn() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader UnrealCore::CallStaticFunctionResults::Reader::getResult() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
+inline  ::UnrealCore::Argument::Reader UnrealCore::CallStaticFunctionResults::Reader::getReturn() const {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder UnrealCore::CallStaticFunctionResults::Builder::getResult() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
+inline  ::UnrealCore::Argument::Builder UnrealCore::CallStaticFunctionResults::Builder::getReturn() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void UnrealCore::CallStaticFunctionResults::Builder::setResult( ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
+#if !CAPNP_LITE
+inline  ::UnrealCore::Argument::Pipeline UnrealCore::CallStaticFunctionResults::Pipeline::getReturn() {
+  return  ::UnrealCore::Argument::Pipeline(_typeless.getPointerField(0));
+}
+#endif  // !CAPNP_LITE
+inline void UnrealCore::CallStaticFunctionResults::Builder::setReturn( ::UnrealCore::Argument::Reader value) {
+  ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder UnrealCore::CallStaticFunctionResults::Builder::initResult(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
+inline  ::UnrealCore::Argument::Builder UnrealCore::CallStaticFunctionResults::Builder::initReturn() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void UnrealCore::CallStaticFunctionResults::Builder::adoptResult(
-    ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
+inline void UnrealCore::CallStaticFunctionResults::Builder::adoptReturn(
+    ::capnp::Orphan< ::UnrealCore::Argument>&& value) {
+  ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>> UnrealCore::CallStaticFunctionResults::Builder::disownResult() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::UnrealCore::Argument> UnrealCore::CallStaticFunctionResults::Builder::disownReturn() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline bool UnrealCore::CallStaticFunctionResults::Reader::hasOutParams() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline bool UnrealCore::CallStaticFunctionResults::Builder::hasOutParams() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader UnrealCore::CallStaticFunctionResults::Reader::getOutParams() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder UnrealCore::CallStaticFunctionResults::Builder::getOutParams() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline void UnrealCore::CallStaticFunctionResults::Builder::setOutParams( ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder UnrealCore::CallStaticFunctionResults::Builder::initOutParams(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), size);
+}
+inline void UnrealCore::CallStaticFunctionResults::Builder::adoptOutParams(
+    ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>> UnrealCore::CallStaticFunctionResults::Builder::disownOutParams() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
 inline bool UnrealCore::FindClassParams::Reader::hasClass() const {

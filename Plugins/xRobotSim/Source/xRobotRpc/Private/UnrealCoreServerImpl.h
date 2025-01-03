@@ -1,6 +1,7 @@
 #pragma once
-
 #include "capnpstub/ue_core.capnp.h"
+
+#include <string>
 
 class FUnrealCoreServerImpl : public UnrealCore::Server
 {
