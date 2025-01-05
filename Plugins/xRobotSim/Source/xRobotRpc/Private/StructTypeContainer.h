@@ -17,13 +17,14 @@ public:
 	// malloc a new object of this type
 	virtual UObject* New(FString Name, uint64 ObjectFlags);
 
-	std::shared_ptr<FFunctionWrapper> FindFunction(FString FuncName);
+	std::shared_ptr<FFunctionWrapper> FindFunction(const FString& FuncName);
+
+	std::shared_ptr<FPropertyWrapper> FindProperty(const FString& PropertyName);
 
 protected:
 	void CreateFunctionWrapper(UFunction* InFunction);
 	void CreatePropertyWrapper(FProperty* InProperty);
 	
-private:
 	// 收集UStruct的类型信息，包括：
 	// 静态函数Function，成员函数Method，成员变量Property，
 	void Init();
@@ -35,16 +36,24 @@ private:
 	TMap<FName, std::shared_ptr<FPropertyWrapper>> PropertiesMap;
 };
 
-class FScriptStructTypeContainer : public FStructTypeContainer
+/*class FScriptStructTypeContainer : public FStructTypeContainer
 {
 public:
-	
+	virtual UObject* New(FString Name, uint64 ObjectFlags) override;
+
+	virtual ~FScriptStructTypeContainer() {}
+
+	static void* Alloc(UScriptStruct* InScriptStruct);
+
+	static void Free(TWeakObjectPtr<UStruct> InStruct, void* InPtr);
 };
 
 class FClassTypeContainer : public FStructTypeContainer
 {
 public:
-	
-};
+	virtual UObject* New(FString Name, uint64 ObjectFlags) override;
+
+	virtual ~FClassTypeContainer() {}
+};*/
 
 

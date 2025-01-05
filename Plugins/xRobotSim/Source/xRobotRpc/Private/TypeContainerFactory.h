@@ -1,12 +1,9 @@
 #pragma once
 #include "StructTypeContainer.h"
 
-namespace xRobotRpc
+class FTypeContainerFactory
 {
-	class FTypeContainerFactory
-	{
-	public:
-		static FStructTypeContainer* CreateStructType(UStruct* InStruct);
-	};
-}
+public:
+	static FStructTypeContainer* CreateStructType(UStruct* InStruct);
+};
 

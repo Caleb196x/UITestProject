@@ -1,6 +1,7 @@
 #include "StructTypeContainer.h"
 
 #include "RpcException.h"
+#include "UnrealPythonRpcLog.h"
 
 void FStructTypeContainer::Init()
 {
@@ -23,12 +24,16 @@ void FStructTypeContainer::Init()
 
 UObject* FStructTypeContainer::New(FString Name, uint64 ObjectFlags)
 {
-	ThrowRuntimeRpcException("Can not create UStruct directly, please create UScriptClass or UClass");
+	UClass* Class = static_cast<UClass*>(Struct.Get());
+	UObject* Outer = GetTransientPackage();
+	FName ClassName = FName(*Name);
+	EObjectFlags Flags = static_cast<EObjectFlags>(ObjectFlags);
+	return NewObject<UObject>(Outer, Class, ClassName, Flags);
 }
 
-std::shared_ptr<FFunctionWrapper> FStructTypeContainer::FindFunction(FString FuncName)
+std::shared_ptr<FFunctionWrapper> FStructTypeContainer::FindFunction(const FString& FuncName)
 {
-	FName Name = FName(*FuncName);
+	const FName Name = FName(*FuncName);
 	if (!FunctionsMap.Contains(Name))
 	{
 		ThrowRuntimeRpcException(FString::Printf(TEXT("Not exist function: %s"), *FuncName));
@@ -37,9 +42,21 @@ std::shared_ptr<FFunctionWrapper> FStructTypeContainer::FindFunction(FString Fun
 	return FunctionsMap.FindChecked(Name);
 }
 
+std::shared_ptr<FPropertyWrapper> FStructTypeContainer::FindProperty(const FString& PropertyName)
+{
+	const FName Name = FName(*PropertyName);
+	if (!PropertiesMap.Contains(Name))
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Not found any property %s"), *PropertyName)
+		return nullptr;
+	}
+
+	return PropertiesMap.FindChecked(Name);
+}
+
 void FStructTypeContainer::CreateFunctionWrapper(UFunction* InFunction)
 {
-	FName FuncName = InFunction->GetFName();
+	const FName FuncName = InFunction->GetFName();
 	if (!FunctionsMap.Contains(FuncName))
 	{
 		const std::shared_ptr<FFunctionWrapper> FunctionWrapper = std::make_shared<FFunctionWrapper>(InFunction);
@@ -49,11 +66,23 @@ void FStructTypeContainer::CreateFunctionWrapper(UFunction* InFunction)
 
 void FStructTypeContainer::CreatePropertyWrapper(FProperty* InProperty)
 {
-	FName PropName = InProperty->GetFName();
+	const FName PropName = InProperty->GetFName();
 	if (!PropertiesMap.Contains(PropName))
 	{
-		const std::shared_ptr<FPropertyWrapper> PropertyWrapper = std::make_shared<FPropertyWrapper>(InProperty);
-		PropertiesMap.Add(PropName, PropertyWrapper);
+		if (const std::shared_ptr<FPropertyWrapper> PropertyWrapper = FPropertyWrapper::Create(InProperty))
+		{
+			PropertiesMap.Add(PropName, PropertyWrapper);
+		}
 	}
 }
+
+/*UObject* FScriptStructTypeContainer::New(FString Name, uint64 ObjectFlags)
+{
+	
+}
+
+UObject* FClassTypeContainer::New(FString Name, uint64 ObjectFlags)
+{
+
+}*/
 

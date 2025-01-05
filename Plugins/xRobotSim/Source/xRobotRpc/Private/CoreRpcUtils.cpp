@@ -1,6 +1,7 @@
 #include "CoreRpcUtils.h"
 #include "CoreMinimal.h"
 #include "RpcException.h"
+#include "TypeContainerFactory.h"
 
 FStructTypeContainer* FCoreUtils::LoadUEType(const FString& TypeName)
 {
@@ -46,7 +47,18 @@ FStructTypeContainer* FCoreUtils::LoadUEType(const FString& TypeName)
 	}
 	
 	// create new type container
-	FStructTypeContainer* NewTypeContainer = nullptr; // TODO: create type container
-	ClassTypeContainerCache.Add(Type, NewTypeContainer);
-	return NewTypeContainer;
+	if (const auto Struct = Cast<UStruct>(Type))
+	{
+		FStructTypeContainer* NewTypeContainer = FTypeContainerFactory::CreateStructType(Struct); // TODO: create type container
+		ClassTypeContainerCache.Add(Type, NewTypeContainer);
+		return NewTypeContainer;
+	}
+
+	if (const auto Enum = Cast<UEnum>(Type))
+	{
+		// TODO: implement enum type
+		return nullptr;
+	}
+	
+	return nullptr;
 }

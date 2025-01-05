@@ -1,6 +1,9 @@
 #pragma once
 #include "StructTypeContainer.h"
 
+#define RELEASED_UOBJECT ((UObject*) 12)
+#define RELEASED_UOBJECT_MEMBER ((void*) 12)
+
 FORCEINLINE bool UEObjectIsPendingKill(const UObject* Test)
 {
 #if ENGINE_MAJOR_VERSION > 4
@@ -33,6 +36,11 @@ public:
 	static FStructTypeContainer* LoadUEType(const FString& TypeName);
 
 	static FStructTypeContainer* GetUEType(const FString& TypeName);
+
+	FORCEINLINE static bool IsReleasePtr(void* Ptr)
+	{
+		return RELEASED_UOBJECT_MEMBER == ptr;
+	}
 
 private:
 	static TMap<UField*, FStructTypeContainer*> ClassTypeContainerCache;

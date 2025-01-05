@@ -29,9 +29,11 @@ public:
 private:
 	void Init(UFunction* InFunction, bool bIsDelegate = false);
 
-	void SlowCall();
+	void SlowCall() {}
 
-	void FastCall(UObject* CallObject, UFunction* CallFunction, const std::vector<void*>& Params, std::map<std::string, void*>& Outputs, void* StackParams);
+	void FastCall(UObject* CallObject, UFunction* CallFunction, const std::vector<void*>& Params, std::map<std::string, void*>& Outputs, void* StackParams) const;
+
+	static std::string ConvertUeTypeNameToRpcTypeName(const FString& TypeName);
 
 	bool bIsStatic;
 

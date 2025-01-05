@@ -186,8 +186,13 @@ kj::Promise<void> FUnrealCoreServerImpl::callFunction(CallFunctionContext contex
 			// 调用时 UMainActor* test = obj->CreateOtherActor("Hello");
 			// 那这个test对象在端侧的内存地址如何传递到ue侧？
 
+			// 解决思路：
 			// 在then函数中传入端侧的test对象指针地址，并且将其存入ObjectHolder中
 			// 
+		}
+		else if (ReturnTypeName == "void")
+		{
+			InitRet.initClass().setTypeName("void");
 		}
 
 		++Iter;
@@ -239,4 +244,21 @@ kj::Promise<void> FUnrealCoreServerImpl::callFunction(CallFunctionContext contex
 	
 	return kj::READY_NOW;
 }
+
+kj::Promise<void> FUnrealCoreServerImpl::callStaticFunction(CallStaticFunctionContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::setProperty(SetPropertyContext context)
+{
+	
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::getProperty(GetPropertyContext context)
+{
+	return kj::READY_NOW;
+}
+
 

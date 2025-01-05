@@ -26,33 +26,44 @@ public:
 
 	static std::unique_ptr<FPropertyWrapper> Create(FProperty* InProperty, bool bIgnoreOutput = false);
 
-	static std::unique_ptr<FPropertyWrapper> CreateWithPlacement(FProperty* InProperty, FPropertyWrapper* InOldProperty);
+	// static std::unique_ptr<FPropertyWrapper> CreateWithPlacement(FProperty* InProperty, FPropertyWrapper* InOldProperty);
 
-	virtual bool AnyToUeValue(const std::any& InValue, void* ValuePtr) const = 0;
+	virtual bool CopyToUeValue(const void* SrcValuePtr, void* DestValuePtr) const = 0;
 
-	virtual bool UeValueToAny(const void* ValuePtr, std::any& OutValue) const = 0;
+	virtual bool ReadUeValue(const void* UeValuePtr, void* OutValue) const = 0;
+
+	virtual bool CopyToUeValueFast(const void* SrcValuePtr, void* TempBuffer, void** OutValuePtr) const
+	{
+		*OutValuePtr = TempBuffer;
+		return CopyToUeValue(SrcValuePtr, TempBuffer);
+	}
 	
 	virtual void Cleanup(void* ContainerPtr) const {}
 	
 	virtual ~FPropertyWrapper() {}
 
-	std::any Getter(UObject* Owner);
+	void* Getter(UObject* Owner);
 	
-	void Setter(UObject* Owner, const std::any& InValue);
+	void Setter(UObject* Owner, const void* InValue);
 
 	FORCEINLINE bool IsOutProperty() const
 	{
 		return bIsOut;
 	}
 	
-	FORCEINLINE bool AnyToUeValueInContainer(const std::any& InValue, void* ContainerPtr) const
+	FORCEINLINE bool CopyToUeValueInContainer(const void* InValue, void* ContainerPtr) const
 	{
-		return AnyToUeValue(InValue, Property->ContainerPtrToValuePtr<void>(ContainerPtr));
+		return CopyToUeValue(InValue, Property->ContainerPtrToValuePtr<void>(ContainerPtr));
 	}
 
-	FORCEINLINE bool UeValueToAnyInContainer(const void* ContainerPtr, std::any& OutValue) const
+	FORCEINLINE bool CopyToUeValueFastInContainer(const void* InValue, void* TempBuffer, void** OutValuePtr) const
 	{
-		return UeValueToAny(Property->ContainerPtrToValuePtr<void>(ContainerPtr), OutValue);
+		return CopyToUeValueFast(InValue, Property->ContainerPtrToValuePtr<void>(TempBuffer), OutValuePtr);
+	}
+
+	FORCEINLINE bool ReadUeValueInContainer(const void* ContainerPtr, void* OutValue) const
+	{
+		return ReadUeValue(Property->ContainerPtrToValuePtr<void>(ContainerPtr), OutValue);
 	}
 	
 	FORCEINLINE FProperty* GetProperty() const { return PropertyWeakPtr.Get(); }
@@ -79,7 +90,7 @@ protected:
 		FIntProperty* IntProperty;
 		FEnumProperty* EnumProperty;
 		FBoolProperty* BoolProperty;
-		FObjectProperty* ObjectProperty;
+		FObjectPropertyBase* ObjectBaseProperty;
 		FSoftObjectProperty* SoftObjectProperty;
 		FSoftClassProperty* SoftClassProperty;
 		FInterfaceProperty* InterfaceProperty;
@@ -104,6 +115,8 @@ protected:
 	bool bNeedLinkOuter;
 	
 	bool bIsOut;
+
+	std::unique_ptr<FPropertyWrapper> Inner;
 	
 	TWeakObjectPtr<FProperty> PropertyWeakPtr;
 };

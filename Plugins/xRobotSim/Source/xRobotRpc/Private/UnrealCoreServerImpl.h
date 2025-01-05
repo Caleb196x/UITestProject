@@ -1,5 +1,6 @@
 #pragma once
 #include "capnpstub/ue_core.capnp.h"
+#include "kj/async-io.h"
 
 #include <string>
 

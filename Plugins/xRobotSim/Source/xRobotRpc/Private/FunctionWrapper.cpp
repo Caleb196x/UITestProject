@@ -184,8 +184,8 @@ void FFunctionWrapper::FastCall(
 	UObject* CallObject,
 	UFunction* CallFunction,
 	const std::vector<void*>& Params,
-	std::map<std::string, void*>& Outputs,
-	void* StackParams)
+	std::map<std::string/*  type name */, void*>& Outputs,
+	void* StackParams) const
 {
 	if (StackParams)
 	{
@@ -235,11 +235,18 @@ void FFunctionWrapper::FastCall(
 		Property->InitializeValue_InContainer(StackParams);
 		if (Property->HasAnyPropertyFlags(CPF_OutParm))
 		{
-			
+			if (!Arguments[ParamIndex]->CopyToUeValueFastInContainer(Params[ParamIndex], StackParams, reinterpret_cast<void**>(&Out->PropAddr)))
+			{
+				UE_LOG(LogUnrealPython, Error, TEXT("Copy to ue value failed, property: %s"), *Property->GetName());
+			}
 		}
 		else
 		{
 			// set argument value to property
+			if (!Arguments[ParamIndex]->CopyToUeValueInContainer(Params[ParamIndex], StackParams))
+			{
+				UE_LOG(LogUnrealPython, Error, TEXT("Copy to ue value failed, property: %s"), *Property->GetName());
+			}
 		}
 
 		++ParamIndex;
@@ -257,6 +264,25 @@ void FFunctionWrapper::FastCall(
 	uint8* ReturnValAddr = bHasReturn ? static_cast<uint8*>(StackParams + CallFunction->ReturnValueOffset) : nullptr;
 	CallFunction->Invoke(CallObject, NewStack, ReturnValAddr);
 
+	if (Return)
+	{
+		// handle return value
+		const FString ReturnTypeName = Return->GetProperty()->GetCPPType();
+		const std::string ReturnTypeNameStr = ConvertUeTypeNameToRpcTypeName(ReturnTypeName);
+		
+		void* RetVal = FMemory::Malloc(Return->GetProperty()->GetSize());
+		if (!Return->ReadUeValueInContainer(StackParams, RetVal))
+		{
+			UE_LOG(LogUnrealPython, Error, TEXT("Copy to ue value failed, property: %s"), *Return->GetProperty()->GetName());
+		}
+		Outputs[ReturnTypeNameStr] = RetVal;
+		Return->GetProperty()->DestroyValue_InContainer(StackParams);
+	}
+	else
+	{
+		Outputs["void"] = nullptr;
+	}
+
 	LastOutParams = &NewStack.OutParms;
 	for (int i = 0; i < Arguments.size(); ++i)
 	{
@@ -272,6 +298,16 @@ void FFunctionWrapper::FastCall(
 					PropAddr < static_cast<uint8*>(StackParams + ParamsBufferSize))
 				{
 					// write outputs
+					const FString OutParamTypeName = Arguments[i]->GetProperty()->GetCPPType();
+					const std::string OutParamTypeNameStr = ConvertUeTypeNameToRpcTypeName(OutParamTypeName);
+					// TODO: copy memory
+					void* RetVal = FMemory::Malloc(Arguments[i]->GetProperty()->GetSize());
+					if (!Arguments[i]->ReadUeValueInContainer(StackParams, RetVal))
+					{
+						UE_LOG(LogUnrealPython, Error, TEXT("Copy to ue value failed, property: %s"), *Arguments[i]->GetProperty()->GetName());
+					}
+					
+					Outputs[OutParamTypeNameStr] = RetVal;
 				}
 				else
 				{
@@ -284,4 +320,41 @@ void FFunctionWrapper::FastCall(
 		}
 		
 	}
+}
+
+std::string FFunctionWrapper::ConvertUeTypeNameToRpcTypeName(const FString& TypeName)
+{
+	std::string RpcTypeName;
+	switch (TypeName)
+	{
+		case "FString":
+		case "FText":
+		case "FName":
+			RpcTypeName = "Str";
+			break;
+		case "int8":
+		case "int16":
+		case "int32":
+		case "int64":
+			RpcTypeName = "int";
+			break;
+		case "uint8":
+		case "uint16":
+		case "uint32":
+		case "uint64":
+			RpcTypeName = "uint";
+			break;
+		case "float":
+		case "double":
+			RpcTypeName = "float";
+			break;
+		case "bool":
+			RpcTypeName = "bool";
+			break;
+		default:
+			RpcTypeName = "object";
+			break;
+	}
+
+	return RpcTypeName;
 }
