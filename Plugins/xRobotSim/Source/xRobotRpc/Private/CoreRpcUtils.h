@@ -39,7 +39,7 @@ public:
 
 	FORCEINLINE static bool IsReleasePtr(void* Ptr)
 	{
-		return RELEASED_UOBJECT_MEMBER == ptr;
+		return RELEASED_UOBJECT_MEMBER == Ptr;
 	}
 
 private:

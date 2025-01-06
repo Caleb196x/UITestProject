@@ -2,17 +2,28 @@
 #include "UnrealPythonRpcLog.h"
 
 #include <mutex>
+#include <unordered_map>
 
 #include "Misc/DefaultValueHelper.h"
 
-static TMap<FName, TMap<FName, TMap<FName, FString>>> AllFunctionParamsDefaultMetaData;
+static TMap<FName, TMap<FName, TMap<FName, FString>>> ParamDefaultMetas;
 static TMap<FName, TMap<FName, FString>>* PC = nullptr;
 static TMap<FName, FString>* PF = nullptr;
 
+#if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 2
+UE_DISABLE_OPTIMIZATION
+#else
+PRAGMA_DISABLE_OPTIMIZATION
+#endif
 static void AllFunctionParamsDefaultMetaDataInit()
 {
 #include "InitParamDefaultMetas.inl"
 }
+#if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 2
+UE_ENABLE_OPTIMIZATION
+#else
+PRAGMA_ENABLE_OPTIMIZATION
+#endif
 
 std::once_flag ParamDefaultMetasInitFlag;
 
@@ -20,7 +31,7 @@ TMap<FName, FString>* GetAllFunctionParamsDefaultMetaData(UFunction* InFunction)
 {
 	std::call_once(ParamDefaultMetasInitFlag, AllFunctionParamsDefaultMetaDataInit);
 	UClass* OuterClass = InFunction->GetOuterUClass();
-	auto ClassParamDefaultMeta = AllFunctionParamsDefaultMetaData.Find(OuterClass->GetFName());
+	auto ClassParamDefaultMeta = ParamDefaultMetas.Find(OuterClass->GetFName());
 	if (ClassParamDefaultMeta)
 	{
 		return ClassParamDefaultMeta->Find(InFunction->GetFName());
@@ -261,7 +272,7 @@ void FFunctionWrapper::FastCall(
 	}
 
 	const bool bHasReturn = CallFunction->ReturnValueOffset != MAX_uint16;
-	uint8* ReturnValAddr = bHasReturn ? static_cast<uint8*>(StackParams + CallFunction->ReturnValueOffset) : nullptr;
+	uint8* ReturnValAddr = bHasReturn ? static_cast<uint8*>(StackParams) + CallFunction->ReturnValueOffset : nullptr;
 	CallFunction->Invoke(CallObject, NewStack, ReturnValAddr);
 
 	if (Return)
@@ -295,7 +306,7 @@ void FFunctionWrapper::FastCall(
 			{
 				auto PropAddr = (*LastOutParams)->PropAddr;
 				if (PropAddr >= static_cast<uint8*>(StackParams) &&
-					PropAddr < static_cast<uint8*>(StackParams + ParamsBufferSize))
+					PropAddr < static_cast<uint8*>(StackParams) + ParamsBufferSize)
 				{
 					// write outputs
 					const FString OutParamTypeName = Arguments[i]->GetProperty()->GetCPPType();
@@ -324,37 +335,31 @@ void FFunctionWrapper::FastCall(
 
 std::string FFunctionWrapper::ConvertUeTypeNameToRpcTypeName(const FString& TypeName)
 {
-	std::string RpcTypeName;
-	switch (TypeName)
-	{
-		case "FString":
-		case "FText":
-		case "FName":
-			RpcTypeName = "Str";
-			break;
-		case "int8":
-		case "int16":
-		case "int32":
-		case "int64":
-			RpcTypeName = "int";
-			break;
-		case "uint8":
-		case "uint16":
-		case "uint32":
-		case "uint64":
-			RpcTypeName = "uint";
-			break;
-		case "float":
-		case "double":
-			RpcTypeName = "float";
-			break;
-		case "bool":
-			RpcTypeName = "bool";
-			break;
-		default:
-			RpcTypeName = "object";
-			break;
-	}
+	const std::string InName = TCHAR_TO_UTF8(*TypeName);
 
-	return RpcTypeName;
+	std::unordered_map<std::string, std::string> TypeMapping = {
+		{"FString", "str"},
+		{"FText", "str"},
+		{"FName", "str"},
+		{"int8", "int"},
+		{"int16", "int"},
+		{"int32", "int"},
+		{"int64", "int"},
+		{"uint8", "uint"},
+		{"uint16", "uint"},
+		{"uint32", "uint"},
+		{"uint64", "uint"},
+		{"float", "float"},
+		{"double", "float"},
+		{"bool", "bool"}
+	};
+
+	if (TypeMapping.contains(InName))
+	{
+		return TypeMapping.at(InName);
+	}
+	else
+	{
+		return "object";
+	}
 }

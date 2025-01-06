@@ -9,8 +9,7 @@ public:
 	: Property(InProperty),
 	bOwnerIsClass(InProperty->GetOwnerClass() != nullptr),
 	bNeedLinkOuter(false),
-	bIsOut(bInIsOut),
-	PropertyWeakPtr(InProperty)
+	bIsOut(bInIsOut)
 	{
 		if (!bOwnerIsClass)
 		{
@@ -66,11 +65,11 @@ public:
 		return ReadUeValue(Property->ContainerPtrToValuePtr<void>(ContainerPtr), OutValue);
 	}
 	
-	FORCEINLINE FProperty* GetProperty() const { return PropertyWeakPtr.Get(); }
+	FORCEINLINE FProperty* GetProperty() const { return Property; }
 
 	FORCEINLINE bool IsPropertyValid() const
 	{
-		if (!PropertyWeakPtr.IsValid())
+		if (!Property)
 		{
 			return false;
 		}
@@ -117,6 +116,4 @@ protected:
 	bool bIsOut;
 
 	std::unique_ptr<FPropertyWrapper> Inner;
-	
-	TWeakObjectPtr<FProperty> PropertyWeakPtr;
 };

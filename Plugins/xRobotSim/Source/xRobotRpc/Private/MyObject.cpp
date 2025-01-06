@@ -26,5 +26,9 @@ void UMyObject::Printf(FString text)
 	UE_LOG(LogTemp, Display, TEXT("%s"), *text)
 }
 
+void UMyObject::MTestArrayParam(UMyObject* array)
+{
+	UE_LOG(LogTemp, Display, TEXT("hello man!"))
+}
 
 

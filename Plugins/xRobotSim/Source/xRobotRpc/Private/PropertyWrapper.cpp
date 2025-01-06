@@ -454,6 +454,11 @@ public:
 			(Class && Class->IsChildOf(ClassProperty->MetaClass)) ? Class : nullptr);
 		return true;
 	}
+
+	bool ReadUeValue(const void* UeValuePtr, void* OutValue) const override
+	{
+		return true;
+	}
 };
 
 class FSoftClassPropertyWrapper : public FPropertyWrapperWithDestructor
@@ -530,7 +535,7 @@ public:
 };
 
 
-#ifdef ENGINE_MINOR_VERSION >= 23 || ENGINE_MAJOR_VERSION > 4
+#if ENGINE_MINOR_VERSION >= 23 || ENGINE_MAJOR_VERSION > 4
 class FFieldPathPropertyWrapper : public FPropertyWrapperWithDestructor
 {
 public:
@@ -567,6 +572,7 @@ public:
 		return true;
 	}
 };
+
 #endif
 
 class FFastPropertyWrapper : public FPropertyWrapperWithDestructor
@@ -631,7 +637,8 @@ public:
 			UE_LOG(LogUnrealPython, Error, TEXT("Invalid array inner property"));
 			return false;
 		}
-
+		ArrayProperty->CopyCompleteValue(DestArray, SrcArray);
+		/*
 		const int32 Count = SrcArray->Num();
 		DestArray->Empty(Count, ArrayProperty->Inner->ElementSize, DEFAULT_ALIGNMENT);
 		DestArray->Add(Count, ArrayProperty->Inner->ElementSize, DEFAULT_ALIGNMENT);
@@ -639,10 +646,11 @@ public:
 		for (int32 i = 0; i < Count; ++i)
 		{
 			ArrayProperty->Inner->CopyCompleteValue(
-				DestArray->GetData() + i * ArrayProperty->Inner->ElementSize,
-				SrcArray->GetData() + i * ArrayProperty->Inner->ElementSize
+				static_cast<uint8*>(DestArray->GetData()) + i * ArrayProperty->Inner->ElementSize,
+				static_cast<uint8*>(SrcArray->GetData()) + i * ArrayProperty->Inner->ElementSize
 			);
 		}
+		*/
 
 		return true;
 	}
@@ -810,7 +818,16 @@ public:
 	{
 		Inner = std::move(InInner);
 	}
-	
+
+	bool CopyToUeValue(const void* SrcValuePtr, void* DestValuePtr) const override
+	{
+		return true;
+	}
+
+	bool ReadUeValue(const void* UeValuePtr, void* OutValue) const override
+	{
+		return true;
+	}
 };
 
 class FDoNothingPropertyWrapper : public FPropertyWrapper
