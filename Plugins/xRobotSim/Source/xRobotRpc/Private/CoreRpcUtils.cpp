@@ -36,7 +36,7 @@ FStructTypeContainer* FCoreUtils::LoadUEType(const FString& TypeName)
 	}
 
 	// blueprint class type
-	if (Type && !Type->HasAnyCastFlags(EClassFlags::CLASS_Native))
+	if (Type && !Type->IsNative())
 	{
 		// throw exception
 		ThrowRuntimeRpcException("not native class");

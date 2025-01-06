@@ -4,9 +4,13 @@
 
 #include <string>
 
-class FUnrealCoreServerImpl : public UnrealCore::Server
+class FUnrealCoreServerImpl final : public UnrealCore::Server
 {
 public:
+	
+	virtual ~FUnrealCoreServerImpl() {}
+
+protected:
 	virtual kj::Promise<void> newObject(NewObjectContext context) override;
 
 	virtual kj::Promise<void> destroyObject(DestroyObjectContext context) override;
@@ -37,5 +41,4 @@ public:
 
 	virtual kj::Promise<void> getProperty(GetPropertyContext context) override;
 
-	virtual ~FUnrealCoreServerImpl() {}
 };

@@ -261,4 +261,48 @@ kj::Promise<void> FUnrealCoreServerImpl::getProperty(GetPropertyContext context)
 	return kj::READY_NOW;
 }
 
+kj::Promise<void> FUnrealCoreServerImpl::findClass(FindClassContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::loadClass(LoadClassContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::bindDelegate(BindDelegateContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::unbindDelegate(UnbindDelegateContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::addMultiDelegate(AddMultiDelegateContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::removeMultiDelegate(RemoveMultiDelegateContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::registerOverrideClass(RegisterOverrideClassContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::unregisterOverrideClass(UnregisterOverrideClassContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::staticClass(StaticClassContext context)
+{
+	return kj::READY_NOW;
+}
 

@@ -3,6 +3,7 @@
 #include "kj/async-io.h"
 #include "capnp/rpc-twoparty.h"
 #include "capnpstub/ue_log.capnp.h"
+#include "UnrealCoreServerImpl.h"
 
 #define LOCTEXT_NAMESPACE "FRobotRpcModule"
 
@@ -73,7 +74,7 @@ uint32 FRpcServerRunnable::Run()
 		kj::Own<kj::NetworkAddress> Addr = Network.parseAddress("127.0.0.1:6003").wait(IoContext.waitScope);
 		Listener = Addr->listen();
 
-		capnp::TwoPartyServer Server(kj::heap<UELogImpl>());
+		capnp::TwoPartyServer Server(kj::heap<FUnrealCoreServerImpl>());
 
 		FString AddrStr = UTF8_TO_TCHAR(Addr->toString().cStr());
 		UE_LOG(LogTemp, Display, TEXT("Listening on %s"), *AddrStr);
