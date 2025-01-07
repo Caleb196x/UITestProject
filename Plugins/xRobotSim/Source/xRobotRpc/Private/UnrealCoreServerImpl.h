@@ -40,5 +40,5 @@ protected:
 	virtual kj::Promise<void> setProperty(SetPropertyContext context) override;
 
 	virtual kj::Promise<void> getProperty(GetPropertyContext context) override;
-
+	
 };

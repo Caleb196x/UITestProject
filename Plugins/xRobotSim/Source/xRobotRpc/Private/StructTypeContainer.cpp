@@ -28,7 +28,7 @@ UObject* FStructTypeContainer::New(FString Name, uint64 ObjectFlags)
 	UObject* Outer = GetTransientPackage();
 	FName ClassName = FName(*Name);
 	EObjectFlags Flags = static_cast<EObjectFlags>(ObjectFlags);
-	return NewObject<UObject>(Outer, Class, ClassName, Flags);
+	return NewObject<UObject>(Outer, Class, ClassName, Flags); // fixme: must run under game thread
 }
 
 std::shared_ptr<FFunctionWrapper> FStructTypeContainer::FindFunction(const FString& FuncName)

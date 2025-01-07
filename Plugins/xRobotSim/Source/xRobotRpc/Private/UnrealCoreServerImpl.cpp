@@ -3,6 +3,10 @@
 #include "CoreRpcUtils.h"
 #include "ObjectHolder.h"
 
+// 1. 数据怎么交互
+// 2. 结果怎么返回
+// 3. 如何同步
+
 kj::Promise<void> FUnrealCoreServerImpl::newObject(NewObjectContext context)
 {
 	auto AllocClass = context.getParams().getClass();
