@@ -7,7 +7,99 @@
 // 2. 结果怎么返回
 // 3. 如何同步
 
+#define CHECK_RESULT_AND_RETURN(Result) \
+	context = Result.Context; \
+	if (!Result.Info.bIsSuccess) \
+	{ \
+		return kj::Promise<void>(kj::Exception(kj::Exception::Type::FAILED, \
+			Result.Info.FileCStr(), Result.Info.Line, kj::str(Result.Info.MessageCStr()))); \
+	} \
+	else \
+	{ \
+		return kj::READY_NOW; \
+	} \
+
 kj::Promise<void> FUnrealCoreServerImpl::newObject(NewObjectContext context)
+{
+	const auto Result = GameThreadDispatcher<NewObjectContext>::EnqueueToGameThreadExec(NewObjectInternal, context);
+
+	CHECK_RESULT_AND_RETURN(Result)
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::destroyObject(DestroyObjectContext context)
+{
+	const auto Result = GameThreadDispatcher<DestroyObjectContext>::EnqueueToGameThreadExec(DestroyObjectInternal, context);
+	CHECK_RESULT_AND_RETURN(Result)
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::callFunction(CallFunctionContext context)
+{
+	const auto Result = GameThreadDispatcher<CallFunctionContext>::EnqueueToGameThreadExec(CallFunctionInternal, context);
+	CHECK_RESULT_AND_RETURN(Result)
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::callStaticFunction(CallStaticFunctionContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::setProperty(SetPropertyContext context)
+{
+	
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::getProperty(GetPropertyContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::findClass(FindClassContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::loadClass(LoadClassContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::bindDelegate(BindDelegateContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::unbindDelegate(UnbindDelegateContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::addMultiDelegate(AddMultiDelegateContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::removeMultiDelegate(RemoveMultiDelegateContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::registerOverrideClass(RegisterOverrideClassContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::unregisterOverrideClass(UnregisterOverrideClassContext context)
+{
+	return kj::READY_NOW;
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::staticClass(StaticClassContext context)
+{
+	return kj::READY_NOW;
+}
+
+ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 {
 	auto AllocClass = context.getParams().getClass();
 	auto Outer = context.getParams().getOuter();
@@ -33,11 +125,11 @@ kj::Promise<void> FUnrealCoreServerImpl::newObject(NewObjectContext context)
 
 	ResponseObj.setName(NewObjName.cStr());
 	ResponseObj.setAddress(reinterpret_cast<uint64_t>(Obj));
-	
-	return kj::READY_NOW;
+
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::destroyObject(DestroyObjectContext context)
+ErrorInfo FUnrealCoreServerImpl::DestroyObjectInternal(DestroyObjectContext context)
 {
 	auto Outer = context.getParams().getOuter();
 	auto PointerAddr = Outer.getAddress();
@@ -54,11 +146,21 @@ kj::Promise<void> FUnrealCoreServerImpl::destroyObject(DestroyObjectContext cont
 		FObjectHolder::Get().RemoveFromRetainer(ClientHolder);
 		context.getResults().setResult(true);
 	}
-	
-	return kj::READY_NOW;
+
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::callFunction(CallFunctionContext context)
+ErrorInfo FUnrealCoreServerImpl::SetPropertyInternal(SetPropertyContext context)
+{
+	return true;
+}
+
+ErrorInfo FUnrealCoreServerImpl::GetPropertyInternal(GetPropertyContext context)
+{
+	return true;
+}
+
+ErrorInfo FUnrealCoreServerImpl::CallFunctionInternal(CallFunctionContext context)
 {
 	auto Outer = context.getParams().getOuter();
 	auto CallObject = context.getParams().getCallObject();
@@ -70,8 +172,8 @@ kj::Promise<void> FUnrealCoreServerImpl::callFunction(CallFunctionContext contex
 	if (!FObjectHolder::Get().HasObject(ClientHolder))
 	{
 		// throw exception to client
-		return kj::Promise<void>(kj::Exception(kj::Exception::Type::FAILED,
-				__FILE__, __LINE__, kj::str("Can not find the object in system's object holder, run newObject at first.")));
+		return ErrorInfo(__FILE__, __LINE__,
+			"Can not find the object in system's object holder, run newObject at first.");
 	}
 
 	UObject* FoundObject = FObjectHolder::Get().GetUObject(ClientHolder);
@@ -79,21 +181,17 @@ kj::Promise<void> FUnrealCoreServerImpl::callFunction(CallFunctionContext contex
 
 	if (FoundObject != PassedInObject)
 	{
-		char buff[128];
-		sprintf_s(buff, sizeof(buff),
-			"Call function %s failed, the object found in object holder %p is not equal to passed by caller %p",
-			FuncName, FoundObject, PassedInObject);
-		
-		return kj::Promise<void>(kj::Exception(kj::Exception::Type::FAILED,
-				__FILE__, __LINE__, kj::str(buff)));
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Call function %s failed, the object found in object holder %p is not equal to passed by caller %p"),
+				UTF8_TO_TCHAR(FuncName), FoundObject, PassedInObject));
 	}
 
 	FString ClassName = UTF8_TO_TCHAR(Class.getTypeName().cStr());
 	auto* TypeContainer = FCoreUtils::GetUEType(ClassName);
 	if (!TypeContainer)
 	{
-		return kj::Promise<void>(kj::Exception(kj::Exception::Type::FAILED,
-		__FILE__, __LINE__, kj::str("Can not find class type, must call newObject to alloc a object.")));
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Can not find type container for class %s"), *ClassName));
 	}
 
 	auto FuncWrapper = TypeContainer->FindFunction(UTF8_TO_TCHAR(FuncName));
@@ -245,68 +343,58 @@ kj::Promise<void> FUnrealCoreServerImpl::callFunction(CallFunctionContext contex
 			OutObj.setAddress(reinterpret_cast<uint64_t>(ObjPtr));
 		}
 	}
-	
-	return kj::READY_NOW;
+
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::callStaticFunction(CallStaticFunctionContext context)
+ErrorInfo FUnrealCoreServerImpl::CallStaticFunctionInternal(CallStaticFunctionContext context)
 {
-	return kj::READY_NOW;
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::setProperty(SetPropertyContext context)
+ErrorInfo FUnrealCoreServerImpl::FindClassInternal(FindClassContext context)
 {
-	
-	return kj::READY_NOW;
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::getProperty(GetPropertyContext context)
+ErrorInfo FUnrealCoreServerImpl::LoadClassInternal(LoadClassContext context)
 {
-	return kj::READY_NOW;
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::findClass(FindClassContext context)
+ErrorInfo FUnrealCoreServerImpl::StaticClassInternal(StaticClassContext context)
 {
-	return kj::READY_NOW;
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::loadClass(LoadClassContext context)
+ErrorInfo FUnrealCoreServerImpl::BindDelegateInternal(BindDelegateContext context)
 {
-	return kj::READY_NOW;
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::bindDelegate(BindDelegateContext context)
+ErrorInfo FUnrealCoreServerImpl::UnbindDelegateInternal(UnbindDelegateContext context)
 {
-	return kj::READY_NOW;
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::unbindDelegate(UnbindDelegateContext context)
+ErrorInfo FUnrealCoreServerImpl::AddMultiDelegateInternal(AddMultiDelegateContext context)
 {
-	return kj::READY_NOW;
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::addMultiDelegate(AddMultiDelegateContext context)
+ErrorInfo FUnrealCoreServerImpl::RemoveMultiDelegateInternal(RemoveMultiDelegateContext context)
 {
-	return kj::READY_NOW;
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::removeMultiDelegate(RemoveMultiDelegateContext context)
+ErrorInfo FUnrealCoreServerImpl::RegisterOverrideClassInternal(RegisterOverrideClassContext context)
 {
-	return kj::READY_NOW;
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::registerOverrideClass(RegisterOverrideClassContext context)
+ErrorInfo FUnrealCoreServerImpl::UnregisterOverrideClassInternal(UnregisterOverrideClassContext context)
 {
-	return kj::READY_NOW;
+	return true;
 }
 
-kj::Promise<void> FUnrealCoreServerImpl::unregisterOverrideClass(UnregisterOverrideClassContext context)
-{
-	return kj::READY_NOW;
-}
-
-kj::Promise<void> FUnrealCoreServerImpl::staticClass(StaticClassContext context)
-{
-	return kj::READY_NOW;
-}
 

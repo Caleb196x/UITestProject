@@ -1,8 +1,53 @@
 #pragma once
+#include <functional>
+#include <future>
+
+#include "RpcException.h"
+#include "UnrealPythonRpcLog.h"
 #include "capnpstub/ue_core.capnp.h"
 #include "kj/async-io.h"
 
-#include <string>
+struct ErrorInfo
+{
+	FString Message;
+	FString File;
+	int32 Line;
+
+	bool bIsSuccess;
+
+	ErrorInfo() : Message(""), File(""), Line(0), bIsSuccess(true) {}
+	
+	ErrorInfo(bool InIsError) : Message(""), File(""), Line(0), bIsSuccess(InIsError) {}
+
+	ErrorInfo(const char* InFile, const int32 InLine, const FString& InMsg) :
+		Message(InMsg), File(UTF8_TO_TCHAR(InFile)), Line(InLine), bIsSuccess(false)
+	{}
+
+	ErrorInfo(const ErrorInfo& Info)
+		: Message(Info.Message), File(Info.File), Line(Info.Line), bIsSuccess(Info.bIsSuccess) {}
+
+	ErrorInfo(ErrorInfo&& Info) noexcept 
+		: Message(Info.Message), File(Info.File), Line(Info.Line), bIsSuccess(Info.bIsSuccess) {}
+
+	const char* MessageCStr() const
+	{
+		return TCHAR_TO_UTF8(*Message);
+	}
+
+	const char* FileCStr() const
+	{
+		return TCHAR_TO_UTF8(*File);
+	}
+};
+
+template<typename T>
+struct ResultWithException
+{
+	T Context;
+	ErrorInfo Info;
+
+	ResultWithException(const T& Context, const ErrorInfo& Info) : Context(Context), Info(Info) {}
+};
 
 class FUnrealCoreServerImpl final : public UnrealCore::Server
 {
@@ -40,5 +85,59 @@ protected:
 	virtual kj::Promise<void> setProperty(SetPropertyContext context) override;
 
 	virtual kj::Promise<void> getProperty(GetPropertyContext context) override;
+
+	static ErrorInfo NewObjectInternal(NewObjectContext context);
+
+	static ErrorInfo DestroyObjectInternal(DestroyObjectContext context);
+
+	static ErrorInfo SetPropertyInternal(SetPropertyContext context);
+
+	static ErrorInfo GetPropertyInternal(GetPropertyContext context);
+
+	static ErrorInfo CallFunctionInternal(CallFunctionContext context);
+
+	static ErrorInfo CallStaticFunctionInternal(CallStaticFunctionContext context);
+
+	static ErrorInfo FindClassInternal(FindClassContext context);
+
+	static ErrorInfo LoadClassInternal(LoadClassContext context);
+
+	static ErrorInfo StaticClassInternal(StaticClassContext context);
+
+	static ErrorInfo BindDelegateInternal(BindDelegateContext context);
+
+	static ErrorInfo UnbindDelegateInternal(UnbindDelegateContext context);
+
+	static ErrorInfo AddMultiDelegateInternal(AddMultiDelegateContext context);
+
+	static ErrorInfo RemoveMultiDelegateInternal(RemoveMultiDelegateContext context);
+
+	static ErrorInfo RegisterOverrideClassInternal(RegisterOverrideClassContext context);
+
+	static ErrorInfo UnregisterOverrideClassInternal(UnregisterOverrideClassContext context);
+};
+
+template<typename T>
+class GameThreadDispatcher
+{
+public:
 	
+	static ResultWithException<T> EnqueueToGameThreadExec(std::function<ErrorInfo(T)>&& Func, T Context)
+	{
+		std::promise<ResultWithException<T>> Promise;
+		auto Future = Promise.get_future();
+		AsyncTask(ENamedThreads::GameThread, [&Promise, Context, Func = std::move(Func)]()
+		{
+			ErrorInfo Info = Func(Context);
+			ResultWithException<T> Result(Context, Info);
+			
+			Promise.set_value(std::move(Result));
+			UE_LOG(LogUnrealPython, Warning, TEXT("Running in lambda function"));
+		});
+		ResultWithException<T> Result = Future.get();
+
+		UE_LOG(LogUnrealPython, Warning, TEXT("GameThreadDispatcher::EnqueueToGameThreadExec finished "));
+		return Result;
+	}
+
 };
