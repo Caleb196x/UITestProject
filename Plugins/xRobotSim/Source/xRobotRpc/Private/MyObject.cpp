@@ -31,4 +31,8 @@ void UMyObject::MTestArrayParam(UMyObject* array)
 	UE_LOG(LogTemp, Display, TEXT("hello man!"))
 }
 
+int32 UMyObject::TestVector(FVector Vector)
+{
+	return static_cast<int32>(Vector.X + Vector.Y);
+}
 

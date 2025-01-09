@@ -108,7 +108,7 @@ ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 	
 	auto ResponseObj = context.getResults().initObject();
 	
-	FString StrClassName = UTF8_TO_TCHAR(AllocClass.getTypeName().cStr());
+	FString ClassName = UTF8_TO_TCHAR(AllocClass.getTypeName().cStr());
 	void* ClientHolder = reinterpret_cast<void*>(Outer.getAddress());
 
 	// TODO: check address
@@ -118,8 +118,8 @@ ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 	// TODO: handle create object failure
 	if (!Obj)
 	{
-		FStructTypeContainer* TypeContainer = FCoreUtils::LoadUEType(StrClassName);
-		Obj = TypeContainer->New(StrClassName, Flags);
+		FStructTypeContainer* TypeContainer = FCoreUtils::LoadUEType(ClassName);
+		Obj = TypeContainer->New(ClassName, Flags);
 		FObjectHolder::Get().RegisterToRetainer(ClientHolder, Obj);
 	}
 
@@ -208,7 +208,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionInternal(CallFunctionContext contex
 		}
 		else if (Param.isIntValue())
 		{
-			auto Val = new int64(Param.getIntValue());
+			auto Val = new int64(Param.getIntValue()); // fixme: free mnemory
 			PassToParams.push_back(Val);
 		}
 		else if (Param.isUintValue())

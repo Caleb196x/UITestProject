@@ -25,4 +25,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "MTestArrayParam", ScriptName = "MTestArrayParam"), Category="Test")
 	void MTestArrayParam(UMyObject* array);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TestVector", ScriptName = "MTestArrayParam"), Category="Test")
+	int32 TestVector(FVector Vector);
 };

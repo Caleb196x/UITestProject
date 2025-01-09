@@ -39,7 +39,7 @@ FStructTypeContainer* FCoreUtils::LoadUEType(const FString& TypeName)
 	if (Type && !Type->IsNative())
 	{
 		// throw exception
-		ThrowRuntimeRpcException("not native class");
+		return nullptr;
 	}
 
 	// find type container in cache map
@@ -96,10 +96,11 @@ FStructTypeContainer* FCoreUtils::GetUEType(const FString& TypeName)
 	}
 
 	// blueprint class type
-	if (Type && !Type->HasAnyCastFlags(EClassFlags::CLASS_Native))
+	if (Type && !Type->IsNative())
 	{
 		// throw exception
-		ThrowRuntimeRpcException("not native class");
+		// fixme: do not throw exception
+		return nullptr;
 	}
 
 	// find type container in cache map
