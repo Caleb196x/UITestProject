@@ -36,7 +36,8 @@ kj::Promise<void> FUnrealCoreServerImpl::callFunction(CallFunctionContext contex
 
 kj::Promise<void> FUnrealCoreServerImpl::callStaticFunction(CallStaticFunctionContext context)
 {
-	return kj::READY_NOW;
+	const auto Result = GameThreadDispatcher<CallStaticFunctionContext>::EnqueueToGameThreadExec(CallStaticFunctionInternal, context);
+	CHECK_RESULT_AND_RETURN(Result)
 }
 
 kj::Promise<void> FUnrealCoreServerImpl::setProperty(SetPropertyContext context)
@@ -272,52 +273,80 @@ ErrorInfo FUnrealCoreServerImpl::GetPropertyInternal(GetPropertyContext context)
 
 ErrorInfo FUnrealCoreServerImpl::CallFunctionInternal(CallFunctionContext context)
 {
-	auto Outer = context.getParams().getOuter();
-	auto CallObject = context.getParams().getCallObject();
-	auto FuncName = context.getParams().getFuncName().cStr();
-	auto Class = context.getParams().getClass();
-	auto FuncParams = context.getParams().getParams();
+	return CallFunctionCommon(&context, nullptr, false);
+}
 
-	void* ClientHolder = reinterpret_cast<void*>(Outer.getAddress());
-	if (!FObjectHolder::Get().HasObject(ClientHolder))
+ErrorInfo FUnrealCoreServerImpl::CallStaticFunctionInternal(CallStaticFunctionContext context)
+{
+	return CallFunctionCommon(nullptr, &context, true);
+}
+
+ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectCallContext, CallStaticFunctionContext* StaticCallContext, bool bIsStaticFunc)
+{
+	FString ClassName;
+	FString FunctionName;
+	capnp::List<UnrealCore::Argument>::Reader InFuncParam;
+	FObjectHolder::FUEObject* FoundObject = nullptr;
+	
+	if (!bIsStaticFunc)
 	{
-		// throw exception to client
-		return ErrorInfo(__FILE__, __LINE__,
-			"Can not find the object in system's object holder, run newObject at first.");
+		auto Outer = ObjectCallContext->getParams().getOuter();
+		auto CallObject = ObjectCallContext->getParams().getCallObject();
+		auto InFuncName = ObjectCallContext->getParams().getFuncName().cStr();
+		auto Class = ObjectCallContext->getParams().getClass();
+		InFuncParam = ObjectCallContext->getParams().getParams();
+
+		void* ClientHolder = reinterpret_cast<void*>(Outer.getAddress());
+		if (!FObjectHolder::Get().HasObject(ClientHolder))
+		{
+			// throw exception to client
+			return ErrorInfo(__FILE__, __LINE__,
+				"Can not find the object in system's object holder, run newObject at first.");
+		}
+
+		FoundObject = FObjectHolder::Get().GetUObject(ClientHolder);
+		FObjectHolder::FUEObject* PassedInObject = reinterpret_cast<FObjectHolder::FUEObject*>(CallObject.getAddress());
+		FunctionName = UTF8_TO_TCHAR(InFuncName);
+		
+		if (FoundObject != PassedInObject)
+		{
+			return ErrorInfo(__FILE__, __LINE__,
+				FString::Printf(TEXT("Call function %s failed, the object found in object holder %p is not equal to passed by caller %p"),
+					*FunctionName, FoundObject, PassedInObject));
+		}
+
+		ClassName = UTF8_TO_TCHAR(Class.getTypeName().cStr());
+	
+		if (!ClassName.Equals(FoundObject->ClassName))
+		{
+			return ErrorInfo(__FILE__, __LINE__,
+				FString::Printf(TEXT("Class name passed from client: %s is not equal to class name saved in object holder: %s"),
+					*ClassName, *FoundObject->ClassName));
+		}
+	}
+	else
+	{
+		auto InFuncName = StaticCallContext->getParams().getFuncName().cStr();
+		auto Class = StaticCallContext->getParams().getClass();
+		InFuncParam = StaticCallContext->getParams().getParams();
+		ClassName = UTF8_TO_TCHAR(Class.getTypeName().cStr());
+		FunctionName = UTF8_TO_TCHAR(InFuncName);
 	}
 
-	FObjectHolder::FUEObject* FoundObject = FObjectHolder::Get().GetUObject(ClientHolder);
-	FObjectHolder::FUEObject* PassedInObject = reinterpret_cast<FObjectHolder::FUEObject*>(CallObject.getAddress());
-
-	if (FoundObject != PassedInObject)
-	{
-		return ErrorInfo(__FILE__, __LINE__,
-			FString::Printf(TEXT("Call function %s failed, the object found in object holder %p is not equal to passed by caller %p"),
-				UTF8_TO_TCHAR(FuncName), FoundObject, PassedInObject));
-	}
-
-	FString ClassName = UTF8_TO_TCHAR(Class.getTypeName().cStr());
 	auto* TypeContainer = FCoreUtils::GetUEType(ClassName);
 	if (!TypeContainer)
 	{
 		return ErrorInfo(__FILE__, __LINE__,
 			FString::Printf(TEXT("Can not find type container for class %s"), *ClassName));
 	}
-
-	if (!ClassName.Equals(FoundObject->ClassName))
-	{
-		return ErrorInfo(__FILE__, __LINE__,
-			FString::Printf(TEXT("Class name passed from client: %s is not equal to class name saved in object holder: %s"),
-				*ClassName, *FoundObject->ClassName));
-	}
-
-	auto FuncWrapper = TypeContainer->FindFunction(UTF8_TO_TCHAR(FuncName));
+	
+	auto FuncWrapper = TypeContainer->FindFunction(FunctionName);
 
 	AutoMemoryFreer AutoFreer;
 
 	// TODO: use any at beta it maybe has some performance issue
 	std::vector<void*> PassToParams;
-	for (const auto& Param : FuncParams)
+	for (const auto& Param : InFuncParam)
 	{
 		const FString ParamClassName = UTF8_TO_TCHAR(Param.getClass().getTypeName().cStr());
 		switch (Param.which())
@@ -372,53 +401,69 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionInternal(CallFunctionContext contex
 		}
 	}
 
-	std::map<std::string /* type name */, void*> OutParams;
-	if (FoundObject->MetaTypeName.Equals("UClass"))
+	std::vector<std::pair<std::string /* type name */, void*>> OutParams;
+	UnrealCore::Argument::Builder* FuncRet = nullptr;
+	capnp::List<UnrealCore::Argument>::Builder InitOutParams;
+	
+	if (!bIsStaticFunc)
 	{
-		UObject* ObjPtr = static_cast<UObject*>(FoundObject->Ptr);
-		FuncWrapper->Call(ObjPtr, PassToParams, OutParams);
+		if (FoundObject && FoundObject->MetaTypeName.Equals("UClass"))
+		{
+			UObject* ObjPtr = static_cast<UObject*>(FoundObject->Ptr);
+			FuncWrapper->Call(ObjPtr, PassToParams, OutParams);
+		}
+		else
+		{
+			return ErrorInfo(__FILE__, __LINE__,
+				FString::Printf(TEXT("Can not call function  %s on %s, only call function on the UClass"),
+					*FunctionName, *FoundObject->ClassName));
+		}
+
+		auto Ret = ObjectCallContext->getResults().initReturn();
+		FuncRet = &Ret;
+		
+		InitOutParams = ObjectCallContext->getResults().initOutParams(OutParams.size() - 1);
 	}
 	else
 	{
-		return ErrorInfo(__FILE__, __LINE__,
-			FString::Printf(TEXT("Can not call function  %s on %s, only call function on the UClass"),
-				UTF8_TO_TCHAR(FuncName), *FoundObject->ClassName));
+		FuncWrapper->CallStatic(PassToParams, OutParams);
+		auto Ret = StaticCallContext->getResults().initReturn();
+		FuncRet = &Ret;
+
+		InitOutParams = StaticCallContext->getResults().initOutParams(OutParams.size() - 1);
 	}
 	
-	auto InitRet = context.getResults().initReturn();
-	auto InitOutParams = context.getResults().initOutParams(OutParams.size() - 1);
-
 	auto Iter = OutParams.begin();
 	if (Iter != OutParams.end())
 	{
 		auto ReturnTypeName = Iter->first;
 		auto ReturnValue = Iter->second; 
-		InitRet.initClass().setTypeName(ReturnTypeName);
+		FuncRet->initClass().setTypeName(ReturnTypeName);
 
 		if (ReturnTypeName == "bool")
 		{
 			bool* Result = static_cast<bool*>(ReturnValue);
-			InitRet.setBoolValue(*Result);
+			FuncRet->setBoolValue(*Result);
 		}
 		else if (ReturnTypeName == "int")
 		{
 			int64_t* Result = static_cast<int64_t*>(ReturnValue);
-			InitRet.setIntValue(*Result);
+			FuncRet->setIntValue(*Result);
 		}
 		else if (ReturnTypeName == "uint")
 		{
 			uint64_t* Result = static_cast<uint64_t*>(ReturnValue);
-			InitRet.setUintValue(*Result);
+			FuncRet->setUintValue(*Result);
 		}
 		else if (ReturnTypeName == "double")
 		{
 			double* Result = static_cast<double*>(ReturnValue);
-			InitRet.setFloatValue(*Result);
+			FuncRet->setFloatValue(*Result);
 		}
 		else if (ReturnTypeName == "str")
 		{
 			const char* Result = static_cast<const char*>(ReturnValue);
-			InitRet.setStrValue(Result);
+			FuncRet->setStrValue(Result);
 		}
 		else if (ReturnTypeName == "object")
 		{
@@ -435,7 +480,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionInternal(CallFunctionContext contex
 		}
 		else if (ReturnTypeName == "void")
 		{
-			InitRet.initClass().setTypeName("void");
+			FuncRet->initClass().setTypeName("void");
 		}
 
 		++Iter;
@@ -485,11 +530,6 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionInternal(CallFunctionContext contex
 		}
 	}
 
-	return true;
-}
-
-ErrorInfo FUnrealCoreServerImpl::CallStaticFunctionInternal(CallStaticFunctionContext context)
-{
 	return true;
 }
 

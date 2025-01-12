@@ -98,6 +98,8 @@ protected:
 
 	static ErrorInfo CallStaticFunctionInternal(CallStaticFunctionContext context);
 
+	static ErrorInfo CallFunctionCommon(CallFunctionContext* ObjectCallContext, CallStaticFunctionContext* StaticCallContext, bool bIsStaticFunc);
+
 	static ErrorInfo FindClassInternal(FindClassContext context);
 
 	static ErrorInfo LoadClassInternal(LoadClassContext context);

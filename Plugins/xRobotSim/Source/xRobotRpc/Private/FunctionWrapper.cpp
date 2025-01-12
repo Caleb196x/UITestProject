@@ -167,7 +167,7 @@ void FFunctionWrapper::Init(UFunction* InFunction, bool bIsDelegate)
 	}
 }
 
-void FFunctionWrapper::Call(UObject* CallObject, const std::vector<void*>& Params, std::map<std::string, void*>& Outputs/*第0个元素是return的返回值*/)
+void FFunctionWrapper::Call(UObject* CallObject, const std::vector<void*>& Params, std::vector<std::pair<std::string, void*>>& Outputs/*第0个元素是return的返回值*/)
 {
 	TWeakObjectPtr<UFunction> CallFuncPtr = !bIsInterfaceFunction ? Function : CallObject->GetClass()->FindFunctionByName(Function->GetFName());
 	void* CallStackParams = ParamsBufferSize > 0 ? FMemory_Alloca(ParamsBufferSize) : nullptr;
@@ -181,7 +181,7 @@ void FFunctionWrapper::Call(UObject* CallObject, const std::vector<void*>& Param
 	FastCall(CallObject, CallFuncPtr.Get(), Params, Outputs, CallStackParams);
 }
 
-void FFunctionWrapper::CallStatic(const std::vector<void*>& Params, std::map<std::string, void*>& Outputs)
+void FFunctionWrapper::CallStatic(const std::vector<void*>& Params, std::vector<std::pair<std::string, void*>>& Outputs)
 {
 	if (!DefaultBindObject)
 	{
@@ -195,7 +195,7 @@ void FFunctionWrapper::FastCall(
 	UObject* CallObject,
 	UFunction* CallFunction,
 	const std::vector<void*>& Params,
-	std::map<std::string/*  type name */, void*>& Outputs,
+	std::vector<std::pair<std::string, void*>>& Outputs,
 	void* StackParams) const
 {
 	if (StackParams)
@@ -286,12 +286,13 @@ void FFunctionWrapper::FastCall(
 		{
 			UE_LOG(LogUnrealPython, Error, TEXT("Copy to ue value failed, property: %s"), *Return->GetProperty()->GetName());
 		}
-		Outputs[ReturnTypeNameStr] = RetVal;
+
 		Return->GetProperty()->DestroyValue_InContainer(StackParams);
+		Outputs.push_back(std::make_pair(ReturnTypeNameStr, RetVal));
 	}
 	else
 	{
-		Outputs["void"] = nullptr;
+		Outputs.push_back(std::make_pair("void", nullptr));
 	}
 
 	LastOutParams = &NewStack.OutParms;
@@ -318,7 +319,7 @@ void FFunctionWrapper::FastCall(
 						UE_LOG(LogUnrealPython, Error, TEXT("Copy to ue value failed, property: %s"), *Arguments[i]->GetProperty()->GetName());
 					}
 					
-					Outputs[OutParamTypeNameStr] = RetVal;
+					Outputs.push_back(std::make_pair(OutParamTypeNameStr, RetVal));
 				}
 				else
 				{

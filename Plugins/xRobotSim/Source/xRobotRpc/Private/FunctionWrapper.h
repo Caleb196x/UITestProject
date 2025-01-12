@@ -15,9 +15,9 @@ public:
 		Init(InFunction);
 	}
 
-	void Call(UObject* CallObject, const std::vector<void*>& Params, std::map<std::string, void*>& Outputs/*第0个元素是return的返回值*/);
+	void Call(UObject* CallObject, const std::vector<void*>& Params, std::vector<std::pair<std::string, void*>>& Outputs/*第0个元素是return的返回值*/);
 
-	void CallStatic(const std::vector<void*>& Params, std::map<std::string, void*>& Outputs);
+	void CallStatic(const std::vector<void*>& Params, std::vector<std::pair<std::string, void*>>& Outputs);
 
 	FString GetName() const { return Function->GetName(); }
 
@@ -31,7 +31,8 @@ private:
 
 	void SlowCall() {}
 
-	void FastCall(UObject* CallObject, UFunction* CallFunction, const std::vector<void*>& Params, std::map<std::string, void*>& Outputs, void* StackParams) const;
+	void FastCall(UObject* CallObject, UFunction* CallFunction, const std::vector<void*>& Params,
+		std::vector<std::pair<std::string, void*>>& Outputs, void* StackParams) const;
 
 	static std::string ConvertUeTypeNameToRpcTypeName(const FString& TypeName);
 
