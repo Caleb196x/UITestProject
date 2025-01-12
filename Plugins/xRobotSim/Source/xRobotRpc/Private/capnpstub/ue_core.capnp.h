@@ -319,7 +319,7 @@ struct UnrealCore::NewObjectParams {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(e93028909ce18c87, 1, 3)
+    CAPNP_DECLARE_STRUCT_HEADER(e93028909ce18c87, 1, 4)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -1890,6 +1890,9 @@ public:
 
   inline  ::uint64_t getFlags() const;
 
+  inline bool hasConstructArgs() const;
+  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader getConstructArgs() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -1941,6 +1944,13 @@ public:
 
   inline  ::uint64_t getFlags();
   inline void setFlags( ::uint64_t value);
+
+  inline bool hasConstructArgs();
+  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder getConstructArgs();
+  inline void setConstructArgs( ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader value);
+  inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder initConstructArgs(unsigned int size);
+  inline void adoptConstructArgs(::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>> disownConstructArgs();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -5478,6 +5488,40 @@ inline  ::uint64_t UnrealCore::NewObjectParams::Builder::getFlags() {
 inline void UnrealCore::NewObjectParams::Builder::setFlags( ::uint64_t value) {
   _builder.setDataField< ::uint64_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool UnrealCore::NewObjectParams::Reader::hasConstructArgs() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+}
+inline bool UnrealCore::NewObjectParams::Builder::hasConstructArgs() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader UnrealCore::NewObjectParams::Reader::getConstructArgs() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder UnrealCore::NewObjectParams::Builder::getConstructArgs() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+inline void UnrealCore::NewObjectParams::Builder::setConstructArgs( ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>::Builder UnrealCore::NewObjectParams::Builder::initConstructArgs(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), size);
+}
+inline void UnrealCore::NewObjectParams::Builder::adoptConstructArgs(
+    ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>> UnrealCore::NewObjectParams::Builder::disownConstructArgs() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 
 inline bool UnrealCore::NewObjectResults::Reader::hasObject() const {

@@ -73,7 +73,7 @@ public:
 		int32 p1 = context.getParams().getP1();
 
 		// 从对象列表中获取Uobject对象，并调用对象的函数
-		UObject* CorrObject = FObjectHolder::Get().GetUObject(this);
+		FObjectHolder::FUEObject* CorrObject = FObjectHolder::Get().GetUObject(this);
 		void* a = static_cast<void*>(&p0);
 		void* b = static_cast<void*>(&p1);
 		
@@ -139,7 +139,7 @@ public:
 			// auto TypeContainer = LoadUEType("MyObject");
 			// UObject* Obj = TypeContainer.New(Name, ObjectFlags);
 			UObject* Obj = nullptr;
-			FObjectHolder::Get().RegisterToRetainer(P, Obj);
+			FObjectHolder::Get().RegisterToRetainer(P, Obj, "UClass", "MyObject");
 			context.getResults().setObject(kj::mv(KJ_P));
 			
 			return kj::READY_NOW;

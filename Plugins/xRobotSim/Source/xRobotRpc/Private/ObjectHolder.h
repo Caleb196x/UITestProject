@@ -1,5 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "CoreRpcUtils.h"
+#include "StructTypeContainer.h"
 
 class FObjectHolder
 {
@@ -10,34 +12,62 @@ public:
 		return ObjectHolder;
 	}
 
-	void RegisterToRetainer(void* GrpcObj, UObject* ObjectPtr)
+	struct FUEObject
 	{
-		ObjectPtr->AddToRoot();
-		UserObjectRetainer.Add(GrpcObj, ObjectPtr);
-		GrpcObjectRetainer.Add(ObjectPtr, GrpcObj);
-	}
+		FString MetaTypeName; // UE反射类型
+		FString ClassName;
+		void* Ptr;
+	};
 
-	void RemoveFromRetainer(void* GrpcObj)
+	FUEObject*  RegisterToRetainer(void* RpcClientObj, void* ObjectPtr, const FString& MetaType, const FString& ClassName)
 	{
-		UObject* ObjectPtr;
-		UserObjectRetainer.RemoveAndCopyValue(GrpcObj, ObjectPtr);
-		ObjectPtr->RemoveFromRoot();
-		GrpcObjectRetainer.RemoveAndCopyValue(ObjectPtr, GrpcObj);
-		
-		ObjectPtr = nullptr;
-	}
-
-	UObject* GetUObject(const void* GrpcObj)
-	{
-		if (UserObjectRetainer.Contains(GrpcObj))
+		const FUEObject UEObject {MetaType, ClassName, ObjectPtr};
+		if (MetaType.Equals("UClass"))
 		{
-			return *UserObjectRetainer.Find(GrpcObj);
+			UObject* Obj = static_cast<UObject*>(ObjectPtr);
+			Obj->AddToRoot();
+		}
+		
+		UserObjectRetainer.Add(RpcClientObj, UEObject);
+		GrpcObjectRetainer.Add(ObjectPtr, RpcClientObj);
+
+		return UserObjectRetainer.Find(RpcClientObj);
+	}
+
+	void RemoveFromRetainer(void* RpcClientObj)
+	{
+		FUEObject UEObject;
+		UserObjectRetainer.RemoveAndCopyValue(RpcClientObj, UEObject);
+		
+		if (UEObject.MetaTypeName.Equals("UClass"))
+		{
+			UObject* ObjectPtr = static_cast<UObject*>(UEObject.Ptr);
+			ObjectPtr->RemoveFromRoot();
+		}
+		else if (UEObject.MetaTypeName.Equals("UScriptStruct"))
+		{
+			if (const FStructTypeContainer* TypeContainer = FCoreUtils::GetUEType(UEObject.ClassName))
+			{
+				
+				FScriptStructTypeContainer::Free(TypeContainer->GetStruct(), UEObject.Ptr);
+			}
+		}
+		
+		GrpcObjectRetainer.RemoveAndCopyValue(UEObject.Ptr, RpcClientObj);
+	}
+
+	FUEObject* GetUObject(const void* RpcClientObj)
+	{
+		if (UserObjectRetainer.Contains(RpcClientObj))
+		{
+			
+			return UserObjectRetainer.Find(RpcClientObj);
 		}
 
 		return nullptr;
 	}
 
-	void* GetGrpcObject(const UObject* ObjectPtr)
+	void* GetGrpcObject(const void* ObjectPtr)
 	{
 		if (GrpcObjectRetainer.Contains(ObjectPtr))
 		{
@@ -47,12 +77,23 @@ public:
 		return nullptr;
 	}
 
-	bool HasObject(const void* GrpcObj) const
+	void* GetGrpcObject(const FUEObject* ObjectPtr)
 	{
-		return UserObjectRetainer.Contains(GrpcObj);
+		const void* Obj = ObjectPtr->Ptr;
+		if (GrpcObjectRetainer.Contains(Obj))
+		{
+			return GrpcObjectRetainer.FindChecked(Obj);
+		}
+
+		return nullptr;
+	}
+
+	bool HasObject(const void* RpcClientObj) const
+	{
+		return UserObjectRetainer.Contains(RpcClientObj);
 	}
 	
 private:
-	TMap<void*, UObject*> UserObjectRetainer;
-	TMap<UObject*, void*> GrpcObjectRetainer;
+	TMap<void*, FUEObject> UserObjectRetainer;
+	TMap<void*, void*> GrpcObjectRetainer;
 };

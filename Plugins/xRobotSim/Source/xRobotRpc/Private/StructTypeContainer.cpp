@@ -1,6 +1,4 @@
 #include "StructTypeContainer.h"
-
-#include "RpcException.h"
 #include "UnrealPythonRpcLog.h"
 
 void FStructTypeContainer::Init()
@@ -22,21 +20,12 @@ void FStructTypeContainer::Init()
 	}
 }
 
-UObject* FStructTypeContainer::New(FString Name, uint64 ObjectFlags)
-{
-	UClass* Class = static_cast<UClass*>(Struct.Get());
-	UObject* Outer = GetTransientPackage();
-	FName ClassName = FName(*Name);
-	EObjectFlags Flags = static_cast<EObjectFlags>(ObjectFlags);
-	return NewObject<UObject>(Outer, Class, ClassName, Flags); // fixme: must run under game thread
-}
-
 std::shared_ptr<FFunctionWrapper> FStructTypeContainer::FindFunction(const FString& FuncName)
 {
 	const FName Name = FName(*FuncName);
 	if (!FunctionsMap.Contains(Name))
 	{
-		ThrowRuntimeRpcException(FString::Printf(TEXT("Not exist function: %s"), *FuncName));
+		return nullptr;
 	}
 
 	return FunctionsMap.FindChecked(Name);
@@ -72,17 +61,45 @@ void FStructTypeContainer::CreatePropertyWrapper(FProperty* InProperty)
 		if (const std::shared_ptr<FPropertyWrapper> PropertyWrapper = FPropertyWrapper::Create(InProperty))
 		{
 			PropertiesMap.Add(PropName, PropertyWrapper);
+			Properties.Add(PropertyWrapper);
 		}
 	}
 }
 
-/*UObject* FScriptStructTypeContainer::New(FString Name, uint64 ObjectFlags)
+void* FScriptStructTypeContainer::New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs)
 {
-	
+	void* Memory = Alloc(static_cast<UScriptStruct*>(Struct.Get()));
+	const int Count = ConstructArgs.Num() < Properties.Num() ? ConstructArgs.Num() : Properties.Num();
+	for (int i = 0; i < Count; ++i)
+	{
+		Properties[i]->CopyToUeValueInContainer(ConstructArgs[i], Memory);
+	}
+
+	return Memory;
 }
 
-UObject* FClassTypeContainer::New(FString Name, uint64 ObjectFlags)
+void* FScriptStructTypeContainer::Alloc(UScriptStruct* InScriptStruct)
 {
+	void* ScriptStructMemory = new char[InScriptStruct->GetStructureSize()];
+	InScriptStruct->InitializeStruct(ScriptStructMemory);
+	return ScriptStructMemory;
+}
 
-}*/
+void FScriptStructTypeContainer::Free(TWeakObjectPtr<UStruct> InStruct, void* InPtr)
+{
+	if (InStruct.IsValid())
+		InStruct->DestroyStruct(InPtr);
+	delete[] static_cast<char*>(InPtr);
+}
+
+void* FClassTypeContainer::New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs)
+{
+	UClass* Class = static_cast<UClass*>(Struct.Get());
+	UObject* Outer = GetTransientPackage();
+	FName ClassName = FName(*Name);
+	EObjectFlags Flags = static_cast<EObjectFlags>(ObjectFlags);
+	UObject* ObjPtr = NewObject<UObject>(Outer, Class, ClassName, Flags);
+	return static_cast<void*>(ObjPtr);
+}
+
 

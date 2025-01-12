@@ -29,15 +29,15 @@ interface UnrealCore
 
     struct Property
     {
-        class @0 : Class;
+        class @0 :Class;
         name @1 :Text;
         union {
-            boolValue @2 : Bool;
-            uintValue @3 : UInt64;
-            intValue @4 : Int64;
-            strValue @5 : Text;
-            floatValue @6 : Float64;
-            object @7 : Object;
+            boolValue @2 :Bool;
+            uintValue @3 :UInt64;
+            intValue @4 :Int64;
+            strValue @5 :Text;
+            floatValue @6 :Float64;
+            object @7 :Object;
         }
     }
 
@@ -56,11 +56,11 @@ interface UnrealCore
         onCall @0 (object :Object, params :List(Argument)) -> ();
     }
 
-    newObject @0 (outer :Object, class :Class, objName :Text, flags :UInt64) -> (object :Object);
+    newObject @0 (outer :Object, class :Class, objName :Text, flags :UInt64, constructArgs :List(Argument)) -> (object :Object);
     destroyObject @1 (outer :Object) -> (result :Bool);
 
-    callFunction @2 (outer :Object, callObject :Object, class :Class, funcName :Text, params :List(Argument)) -> (result :List(Argument));
-    callStaticFunction @3 (class :Class, funcName :Text, params :List(Argument)) -> (result :List(Argument));
+    callFunction @2 (outer :Object, callObject :Object, class :Class, funcName :Text, params :List(Argument)) -> (return :Argument, outParams :List(Argument));
+    callStaticFunction @3 (class :Class, funcName :Text, params :List(Argument)) -> (return :Argument, outParams :List(Argument));
 
     findClass @4 (class :Class) -> (object :Object);
     loadClass @5 (class :Class) -> (object :Object);

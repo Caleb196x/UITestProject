@@ -15,11 +15,15 @@ public:
 	virtual ~FStructTypeContainer() {}
 	
 	// malloc a new object of this type
-	virtual UObject* New(FString Name, uint64 ObjectFlags);
+	virtual void* New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs = {}) = 0;
+
+	virtual FString GetMetaTypeName() = 0;
 
 	std::shared_ptr<FFunctionWrapper> FindFunction(const FString& FuncName);
 
 	std::shared_ptr<FPropertyWrapper> FindProperty(const FString& PropertyName);
+
+	TWeakObjectPtr<UStruct> GetStruct() const { return Struct; }
 
 protected:
 	void CreateFunctionWrapper(UFunction* InFunction);
@@ -34,26 +38,35 @@ protected:
 	// 存放静态函数和成员函数
 	TMap<FName, std::shared_ptr<FFunctionWrapper>> FunctionsMap;
 	TMap<FName, std::shared_ptr<FPropertyWrapper>> PropertiesMap;
+	TArray<std::shared_ptr<FPropertyWrapper>> Properties;
 };
 
-/*class FScriptStructTypeContainer : public FStructTypeContainer
+class FScriptStructTypeContainer : public FStructTypeContainer
 {
 public:
-	virtual UObject* New(FString Name, uint64 ObjectFlags) override;
+	explicit FScriptStructTypeContainer(UScriptStruct* InScriptStruct) : FStructTypeContainer(InScriptStruct) {}
+	
+	virtual void* New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs={}) override;
 
-	virtual ~FScriptStructTypeContainer() {}
+	virtual FString GetMetaTypeName() override { return "UScriptStruct"; }
+
+	virtual ~FScriptStructTypeContainer() override {}
 
 	static void* Alloc(UScriptStruct* InScriptStruct);
-
+	
 	static void Free(TWeakObjectPtr<UStruct> InStruct, void* InPtr);
 };
 
 class FClassTypeContainer : public FStructTypeContainer
 {
 public:
-	virtual UObject* New(FString Name, uint64 ObjectFlags) override;
+	explicit FClassTypeContainer(UClass* InClass) : FStructTypeContainer(InClass) {}
+	
+	virtual void* New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs = {}) override;
 
-	virtual ~FClassTypeContainer() {}
-};*/
+	virtual FString GetMetaTypeName() override { return "UClass"; }
+
+	virtual ~FClassTypeContainer() override {}
+};
 
 

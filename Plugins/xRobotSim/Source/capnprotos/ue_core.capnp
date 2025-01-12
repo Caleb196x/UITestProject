@@ -56,7 +56,7 @@ interface UnrealCore
         onCall @0 (object :Object, params :List(Argument)) -> ();
     }
 
-    newObject @0 (outer :Object, class :Class, objName :Text, flags :UInt64) -> (object :Object);
+    newObject @0 (outer :Object, class :Class, objName :Text, flags :UInt64, constructArgs :List(Argument)) -> (object :Object);
     destroyObject @1 (outer :Object) -> (result :Bool);
 
     callFunction @2 (outer :Object, callObject :Object, class :Class, funcName :Text, params :List(Argument)) -> (return :Argument, outParams :List(Argument));
