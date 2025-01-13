@@ -427,7 +427,15 @@ ErrorInfo FUnrealCoreServerImpl::GetPropertyInternal(GetPropertyContext context)
 		else if (RpcTypeName == "object")
 		{
 			auto Object = Result.initObject();
-			uint64 Addr = reinterpret_cast<uint64>(PropertyValue);
+			void* RpcObject = FObjectHolder::Get().GetGrpcObject(PropertyValue);
+			if (!RpcObject)
+			{
+				return ErrorInfo(__FILE__, __LINE__,
+					FString::Printf(TEXT("Get property %s failed, can not find rpc object for ue object %p"),
+						*PropertyName, PropertyValue));
+			}
+			
+			uint64 Addr = reinterpret_cast<uint64>(RpcObject);
 			Object.setAddress(Addr);
 		}
 		else if (RpcTypeName == "enum")
