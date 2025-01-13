@@ -281,7 +281,7 @@ void FFunctionWrapper::FastCall(
 		const FString ReturnTypeName = Return->GetProperty()->GetCPPType();
 		const std::string ReturnTypeNameStr = ConvertUeTypeNameToRpcTypeName(ReturnTypeName);
 		
-		void* RetVal = FMemory::Malloc(Return->GetProperty()->GetSize());
+		void* RetVal = FMemory::Malloc(Return->GetProperty()->GetSize()); // fixme@mingyuan: free memory
 		if (!Return->ReadUeValueInContainer(StackParams, RetVal))
 		{
 			UE_LOG(LogUnrealPython, Error, TEXT("Copy to ue value failed, property: %s"), *Return->GetProperty()->GetName());
@@ -313,7 +313,7 @@ void FFunctionWrapper::FastCall(
 					const FString OutParamTypeName = Arguments[i]->GetProperty()->GetCPPType();
 					const std::string OutParamTypeNameStr = ConvertUeTypeNameToRpcTypeName(OutParamTypeName);
 					// TODO: copy memory
-					void* RetVal = FMemory::Malloc(Arguments[i]->GetProperty()->GetSize());
+					void* RetVal = FMemory::Malloc(Arguments[i]->GetProperty()->GetSize()); // fixme@mingyuan: free memory
 					if (!Arguments[i]->ReadUeValueInContainer(StackParams, RetVal))
 					{
 						UE_LOG(LogUnrealPython, Error, TEXT("Copy to ue value failed, property: %s"), *Arguments[i]->GetProperty()->GetName());

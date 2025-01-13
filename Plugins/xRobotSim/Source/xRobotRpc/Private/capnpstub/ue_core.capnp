@@ -39,6 +39,7 @@ interface UnrealCore
             strValue @5 :Text;
             floatValue @6 :Float64;
             object @7 :Object;
+            enumValue @8 :Int64;
         }
     }
 
@@ -75,6 +76,6 @@ interface UnrealCore
     registerOverrideClass @11 (class :Class, parent :Class, methods :List(Method)) -> ();
     unregisterOverrideClass @12 (class :Class, parent :Class) -> ();
 
-    setProperty @13 (outer :Object, owner :Object, property :Property) -> ();
-    getProperty @14 (outer :Object, owner :Object) -> (property :Property);
+    setProperty @13 (class :Class, owner :Object, property :Property) -> ();
+    getProperty @14 (class :Class, owner :Object) -> (property :Property);
 }

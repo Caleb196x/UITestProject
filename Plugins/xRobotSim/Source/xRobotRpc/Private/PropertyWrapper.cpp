@@ -54,7 +54,7 @@ void* FPropertyWrapper::Getter(UObject* Owner)
 	}
 
 	auto ValSize = Property->GetSize();
-	void* OutValue = FMemory::Malloc(ValSize);
+	void* OutValue = FMemory::Malloc(ValSize); // fixme@mingyuan: free memory
 	FMemory::Memzero(OutValue, ValSize);
 	if (!ReadUeValueInContainer(Owner, OutValue))
 	{

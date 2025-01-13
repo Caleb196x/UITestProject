@@ -271,6 +271,71 @@ ErrorInfo FUnrealCoreServerImpl::DestroyObjectInternal(DestroyObjectContext cont
 
 ErrorInfo FUnrealCoreServerImpl::SetPropertyInternal(SetPropertyContext context)
 {
+	const auto OwnerClass = context.getParams().getClass();
+	const auto OwnerObject = context.getParams().getOwner();
+	const auto Property = context.getParams().getProperty();
+	const FString PropertyName = UTF8_TO_TCHAR(Property.getName().cStr());
+	FString PropertyTypeName = UTF8_TO_TCHAR(Property.getClass().getTypeName().cStr());
+	
+	void* ClientHolder = reinterpret_cast<void*>(OwnerObject.getAddress());
+	
+	FObjectHolder::FUEObject* Obj = FObjectHolder::Get().GetUObject(ClientHolder);
+	if (!Obj)
+	{
+		return ErrorInfo(__FILE__, __LINE__, 
+			FString::Printf(TEXT("Set property %s failed, can not find ue object for client object %p"),
+				*PropertyName, ClientHolder));
+	}
+
+	const FString OwnerClassTypeName = UTF8_TO_TCHAR(OwnerClass.getTypeName().cStr());
+	FStructTypeContainer* TypeContainer = FCoreUtils::LoadUEStructType(OwnerClassTypeName);
+	if (!TypeContainer)
+	{
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Can not load type container for %s"), *OwnerClassTypeName));
+	}
+		
+	if (const std::shared_ptr<FPropertyWrapper> PropertyWrapper = TypeContainer->FindProperty(PropertyName))
+	{
+		UObject* ObjectPtr = static_cast<UObject*>(Obj->Ptr);
+
+		if (FCoreUtils::IsReleasePtr(ObjectPtr))
+		{
+			return ErrorInfo(__FILE__, __LINE__,
+				FString::Printf(TEXT("Set property %s failed, object has bee released"),
+					*PropertyName));
+		}
+
+		void* PropertyValue = nullptr;
+		switch (Property.which())
+		{
+			case UnrealCore::Property::INT_VALUE:
+				PropertyValue = new int64(Property.getIntValue());
+				break;
+			case UnrealCore::Property::STR_VALUE:
+				PropertyValue = new FString(UTF8_TO_TCHAR(Property.getStrValue().cStr()));
+				break;
+			case UnrealCore::Property::UINT_VALUE:
+				PropertyValue = new uint64(Property.getUintValue());
+				break;
+			case UnrealCore::Property::FLOAT_VALUE:
+				PropertyValue = new double(Property.getFloatValue());
+				break;
+			case UnrealCore::Property::BOOL_VALUE:
+				PropertyValue = new bool(Property.getBoolValue());
+				break;
+			case UnrealCore::Property::OBJECT:
+				PropertyValue = reinterpret_cast<void*>(Property.getObject().getAddress());
+				break;
+			case UnrealCore::Property::ENUM_VALUE:
+				PropertyValue = new int64(Property.getEnumValue());
+				break;
+			default:
+				break;
+		}
+		PropertyWrapper->Setter(ObjectPtr, PropertyValue);
+	}
+	
 	return true;
 }
 
