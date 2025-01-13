@@ -335,12 +335,115 @@ ErrorInfo FUnrealCoreServerImpl::SetPropertyInternal(SetPropertyContext context)
 		}
 		PropertyWrapper->Setter(ObjectPtr, PropertyValue);
 	}
+	else
+	{
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Set property %s failed, can not find property %s in class %s"),
+				*PropertyName, *PropertyTypeName, *OwnerClassTypeName));
+	}
 	
 	return true;
 }
 
 ErrorInfo FUnrealCoreServerImpl::GetPropertyInternal(GetPropertyContext context)
 {
+	const auto OwnerClass = context.getParams().getClass();
+	const auto OwnerObject = context.getParams().getOwner();
+	const FString PropertyName = UTF8_TO_TCHAR(context.getParams().getPropertyName().cStr());
+	void* ClientHolder = reinterpret_cast<void*>(OwnerObject.getAddress());
+	
+	FObjectHolder::FUEObject* Obj = FObjectHolder::Get().GetUObject(ClientHolder);
+	if (!Obj)
+	{
+		return ErrorInfo(__FILE__, __LINE__, 
+			FString::Printf(TEXT("Set property %s failed, can not find ue object for client object %p"),
+				*PropertyName, ClientHolder));
+	}
+
+	const FString OwnerClassTypeName = UTF8_TO_TCHAR(OwnerClass.getTypeName().cStr());
+	FStructTypeContainer* TypeContainer = FCoreUtils::LoadUEStructType(OwnerClassTypeName);
+	if (!TypeContainer)
+	{
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Can not load type container for %s"), *OwnerClassTypeName));
+	}
+
+	AutoMemoryFreer Freer;
+
+	if (const std::shared_ptr<FPropertyWrapper> PropertyWrapper = TypeContainer->FindProperty(PropertyName))
+	{
+		auto Result = context.getResults().initProperty();
+		const FString UePropertyTypeName = PropertyWrapper->GetCppType();
+		Result.initClass().setTypeName(TCHAR_TO_UTF8(*UePropertyTypeName));
+		Result.setName(context.getParams().getPropertyName());
+		std::string RpcTypeName = FCoreUtils::ConvertUeTypeNameToRpcTypeName(UePropertyTypeName);
+
+		UObject* ObjectPtr = static_cast<UObject*>(Obj->Ptr);
+		if (FCoreUtils::IsReleasePtr(ObjectPtr))
+		{
+			return ErrorInfo(__FILE__, __LINE__,
+				FString::Printf(TEXT("Get property %s failed, object has bee released"),
+					*PropertyName));
+		}
+		
+		void* PropertyValue = PropertyWrapper->Getter(ObjectPtr);
+
+		if (PropertyWrapper->GetProperty()->IsA<UEnum>())
+		{
+			RpcTypeName = "enum";
+		}
+
+		if (RpcTypeName == "int")
+		{
+			const int64* Value = static_cast<int64*>(PropertyValue);
+			Result.setIntValue(*Value);
+			Freer.AddPtr("int", PropertyValue);
+		}
+		else if (RpcTypeName == "uint")
+		{
+			const uint64* Value = static_cast<uint64*>(PropertyValue);
+			Result.setUintValue(*Value);
+			Freer.AddPtr("uint", PropertyValue);
+		}
+		else if (RpcTypeName == "bool")
+		{
+			const bool* Value = static_cast<bool*>(PropertyValue);
+			Result.setBoolValue(*Value);
+			Freer.AddPtr("bool", PropertyValue);
+		}
+		else if (RpcTypeName == "float")
+		{
+			const double* Value = static_cast<double*>(PropertyValue);
+			Result.setFloatValue(*Value);
+			Freer.AddPtr("float", PropertyValue);
+		}
+		else if (RpcTypeName == "str")
+		{
+			const FString* Value = static_cast<FString*>(PropertyValue);
+			std::string StdStr = TCHAR_TO_UTF8(*(*Value));
+			Result.setStrValue(StdStr);
+			Freer.AddPtr("str", PropertyValue);
+		}
+		else if (RpcTypeName == "object")
+		{
+			auto Object = Result.initObject();
+			uint64 Addr = reinterpret_cast<uint64>(PropertyValue);
+			Object.setAddress(Addr);
+		}
+		else if (RpcTypeName == "enum")
+		{
+			const int64* Value = static_cast<int64*>(PropertyValue);
+			Result.setEnumValue(*Value);
+			Freer.AddPtr("enum", PropertyValue);
+		}
+	}
+	else
+	{
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Can not find property %s in class %s"),
+				*PropertyName, *OwnerClassTypeName));
+	}
+	
 	return true;
 }
 

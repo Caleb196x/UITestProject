@@ -1,4 +1,7 @@
 #include "CoreRpcUtils.h"
+
+#include <unordered_map>
+
 #include "CoreMinimal.h"
 #include "RpcException.h"
 #include "TypeContainerFactory.h"
@@ -118,5 +121,38 @@ FStructTypeContainer* FCoreUtils::GetUEStructType(const FString& TypeName)
 	else
 	{
 		return nullptr;
+	}
+}
+
+
+std::string FCoreUtils::ConvertUeTypeNameToRpcTypeName(const FString& TypeName)
+{
+	const std::string InName = TCHAR_TO_UTF8(*TypeName);
+
+	// todo: add more type
+	std::unordered_map<std::string, std::string> TypeMapping = {
+		{"FString", "str"},
+		{"FText", "str"},
+		{"FName", "str"},
+		{"int8", "int"},
+		{"int16", "int"},
+		{"int32", "int"},
+		{"int64", "int"},
+		{"uint8", "uint"},
+		{"uint16", "uint"},
+		{"uint32", "uint"},
+		{"uint64", "uint"},
+		{"float", "float"},
+		{"double", "float"},
+		{"bool", "bool"}
+	};
+
+	if (TypeMapping.contains(InName))
+	{
+		return TypeMapping.at(InName);
+	}
+	else
+	{
+		return "object";
 	}
 }

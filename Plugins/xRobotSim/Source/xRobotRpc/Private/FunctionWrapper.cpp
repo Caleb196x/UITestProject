@@ -4,6 +4,7 @@
 #include <mutex>
 #include <unordered_map>
 
+#include "CoreRpcUtils.h"
 #include "Misc/DefaultValueHelper.h"
 
 static TMap<FName, TMap<FName, TMap<FName, FString>>> ParamDefaultMetas;
@@ -279,7 +280,7 @@ void FFunctionWrapper::FastCall(
 	{
 		// handle return value
 		const FString ReturnTypeName = Return->GetProperty()->GetCPPType();
-		const std::string ReturnTypeNameStr = ConvertUeTypeNameToRpcTypeName(ReturnTypeName);
+		const std::string ReturnTypeNameStr = FCoreUtils::ConvertUeTypeNameToRpcTypeName(ReturnTypeName);
 		
 		void* RetVal = FMemory::Malloc(Return->GetProperty()->GetSize()); // fixme@mingyuan: free memory
 		if (!Return->ReadUeValueInContainer(StackParams, RetVal))
@@ -311,7 +312,7 @@ void FFunctionWrapper::FastCall(
 				{
 					// write outputs
 					const FString OutParamTypeName = Arguments[i]->GetProperty()->GetCPPType();
-					const std::string OutParamTypeNameStr = ConvertUeTypeNameToRpcTypeName(OutParamTypeName);
+					const std::string OutParamTypeNameStr = FCoreUtils::ConvertUeTypeNameToRpcTypeName(OutParamTypeName);
 					// TODO: copy memory
 					void* RetVal = FMemory::Malloc(Arguments[i]->GetProperty()->GetSize()); // fixme@mingyuan: free memory
 					if (!Arguments[i]->ReadUeValueInContainer(StackParams, RetVal))
@@ -331,36 +332,5 @@ void FFunctionWrapper::FastCall(
 			LastOutParams = &(*LastOutParams)->NextOutParm;
 		}
 		
-	}
-}
-
-std::string FFunctionWrapper::ConvertUeTypeNameToRpcTypeName(const FString& TypeName)
-{
-	const std::string InName = TCHAR_TO_UTF8(*TypeName);
-
-	std::unordered_map<std::string, std::string> TypeMapping = {
-		{"FString", "str"},
-		{"FText", "str"},
-		{"FName", "str"},
-		{"int8", "int"},
-		{"int16", "int"},
-		{"int32", "int"},
-		{"int64", "int"},
-		{"uint8", "uint"},
-		{"uint16", "uint"},
-		{"uint32", "uint"},
-		{"uint64", "uint"},
-		{"float", "float"},
-		{"double", "float"},
-		{"bool", "bool"}
-	};
-
-	if (TypeMapping.contains(InName))
-	{
-		return TypeMapping.at(InName);
-	}
-	else
-	{
-		return "object";
 	}
 }

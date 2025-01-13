@@ -33,8 +33,7 @@ private:
 
 	void FastCall(UObject* CallObject, UFunction* CallFunction, const std::vector<void*>& Params,
 		std::vector<std::pair<std::string, void*>>& Outputs, void* StackParams) const;
-
-	static std::string ConvertUeTypeNameToRpcTypeName(const FString& TypeName);
+	
 
 	bool bIsStatic;
 

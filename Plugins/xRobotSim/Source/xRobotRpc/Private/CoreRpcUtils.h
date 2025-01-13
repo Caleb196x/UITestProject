@@ -39,6 +39,8 @@ public:
 
 	static FStructTypeContainer* GetUEStructType(const FString& TypeName);
 
+	static std::string ConvertUeTypeNameToRpcTypeName(const FString& TypeName);
+
 	FORCEINLINE static bool IsReleasePtr(void* Ptr)
 	{
 		return RELEASED_UOBJECT_MEMBER == Ptr;

@@ -77,5 +77,5 @@ interface UnrealCore
     unregisterOverrideClass @12 (class :Class, parent :Class) -> ();
 
     setProperty @13 (class :Class, owner :Object, property :Property) -> ();
-    getProperty @14 (class :Class, owner :Object) -> (property :Property);
+    getProperty @14 (class :Class, owner :Object, propertyName :Text) -> (property :Property);
 }
