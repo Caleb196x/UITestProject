@@ -165,6 +165,7 @@ struct UnrealCore::Argument {
     STR_VALUE,
     FLOAT_VALUE,
     OBJECT,
+    ENUM_VALUE,
   };
 
   struct _capnpPrivate {
@@ -1111,6 +1112,9 @@ public:
   inline bool hasObject() const;
   inline  ::UnrealCore::Object::Reader getObject() const;
 
+  inline bool isEnumValue() const;
+  inline  ::int64_t getEnumValue() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -1185,6 +1189,10 @@ public:
   inline  ::UnrealCore::Object::Builder initObject();
   inline void adoptObject(::capnp::Orphan< ::UnrealCore::Object>&& value);
   inline ::capnp::Orphan< ::UnrealCore::Object> disownObject();
+
+  inline bool isEnumValue();
+  inline  ::int64_t getEnumValue();
+  inline void setEnumValue( ::int64_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -4874,6 +4882,32 @@ inline ::capnp::Orphan< ::UnrealCore::Object> UnrealCore::Argument::Builder::dis
               "Must check which() before get()ing a union member.");
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::disown(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS));
+}
+
+inline bool UnrealCore::Argument::Reader::isEnumValue() const {
+  return which() == UnrealCore::Argument::ENUM_VALUE;
+}
+inline bool UnrealCore::Argument::Builder::isEnumValue() {
+  return which() == UnrealCore::Argument::ENUM_VALUE;
+}
+inline  ::int64_t UnrealCore::Argument::Reader::getEnumValue() const {
+  KJ_IREQUIRE((which() == UnrealCore::Argument::ENUM_VALUE),
+              "Must check which() before get()ing a union member.");
+  return _reader.getDataField< ::int64_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int64_t UnrealCore::Argument::Builder::getEnumValue() {
+  KJ_IREQUIRE((which() == UnrealCore::Argument::ENUM_VALUE),
+              "Must check which() before get()ing a union member.");
+  return _builder.getDataField< ::int64_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+inline void UnrealCore::Argument::Builder::setEnumValue( ::int64_t value) {
+  _builder.setDataField<UnrealCore::Argument::Which>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Argument::ENUM_VALUE);
+  _builder.setDataField< ::int64_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
 
 inline  ::UnrealCore::Property::Which UnrealCore::Property::Reader::which() const {

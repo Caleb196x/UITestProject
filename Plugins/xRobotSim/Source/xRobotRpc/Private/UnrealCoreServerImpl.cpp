@@ -42,13 +42,14 @@ kj::Promise<void> FUnrealCoreServerImpl::callStaticFunction(CallStaticFunctionCo
 
 kj::Promise<void> FUnrealCoreServerImpl::setProperty(SetPropertyContext context)
 {
-	
-	return kj::READY_NOW;
+	const auto Result = GameThreadDispatcher<SetPropertyContext>::EnqueueToGameThreadExec(SetPropertyInternal, context);
+	CHECK_RESULT_AND_RETURN(Result)
 }
 
 kj::Promise<void> FUnrealCoreServerImpl::getProperty(GetPropertyContext context)
 {
-	return kj::READY_NOW;
+	const auto Result = GameThreadDispatcher<GetPropertyContext>::EnqueueToGameThreadExec(GetPropertyInternal, context);
+	CHECK_RESULT_AND_RETURN(Result)
 }
 
 kj::Promise<void> FUnrealCoreServerImpl::findClass(FindClassContext context)
@@ -98,7 +99,7 @@ kj::Promise<void> FUnrealCoreServerImpl::staticClass(StaticClassContext context)
 
 struct AutoMemoryFreer
 {
-	void AddPtr(FString TypeName, void* Ptr)
+	void AddPtr(const FString& TypeName, void* Ptr)
 	{
 		PtrRetainer.Add(TypeName, Ptr);
 	}
@@ -111,7 +112,7 @@ struct AutoMemoryFreer
 		{
 			FString TypeName = Pair.Key;
 			void* Ptr = Pair.Value;
-			if (TypeName == "int")
+			if (TypeName == "int" || TypeName == "enum")
 			{
 				const int64* DataPtr = static_cast<int64*>(Ptr);
 				delete DataPtr;
@@ -167,7 +168,7 @@ ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 	// TODO: handle create object failure
 	if (!Obj)
 	{
-		FStructTypeContainer* TypeContainer = FCoreUtils::LoadUEType(ClassName);
+		FStructTypeContainer* TypeContainer = FCoreUtils::LoadUEStructType(ClassName);
 		if (!TypeContainer)
 		{
 			return ErrorInfo(__FILE__, __LINE__,
@@ -223,6 +224,13 @@ ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 					// TODO: support cpp native type
 					FObjectHolder::FUEObject* ObjPointer = FObjectHolder::Get().GetUObject(Pointer);
 					Args.Add(ObjPointer->Ptr);
+					break;
+				}
+				case UnrealCore::Argument::ENUM_VALUE:
+				{
+					int64* EnumPtr = new int64(Arg.getEnumValue());
+					AutoFreer.AddPtr("enum", EnumPtr);
+					Args.Add(EnumPtr);
 					break;
 				}
 				default:
@@ -333,7 +341,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 		FunctionName = UTF8_TO_TCHAR(InFuncName);
 	}
 
-	auto* TypeContainer = FCoreUtils::GetUEType(ClassName);
+	auto* TypeContainer = FCoreUtils::GetUEStructType(ClassName);
 	if (!TypeContainer)
 	{
 		return ErrorInfo(__FILE__, __LINE__,
@@ -394,6 +402,13 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 				// TODO: support cpp native type
 				FObjectHolder::FUEObject* ObjPointer = FObjectHolder::Get().GetUObject(Pointer);
 				PassToParams.push_back(ObjPointer->Ptr);
+				break;
+			}
+			case UnrealCore::Argument::ENUM_VALUE:
+			{
+				int64* EnumPtr = new int64(Param.getEnumValue());
+				AutoFreer.AddPtr("enum", EnumPtr);
+				PassToParams.push_back(EnumPtr);
 				break;
 			}
 			default:
@@ -481,6 +496,11 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 		else if (ReturnTypeName == "void")
 		{
 			FuncRet->initClass().setTypeName("void");
+		}
+		else if (ReturnTypeName == "enum")
+		{
+			int64_t* Result = static_cast<int64_t*>(ReturnValue);
+			FuncRet->setEnumValue(*Result);
 		}
 
 		++Iter;

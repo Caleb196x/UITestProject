@@ -33,9 +33,11 @@ T* FindAnyType(const FString& InShortName)
 class FCoreUtils
 {
 public:
-	static FStructTypeContainer* LoadUEType(const FString& TypeName);
+	static FStructTypeContainer* LoadUEStructType(const FString& TypeName);
 
-	static FStructTypeContainer* GetUEType(const FString& TypeName);
+	static UEnum* LoadUEEnumType(const FString& EnumTypeName);
+
+	static FStructTypeContainer* GetUEStructType(const FString& TypeName);
 
 	FORCEINLINE static bool IsReleasePtr(void* Ptr)
 	{

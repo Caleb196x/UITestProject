@@ -5,7 +5,7 @@
 
 TMap<UField*, FStructTypeContainer*> FCoreUtils::ClassTypeContainerCache = {};
 
-FStructTypeContainer* FCoreUtils::LoadUEType(const FString& TypeName)
+FStructTypeContainer* FCoreUtils::LoadUEStructType(const FString& TypeName)
 {
 	// find
 	UField* Type = FindAnyType<UClass>(TypeName);
@@ -17,11 +17,6 @@ FStructTypeContainer* FCoreUtils::LoadUEType(const FString& TypeName)
 
 	if (!Type)
 	{
-		Type = FindAnyType<UEnum>(TypeName);
-	}
-
-	if (!Type)
-	{
 		Type = LoadObject<UClass>(nullptr, *TypeName);
 	}
 
@@ -29,12 +24,7 @@ FStructTypeContainer* FCoreUtils::LoadUEType(const FString& TypeName)
 	{
 		Type = LoadObject<UScriptStruct>(nullptr, *TypeName);
 	}
-
-	if (!Type)
-	{
-		Type = LoadObject<UEnum>(nullptr, *TypeName);
-	}
-
+	
 	// blueprint class type
 	if (Type && !Type->IsNative())
 	{
@@ -65,8 +55,25 @@ FStructTypeContainer* FCoreUtils::LoadUEType(const FString& TypeName)
 	return nullptr;
 }
 
+UEnum* FCoreUtils::LoadUEEnumType(const FString& EnumTypeName)
+{
+	UField* Type = FindAnyType<UEnum>(EnumTypeName);
+
+	if (!Type)
+	{
+		Type = LoadObject<UEnum>(nullptr, *EnumTypeName);
+	}
+
+	if (UEnum* Enum = Cast<UEnum>(Type))
+	{
+		return Enum;
+	}
+	
+	return nullptr; 
+}
+
 // todo: impl more reliable
-FStructTypeContainer* FCoreUtils::GetUEType(const FString& TypeName)
+FStructTypeContainer* FCoreUtils::GetUEStructType(const FString& TypeName)
 {
 	UField* Type = FindAnyType<UClass>(TypeName);
 

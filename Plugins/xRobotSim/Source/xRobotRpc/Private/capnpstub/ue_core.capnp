@@ -24,6 +24,7 @@ interface UnrealCore
             strValue @5 :Text;
             floatValue @6 :Float64;
             object @7 :Object;
+            enumValue @8 :Int64;
         }
     }
 
