@@ -388,7 +388,7 @@ ErrorInfo FUnrealCoreServerImpl::GetPropertyInternal(GetPropertyContext context)
 		
 		void* PropertyValue = PropertyWrapper->Getter(ObjectPtr);
 
-		if (PropertyWrapper->GetProperty()->IsA<UEnum>())
+		if (UEnum* Enum = Cast<UEnum>(PropertyWrapper->GetProperty()))
 		{
 			RpcTypeName = "enum";
 		}

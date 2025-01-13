@@ -19,7 +19,7 @@ public:
 		void* Ptr;
 	};
 
-	FUEObject*  RegisterToRetainer(void* RpcClientObj, void* ObjectPtr, const FString& MetaType, const FString& ClassName)
+	FUEObject* RegisterToRetainer(void* RpcClientObj, void* ObjectPtr, const FString& MetaType, const FString& ClassName)
 	{
 		const FUEObject UEObject {MetaType, ClassName, ObjectPtr};
 		if (MetaType.Equals("UClass"))
@@ -46,7 +46,7 @@ public:
 		}
 		else if (UEObject.MetaTypeName.Equals("UScriptStruct"))
 		{
-			if (const FStructTypeContainer* TypeContainer = FCoreUtils::GetUEType(UEObject.ClassName))
+			if (const FStructTypeContainer* TypeContainer = FCoreUtils::GetUEStructType(UEObject.ClassName))
 			{
 				
 				FScriptStructTypeContainer::Free(TypeContainer->GetStruct(), UEObject.Ptr);
