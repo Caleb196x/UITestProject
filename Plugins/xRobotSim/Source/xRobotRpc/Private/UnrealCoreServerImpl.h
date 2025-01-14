@@ -128,8 +128,11 @@ public:
 	{
 		std::promise<ResultWithException<T>> Promise;
 		auto Future = Promise.get_future();
+		UE_LOG(LogUnrealPython, Warning, TEXT("Enqueue lambda function to game thread"));
+		// fixme@caleb196x: task graph maybe time consuming (大约会等待300ms)
 		AsyncTask(ENamedThreads::GameThread, [&Promise, Context, Func = std::move(Func)]()
 		{
+			UE_LOG(LogUnrealPython, Warning, TEXT("Step into lambda function"));
 			ErrorInfo Info = Func(Context);
 			ResultWithException<T> Result(Context, Info);
 			

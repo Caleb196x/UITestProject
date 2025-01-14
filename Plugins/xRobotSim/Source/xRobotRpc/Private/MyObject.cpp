@@ -1,5 +1,7 @@
 ﻿#include "MyObject.h"
 
+#include "UnrealPythonRpcLog.h"
+
 int32 UMyObject::Add(int32 a, int32 b)
 {
 	return a + b;
@@ -33,6 +35,7 @@ void UMyObject::MTestArrayParam(UMyObject* array)
 
 int32 UMyObject::TestVector(FVector Vector)
 {
+	UE_LOG(LogUnrealPython, Warning, TEXT("Test vector get Vector.X: %f, Vector.Y: %f"), Vector.X, Vector.Y)
 	return static_cast<int32>(Vector.X + Vector.Y);
 }
 

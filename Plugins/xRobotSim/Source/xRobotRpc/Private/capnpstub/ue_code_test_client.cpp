@@ -169,6 +169,26 @@ public:
         auto callRes = result.getReturn();
         return static_cast<int32_t>(callRes.getIntValue());
     }
+
+    int32_t TestVector(Vector2D* vector)
+    {
+        auto callReq = Client->callFunctionRequest();
+        auto outer = callReq.initOuter();
+        outer.setAddress(reinterpret_cast<uint64_t>(this));
+        outer.setName("TestMyObject");
+
+        auto callObject = callReq.initCallObject();
+        callObject.setAddress(reinterpret_cast<uint64_t>(UEObjectPtr));
+
+        callReq.initClass().setTypeName("MyObject");
+        callReq.setFuncName("TestVector");
+
+        auto Params = callReq.initParams(1);
+        Params[0].initObject().setAddress(reinterpret_cast<uint64_t>(vector));
+        auto Result = callReq.send().wait(*waitScope);
+        auto CallRes = Result.getReturn();
+        return static_cast<int32_t>(CallRes.getIntValue());
+    }
     
 private:
     static uint64_t ObjectIndex;
@@ -200,6 +220,13 @@ int main()
         MyObject* Object =  new MyObject(&unreal_core, &waitScope);
         int32_t Res = Object->Add(1, 2);
         std::cout << "Add result: " << Res << std::endl;
+
+        std::cout << "Call param vector function TestVector" << std::endl;
+        Vector2D vector_2d(&unreal_core, &waitScope);
+        vector_2d.SetX(4.0f);
+        vector_2d.SetY(5.0f);
+        Res = Object->TestVector(&vector_2d);
+        std::cout << "TestVector result: " << Res << std::endl;
     }
 
     {

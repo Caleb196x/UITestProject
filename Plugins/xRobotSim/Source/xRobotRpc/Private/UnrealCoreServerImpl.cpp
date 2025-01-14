@@ -2,6 +2,7 @@
 
 #include "CoreRpcUtils.h"
 #include "ObjectHolder.h"
+#include "UObject/UnrealTypePrivate.h"
 
 #define CHECK_RESULT_AND_RETURN(Result) \
 	context = Result.Context; \
@@ -388,7 +389,7 @@ ErrorInfo FUnrealCoreServerImpl::GetPropertyInternal(GetPropertyContext context)
 		
 		void* PropertyValue = PropertyWrapper->Getter(ObjectPtr);
 
-		if (UEnum* Enum = Cast<UEnum>(PropertyWrapper->GetProperty()))
+		if (PropertyWrapper->GetProperty()->IsA<FEnumProperty>())
 		{
 			RpcTypeName = "enum";
 		}
