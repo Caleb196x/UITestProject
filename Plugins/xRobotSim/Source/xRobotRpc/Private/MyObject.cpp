@@ -36,3 +36,7 @@ int32 UMyObject::TestVector(FVector Vector)
 	return static_cast<int32>(Vector.X + Vector.Y);
 }
 
+void UMyObject::TestEnum(EMyEnum MyEnum)
+{
+	UE_LOG(LogTemp, Display, TEXT("Test UEnum enum value is %d"), MyEnum)
+}
