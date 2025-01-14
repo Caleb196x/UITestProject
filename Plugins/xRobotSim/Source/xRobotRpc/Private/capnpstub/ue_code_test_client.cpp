@@ -5,6 +5,111 @@
 #include <iostream>
 #include <capnp/dynamic.h>
 
+struct Vector2D
+{
+    Vector2D(UnrealCore::Client* InClient, kj::WaitScope* inWaitScope) :
+        Client(InClient), waitScope(inWaitScope)
+    {
+        auto request = Client->newObjectRequest();
+        request.getClass().setTypeName("Vector2D");
+        request.getOuter().setAddress(reinterpret_cast<uint64_t>(this));
+        request.setFlags(0x00);
+        request.setObjName("TestVector2D");
+        auto ConstructArgs = request.initConstructArgs(2);
+
+        ConstructArgs[0].setName("X");
+        ConstructArgs[0].setFloatValue(1.0f);
+
+        ConstructArgs[1].setName("Y");
+        ConstructArgs[1].setFloatValue(2.0f);
+
+        auto promise = request.send();
+        auto result = promise.wait(*waitScope);
+        uint64_t addr = result.getObject().getAddress();
+        UEObjectPtr = reinterpret_cast<void*>(addr);
+        const auto name = result.getObject().getName();
+        std::cout << "construct vector2d created by ue: " << name.cStr() << ", ue object ptr: " << std::hex << UEObjectPtr << std::endl;
+    }
+
+    ~Vector2D()
+    {
+        auto destroyRequest = Client->destroyObjectRequest();
+        destroyRequest.initOuter().setAddress(reinterpret_cast<uint64_t>(this));
+
+        auto promise = destroyRequest.send();
+        auto res = promise.wait(*waitScope);
+        if (res.getResult())
+        {
+            std::cout << "Destroy vector2d success \n";
+        }
+        else
+        {
+            std::cout << "Destroy vector2d failed \n";
+        }
+    }
+
+    void SetX(double InX)
+    {
+        X = InX;
+        auto SetPropReq = Client->setPropertyRequest();
+        SetPropReq.initClass().setTypeName("Vector2D");
+        SetPropReq.initOwner().setName("TestVector2D");
+        SetPropReq.initOwner().setAddress(reinterpret_cast<uint64_t>(this));
+        auto Prop = SetPropReq.initProperty();
+        Prop.setName("X");
+        Prop.setFloatValue(InX);
+
+        SetPropReq.send().wait(*waitScope);
+    }
+
+    double GetX()
+    {
+        auto GetPropReq = Client->getPropertyRequest();
+        GetPropReq.initClass().setTypeName("Vector2D");
+        GetPropReq.initOwner().setName("TestVector2D");
+        GetPropReq.initOwner().setAddress(reinterpret_cast<uint64_t>(this));
+        GetPropReq.setPropertyName("X");
+
+        auto Result = GetPropReq.send().wait(*waitScope);
+        X= Result.getProperty().getFloatValue();
+        return X;
+    }
+
+    void SetY(double InY)
+    {
+        Y = InY;
+        auto SetPropReq = Client->setPropertyRequest();
+        SetPropReq.initClass().setTypeName("Vector2D");
+        SetPropReq.initOwner().setName("TestVector2D");
+        SetPropReq.initOwner().setAddress(reinterpret_cast<uint64_t>(this));
+        auto Prop = SetPropReq.initProperty();
+        Prop.setName("Y");
+        Prop.setFloatValue(InY);
+
+        SetPropReq.send().wait(*waitScope);
+    }
+
+    double GetY()
+    {
+        auto GetPropReq = Client->getPropertyRequest();
+        GetPropReq.initClass().setTypeName("Vector2D");
+        GetPropReq.initOwner().setName("TestVector2D");
+        GetPropReq.initOwner().setAddress(reinterpret_cast<uint64_t>(this));
+        GetPropReq.setPropertyName("Y");
+
+        auto Result = GetPropReq.send().wait(*waitScope);
+        Y= Result.getProperty().getFloatValue();
+        return Y;
+    }
+
+    double X;
+    double Y;
+
+    UnrealCore::Client* Client;
+    void* UEObjectPtr;
+    kj::WaitScope* waitScope;
+};
+
 class MyObject
 {
 public:
@@ -93,6 +198,22 @@ int main()
         std::cout << "Test new object" << std::endl;
 
         MyObject* Object =  new MyObject(&unreal_core, &waitScope);
-        Object->Add(1, 2);
+        int32_t Res = Object->Add(1, 2);
+        std::cout << "Add result: " << Res << std::endl;
+    }
+
+    {
+        Vector2D vector_2d(&unreal_core, &waitScope);
+        std::cout << "before set property: ";
+        double X = vector_2d.GetX();
+        double Y = vector_2d.GetY();
+        std::cout << "X: " << X << ", Y: " << Y << std::endl;
+        vector_2d.SetX(5.0f);
+        vector_2d.SetY(6.0f);
+        std::cout << "after set property: ";
+        X = vector_2d.GetX();
+        Y = vector_2d.GetY();
+        std::cout << "X: " << X << ", Y: " << Y << std::endl;
+        
     }
 }

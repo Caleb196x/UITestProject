@@ -243,7 +243,7 @@ ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 	}
 
 	ResponseObj.setName(NewObjName.cStr());
-	ResponseObj.setAddress(reinterpret_cast<uint64_t>(Obj));
+	ResponseObj.setAddress(reinterpret_cast<uint64_t>(Obj->Ptr));
 
 	return true;
 }
@@ -489,10 +489,10 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 		}
 
 		FoundObject = FObjectHolder::Get().GetUObject(ClientHolder);
-		FObjectHolder::FUEObject* PassedInObject = reinterpret_cast<FObjectHolder::FUEObject*>(CallObject.getAddress());
+		UObject* PassedInObject = reinterpret_cast<UObject*>(CallObject.getAddress());
 		FunctionName = UTF8_TO_TCHAR(InFuncName);
 		
-		if (FoundObject != PassedInObject)
+		if (FoundObject->Ptr != PassedInObject)
 		{
 			return ErrorInfo(__FILE__, __LINE__,
 				FString::Printf(TEXT("Call function %s failed, the object found in object holder %p is not equal to passed by caller %p"),

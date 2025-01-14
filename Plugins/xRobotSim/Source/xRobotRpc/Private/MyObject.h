@@ -3,6 +3,13 @@
 
 #include "MyObject.generated.h"
 
+UENUM()
+enum EMyEnum
+{
+	TEST = 0,
+	TEST2 = 1
+};
+
 UCLASS()
 class UMyObject : public UObject
 {
@@ -28,4 +35,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TestVector", ScriptName = "MTestArrayParam"), Category="Test")
 	int32 TestVector(FVector Vector);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TestVector", ScriptName = "MTestArrayParam"), Category="Test")
+	void TestEnum(EMyEnum MyEnum);
 };
