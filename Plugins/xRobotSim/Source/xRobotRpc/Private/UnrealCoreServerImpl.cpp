@@ -149,7 +149,7 @@ struct AutoMemoryFreer
 
 ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 {
-	const auto AllocClass = context.getParams().getClass();
+	const auto AllocClass = context.getParams().getUeClass();
 	const auto Outer = context.getParams().getOuter();
 	const auto NewObjName = context.getParams().getObjName();
 	const auto Flags = context.getParams().getFlags();
@@ -219,7 +219,7 @@ ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 				}
 				case UnrealCore::Argument::OBJECT:
 				{
-					FString TypeName = UTF8_TO_TCHAR(Arg.getClass().getTypeName().cStr());
+					FString TypeName = UTF8_TO_TCHAR(Arg.getUeClass().getTypeName().cStr());
 					void* Pointer = reinterpret_cast<void*>(Arg.getObject().getAddress());
 					UE_LOG(LogUnrealPython, Display, TEXT("NewObject for class %s and pass by object type %s"), *ClassName, *TypeName)
 					// TODO: support cpp native type
@@ -272,11 +272,11 @@ ErrorInfo FUnrealCoreServerImpl::DestroyObjectInternal(DestroyObjectContext cont
 
 ErrorInfo FUnrealCoreServerImpl::SetPropertyInternal(SetPropertyContext context)
 {
-	const auto OwnerClass = context.getParams().getClass();
+	const auto OwnerClass = context.getParams().getUeClass();
 	const auto OwnerObject = context.getParams().getOwner();
 	const auto Property = context.getParams().getProperty();
 	const FString PropertyName = UTF8_TO_TCHAR(Property.getName().cStr());
-	FString PropertyTypeName = UTF8_TO_TCHAR(Property.getClass().getTypeName().cStr());
+	FString PropertyTypeName = UTF8_TO_TCHAR(Property.getUeClass().getTypeName().cStr());
 	
 	void* ClientHolder = reinterpret_cast<void*>(OwnerObject.getAddress());
 	
@@ -348,7 +348,7 @@ ErrorInfo FUnrealCoreServerImpl::SetPropertyInternal(SetPropertyContext context)
 
 ErrorInfo FUnrealCoreServerImpl::GetPropertyInternal(GetPropertyContext context)
 {
-	const auto OwnerClass = context.getParams().getClass();
+	const auto OwnerClass = context.getParams().getUeClass();
 	const auto OwnerObject = context.getParams().getOwner();
 	const FString PropertyName = UTF8_TO_TCHAR(context.getParams().getPropertyName().cStr());
 	void* ClientHolder = reinterpret_cast<void*>(OwnerObject.getAddress());
@@ -375,7 +375,7 @@ ErrorInfo FUnrealCoreServerImpl::GetPropertyInternal(GetPropertyContext context)
 	{
 		auto Result = context.getResults().initProperty();
 		const FString UePropertyTypeName = PropertyWrapper->GetCppType();
-		Result.initClass().setTypeName(TCHAR_TO_UTF8(*UePropertyTypeName));
+		Result.initUeClass().setTypeName(TCHAR_TO_UTF8(*UePropertyTypeName));
 		Result.setName(context.getParams().getPropertyName());
 		std::string RpcTypeName = FCoreUtils::ConvertUeTypeNameToRpcTypeName(UePropertyTypeName);
 
@@ -478,7 +478,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 		auto Outer = ObjectCallContext->getParams().getOuter();
 		auto CallObject = ObjectCallContext->getParams().getCallObject();
 		auto InFuncName = ObjectCallContext->getParams().getFuncName().cStr();
-		auto Class = ObjectCallContext->getParams().getClass();
+		auto Class = ObjectCallContext->getParams().getUeClass();
 		InFuncParam = ObjectCallContext->getParams().getParams();
 
 		void* ClientHolder = reinterpret_cast<void*>(Outer.getAddress());
@@ -512,7 +512,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 	else
 	{
 		auto InFuncName = StaticCallContext->getParams().getFuncName().cStr();
-		auto Class = StaticCallContext->getParams().getClass();
+		auto Class = StaticCallContext->getParams().getUeClass();
 		InFuncParam = StaticCallContext->getParams().getParams();
 		ClassName = UTF8_TO_TCHAR(Class.getTypeName().cStr());
 		FunctionName = UTF8_TO_TCHAR(InFuncName);
@@ -533,7 +533,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 	std::vector<void*> PassToParams;
 	for (const auto& Param : InFuncParam)
 	{
-		const FString ParamClassName = UTF8_TO_TCHAR(Param.getClass().getTypeName().cStr());
+		const FString ParamClassName = UTF8_TO_TCHAR(Param.getUeClass().getTypeName().cStr());
 		switch (Param.which())
 		{
 			case UnrealCore::Argument::INT_VALUE:
@@ -573,7 +573,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 			}
 			case UnrealCore::Argument::OBJECT:
 			{
-				FString TypeName = UTF8_TO_TCHAR(Param.getClass().getTypeName().cStr());
+				FString TypeName = UTF8_TO_TCHAR(Param.getUeClass().getTypeName().cStr());
 				void* Pointer = reinterpret_cast<void*>(Param.getObject().getAddress());
 				UE_LOG(LogUnrealPython, Display, TEXT("CallFunction for class %s and pass by object type %s"), *ClassName, *TypeName)
 				// TODO: support cpp native type
@@ -630,7 +630,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 	{
 		auto ReturnTypeName = Iter->first;
 		auto ReturnValue = Iter->second; 
-		FuncRet->initClass().setTypeName(ReturnTypeName);
+		FuncRet->initUeClass().setTypeName(ReturnTypeName);
 
 		if (ReturnTypeName == "bool")
 		{
@@ -672,7 +672,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 		}
 		else if (ReturnTypeName == "void")
 		{
-			FuncRet->initClass().setTypeName("void");
+			FuncRet->initUeClass().setTypeName("void");
 		}
 		else if (ReturnTypeName == "enum")
 		{
@@ -689,7 +689,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 		auto TypeName = OutParam.first;
 		auto Value = OutParam.second;
 
-		InitOutParams[i].initClass().setTypeName(TypeName);
+		InitOutParams[i].initUeClass().setTypeName(TypeName);
 
 		if (TypeName == "bool")
 		{

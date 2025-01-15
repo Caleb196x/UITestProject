@@ -11,7 +11,7 @@ struct Vector2D
         Client(InClient), waitScope(inWaitScope)
     {
         auto request = Client->newObjectRequest();
-        request.getClass().setTypeName("Vector2D");
+        request.getUeClass().setTypeName("Vector2D");
         request.getOuter().setAddress(reinterpret_cast<uint64_t>(this));
         request.setFlags(0x00);
         request.setObjName("TestVector2D");
@@ -52,7 +52,7 @@ struct Vector2D
     {
         X = InX;
         auto SetPropReq = Client->setPropertyRequest();
-        SetPropReq.initClass().setTypeName("Vector2D");
+        SetPropReq.initUeClass().setTypeName("Vector2D");
         SetPropReq.initOwner().setName("TestVector2D");
         SetPropReq.initOwner().setAddress(reinterpret_cast<uint64_t>(this));
         auto Prop = SetPropReq.initProperty();
@@ -65,7 +65,7 @@ struct Vector2D
     double GetX()
     {
         auto GetPropReq = Client->getPropertyRequest();
-        GetPropReq.initClass().setTypeName("Vector2D");
+        GetPropReq.initUeClass().setTypeName("Vector2D");
         GetPropReq.initOwner().setName("TestVector2D");
         GetPropReq.initOwner().setAddress(reinterpret_cast<uint64_t>(this));
         GetPropReq.setPropertyName("X");
@@ -79,7 +79,7 @@ struct Vector2D
     {
         Y = InY;
         auto SetPropReq = Client->setPropertyRequest();
-        SetPropReq.initClass().setTypeName("Vector2D");
+        SetPropReq.initUeClass().setTypeName("Vector2D");
         SetPropReq.initOwner().setName("TestVector2D");
         SetPropReq.initOwner().setAddress(reinterpret_cast<uint64_t>(this));
         auto Prop = SetPropReq.initProperty();
@@ -92,7 +92,7 @@ struct Vector2D
     double GetY()
     {
         auto GetPropReq = Client->getPropertyRequest();
-        GetPropReq.initClass().setTypeName("Vector2D");
+        GetPropReq.initUeClass().setTypeName("Vector2D");
         GetPropReq.initOwner().setName("TestVector2D");
         GetPropReq.initOwner().setAddress(reinterpret_cast<uint64_t>(this));
         GetPropReq.setPropertyName("Y");
@@ -117,7 +117,7 @@ public:
         Client(InClient), waitScope(inWaitScope)
     {
         auto request = Client->newObjectRequest();
-        request.getClass().setTypeName("MyObject");
+        request.getUeClass().setTypeName("MyObject");
         request.getOuter().setAddress(reinterpret_cast<uint64_t>(this));
         request.getOuter().setName("MyObject");
 
@@ -158,7 +158,7 @@ public:
         auto callObject = callReq.initCallObject();
         callObject.setAddress(reinterpret_cast<uint64_t>(UEObjectPtr));
 
-        callReq.initClass().setTypeName("MyObject");
+        callReq.initUeClass().setTypeName("MyObject");
         callReq.setFuncName("Add");
 
         auto Params = callReq.initParams(2);
@@ -180,7 +180,7 @@ public:
         auto callObject = callReq.initCallObject();
         callObject.setAddress(reinterpret_cast<uint64_t>(UEObjectPtr));
 
-        callReq.initClass().setTypeName("MyObject");
+        callReq.initUeClass().setTypeName("MyObject");
         callReq.setFuncName("TestVector");
 
         auto Params = callReq.initParams(1);
