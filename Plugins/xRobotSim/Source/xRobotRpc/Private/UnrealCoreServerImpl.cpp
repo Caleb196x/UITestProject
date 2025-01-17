@@ -150,7 +150,7 @@ struct AutoMemoryFreer
 ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 {
 	const auto AllocClass = context.getParams().getUeClass();
-	const auto Outer = context.getParams().getOuter();
+	const auto Owner = context.getParams().getOwn();
 	const auto NewObjName = context.getParams().getObjName();
 	const auto Flags = context.getParams().getFlags();
 	auto ConstructArgs = context.getParams().getConstructArgs();
@@ -158,7 +158,7 @@ ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 	auto ResponseObj = context.getResults().initObject();
 	
 	const FString ClassName = UTF8_TO_TCHAR(AllocClass.getTypeName().cStr());
-	void* ClientHolder = reinterpret_cast<void*>(Outer.getAddress());
+	void* ClientHolder = reinterpret_cast<void*>(Owner.getAddress());
 
 	AutoMemoryFreer AutoFreer;
 
@@ -251,8 +251,8 @@ ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 
 ErrorInfo FUnrealCoreServerImpl::DestroyObjectInternal(DestroyObjectContext context)
 {
-	auto Outer = context.getParams().getOuter();
-	auto PointerAddr = Outer.getAddress();
+	auto Owner = context.getParams().getOwn();
+	auto PointerAddr = Owner.getAddress();
 	void* ClientHolder = reinterpret_cast<void*>(PointerAddr);
 
 	// TODO: check address
@@ -310,25 +310,25 @@ ErrorInfo FUnrealCoreServerImpl::SetPropertyInternal(SetPropertyContext context)
 		void* PropertyValue = nullptr;
 		switch (Property.which())
 		{
-			case UnrealCore::Property::INT_VALUE:
+			case UnrealCore::Argument::INT_VALUE:
 				PropertyValue = new int64(Property.getIntValue());
 				break;
-			case UnrealCore::Property::STR_VALUE:
+			case UnrealCore::Argument::STR_VALUE:
 				PropertyValue = new FString(UTF8_TO_TCHAR(Property.getStrValue().cStr()));
 				break;
-			case UnrealCore::Property::UINT_VALUE:
+			case UnrealCore::Argument::UINT_VALUE:
 				PropertyValue = new uint64(Property.getUintValue());
 				break;
-			case UnrealCore::Property::FLOAT_VALUE:
+			case UnrealCore::Argument::FLOAT_VALUE:
 				PropertyValue = new double(Property.getFloatValue());
 				break;
-			case UnrealCore::Property::BOOL_VALUE:
+			case UnrealCore::Argument::BOOL_VALUE:
 				PropertyValue = new bool(Property.getBoolValue());
 				break;
-			case UnrealCore::Property::OBJECT:
+			case UnrealCore::Argument::OBJECT:
 				PropertyValue = reinterpret_cast<void*>(Property.getObject().getAddress());
 				break;
-			case UnrealCore::Property::ENUM_VALUE:
+			case UnrealCore::Argument::ENUM_VALUE:
 				PropertyValue = new int64(Property.getEnumValue());
 				break;
 			default:
@@ -475,13 +475,13 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 	
 	if (!bIsStaticFunc)
 	{
-		auto Outer = ObjectCallContext->getParams().getOuter();
+		auto Owner = ObjectCallContext->getParams().getOwn();
 		auto CallObject = ObjectCallContext->getParams().getCallObject();
 		auto InFuncName = ObjectCallContext->getParams().getFuncName().cStr();
 		auto Class = ObjectCallContext->getParams().getUeClass();
 		InFuncParam = ObjectCallContext->getParams().getParams();
 
-		void* ClientHolder = reinterpret_cast<void*>(Outer.getAddress());
+		void* ClientHolder = reinterpret_cast<void*>(Owner.getAddress());
 		if (!FObjectHolder::Get().HasObject(ClientHolder))
 		{
 			// throw exception to client

@@ -206,23 +206,33 @@ int main()
     auto io = kj::setupAsyncIo();
     auto& waitScope = io.waitScope;
     kj::Network& network = io.provider->getNetwork();
-    kj::Own<kj::NetworkAddress> addr = network.parseAddress("127.0.0.1:6003").wait(waitScope);
-    kj::Own<kj::AsyncIoStream> conn = addr->connect().wait(waitScope);
+    UnrealCore::Client* unreal_core_client = nullptr;
+    try{
+        kj::Own<kj::NetworkAddress> addr = network.parseAddress("127.0.0.1:6003").wait(waitScope);
+        kj::Own<kj::AsyncIoStream> conn = addr->connect().wait(waitScope);
+        capnp::TwoPartyClient client(*conn);
+
+        UnrealCore::Client unreal_core = client.bootstrap().castAs<UnrealCore>();
+    }catch(kj::Exception& e){
+        std::cout << "connect error" << e.getDescription().cStr() << std::endl;
+        return -1;
+    }
+
 
     // Now we can start the Cap'n Proto RPC system on this connection.
-    capnp::TwoPartyClient client(*conn);
+    // capnp::TwoPartyClient client(*conn);
 
-    UnrealCore::Client unreal_core = client.bootstrap().castAs<UnrealCore>();
+    // UnrealCore::Client unreal_core = client.bootstrap().castAs<UnrealCore>();
 
     {
         std::cout << "Test new object" << std::endl;
 
-        MyObject* Object =  new MyObject(&unreal_core, &waitScope);
+        MyObject* Object =  new MyObject(unreal_core_client, &waitScope);
         int32_t Res = Object->Add(1, 2);
         std::cout << "Add result: " << Res << std::endl;
 
         std::cout << "Call param vector function TestVector" << std::endl;
-        Vector2D vector_2d(&unreal_core, &waitScope);
+        Vector2D vector_2d(unreal_core_client, &waitScope);
         vector_2d.SetX(4.0f);
         vector_2d.SetY(5.0f);
         Res = Object->TestVector(&vector_2d);
@@ -230,7 +240,7 @@ int main()
     }
 
     {
-        Vector2D vector_2d(&unreal_core, &waitScope);
+        Vector2D vector_2d(unreal_core_client, &waitScope);
         std::cout << "before set property: ";
         double X = vector_2d.GetX();
         double Y = vector_2d.GetY();

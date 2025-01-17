@@ -25,7 +25,6 @@ CAPNP_DECLARE_SCHEMA(8e1737faadc1c8be);
 CAPNP_DECLARE_SCHEMA(bbbd9ab104716176);
 CAPNP_DECLARE_SCHEMA(bda606608274c0bd);
 CAPNP_DECLARE_SCHEMA(a53c5ce887c3c1e6);
-CAPNP_DECLARE_SCHEMA(cdff00d120b52bc6);
 CAPNP_DECLARE_SCHEMA(8f2d77d834a5e736);
 CAPNP_DECLARE_SCHEMA(a46e9e12cd75e297);
 CAPNP_DECLARE_SCHEMA(8853ccc3271ca36f);
@@ -79,7 +78,6 @@ struct UnrealCore {
   struct Object;
   struct Class;
   struct Argument;
-  struct Property;
   struct Method;
   struct MethodCallable;
   struct DelegateCallback;
@@ -170,30 +168,6 @@ struct UnrealCore::Argument {
 
   struct _capnpPrivate {
     CAPNP_DECLARE_STRUCT_HEADER(a53c5ce887c3c1e6, 2, 3)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
-  };
-};
-
-struct UnrealCore::Property {
-  Property() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-  enum Which: uint16_t {
-    BOOL_VALUE,
-    UINT_VALUE,
-    INT_VALUE,
-    STR_VALUE,
-    FLOAT_VALUE,
-    OBJECT,
-    ENUM_VALUE,
-  };
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(cdff00d120b52bc6, 2, 3)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -1222,159 +1196,6 @@ private:
 };
 #endif  // !CAPNP_LITE
 
-class UnrealCore::Property::Reader {
-public:
-  typedef Property Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
-  }
-#endif  // !CAPNP_LITE
-
-  inline Which which() const;
-  inline bool hasUeClass() const;
-  inline  ::UnrealCore::Class::Reader getUeClass() const;
-
-  inline bool hasName() const;
-  inline  ::capnp::Text::Reader getName() const;
-
-  inline bool isBoolValue() const;
-  inline bool getBoolValue() const;
-
-  inline bool isUintValue() const;
-  inline  ::uint64_t getUintValue() const;
-
-  inline bool isIntValue() const;
-  inline  ::int64_t getIntValue() const;
-
-  inline bool isStrValue() const;
-  inline bool hasStrValue() const;
-  inline  ::capnp::Text::Reader getStrValue() const;
-
-  inline bool isFloatValue() const;
-  inline double getFloatValue() const;
-
-  inline bool isObject() const;
-  inline bool hasObject() const;
-  inline  ::UnrealCore::Object::Reader getObject() const;
-
-  inline bool isEnumValue() const;
-  inline  ::int64_t getEnumValue() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class UnrealCore::Property::Builder {
-public:
-  typedef Property Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline Which which();
-  inline bool hasUeClass();
-  inline  ::UnrealCore::Class::Builder getUeClass();
-  inline void setUeClass( ::UnrealCore::Class::Reader value);
-  inline  ::UnrealCore::Class::Builder initUeClass();
-  inline void adoptUeClass(::capnp::Orphan< ::UnrealCore::Class>&& value);
-  inline ::capnp::Orphan< ::UnrealCore::Class> disownUeClass();
-
-  inline bool hasName();
-  inline  ::capnp::Text::Builder getName();
-  inline void setName( ::capnp::Text::Reader value);
-  inline  ::capnp::Text::Builder initName(unsigned int size);
-  inline void adoptName(::capnp::Orphan< ::capnp::Text>&& value);
-  inline ::capnp::Orphan< ::capnp::Text> disownName();
-
-  inline bool isBoolValue();
-  inline bool getBoolValue();
-  inline void setBoolValue(bool value);
-
-  inline bool isUintValue();
-  inline  ::uint64_t getUintValue();
-  inline void setUintValue( ::uint64_t value);
-
-  inline bool isIntValue();
-  inline  ::int64_t getIntValue();
-  inline void setIntValue( ::int64_t value);
-
-  inline bool isStrValue();
-  inline bool hasStrValue();
-  inline  ::capnp::Text::Builder getStrValue();
-  inline void setStrValue( ::capnp::Text::Reader value);
-  inline  ::capnp::Text::Builder initStrValue(unsigned int size);
-  inline void adoptStrValue(::capnp::Orphan< ::capnp::Text>&& value);
-  inline ::capnp::Orphan< ::capnp::Text> disownStrValue();
-
-  inline bool isFloatValue();
-  inline double getFloatValue();
-  inline void setFloatValue(double value);
-
-  inline bool isObject();
-  inline bool hasObject();
-  inline  ::UnrealCore::Object::Builder getObject();
-  inline void setObject( ::UnrealCore::Object::Reader value);
-  inline  ::UnrealCore::Object::Builder initObject();
-  inline void adoptObject(::capnp::Orphan< ::UnrealCore::Object>&& value);
-  inline ::capnp::Orphan< ::UnrealCore::Object> disownObject();
-
-  inline bool isEnumValue();
-  inline  ::int64_t getEnumValue();
-  inline void setEnumValue( ::int64_t value);
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class UnrealCore::Property::Pipeline {
-public:
-  typedef Property Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-  inline  ::UnrealCore::Class::Pipeline getUeClass();
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
-
 class UnrealCore::Method::Reader {
 public:
   typedef Method Reads;
@@ -1895,8 +1716,8 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool hasOuter() const;
-  inline  ::UnrealCore::Object::Reader getOuter() const;
+  inline bool hasOwn() const;
+  inline  ::UnrealCore::Object::Reader getOwn() const;
 
   inline bool hasUeClass() const;
   inline  ::UnrealCore::Class::Reader getUeClass() const;
@@ -1937,12 +1758,12 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool hasOuter();
-  inline  ::UnrealCore::Object::Builder getOuter();
-  inline void setOuter( ::UnrealCore::Object::Reader value);
-  inline  ::UnrealCore::Object::Builder initOuter();
-  inline void adoptOuter(::capnp::Orphan< ::UnrealCore::Object>&& value);
-  inline ::capnp::Orphan< ::UnrealCore::Object> disownOuter();
+  inline bool hasOwn();
+  inline  ::UnrealCore::Object::Builder getOwn();
+  inline void setOwn( ::UnrealCore::Object::Reader value);
+  inline  ::UnrealCore::Object::Builder initOwn();
+  inline void adoptOwn(::capnp::Orphan< ::UnrealCore::Object>&& value);
+  inline ::capnp::Orphan< ::UnrealCore::Object> disownOwn();
 
   inline bool hasUeClass();
   inline  ::UnrealCore::Class::Builder getUeClass();
@@ -1986,7 +1807,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::UnrealCore::Object::Pipeline getOuter();
+  inline  ::UnrealCore::Object::Pipeline getOwn();
   inline  ::UnrealCore::Class::Pipeline getUeClass();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
@@ -2095,8 +1916,8 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool hasOuter() const;
-  inline  ::UnrealCore::Object::Reader getOuter() const;
+  inline bool hasOwn() const;
+  inline  ::UnrealCore::Object::Reader getOwn() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -2126,12 +1947,12 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool hasOuter();
-  inline  ::UnrealCore::Object::Builder getOuter();
-  inline void setOuter( ::UnrealCore::Object::Reader value);
-  inline  ::UnrealCore::Object::Builder initOuter();
-  inline void adoptOuter(::capnp::Orphan< ::UnrealCore::Object>&& value);
-  inline ::capnp::Orphan< ::UnrealCore::Object> disownOuter();
+  inline bool hasOwn();
+  inline  ::UnrealCore::Object::Builder getOwn();
+  inline void setOwn( ::UnrealCore::Object::Reader value);
+  inline  ::UnrealCore::Object::Builder initOwn();
+  inline void adoptOwn(::capnp::Orphan< ::UnrealCore::Object>&& value);
+  inline ::capnp::Orphan< ::UnrealCore::Object> disownOwn();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -2151,7 +1972,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::UnrealCore::Object::Pipeline getOuter();
+  inline  ::UnrealCore::Object::Pipeline getOwn();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -2253,8 +2074,8 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool hasOuter() const;
-  inline  ::UnrealCore::Object::Reader getOuter() const;
+  inline bool hasOwn() const;
+  inline  ::UnrealCore::Object::Reader getOwn() const;
 
   inline bool hasCallObject() const;
   inline  ::UnrealCore::Object::Reader getCallObject() const;
@@ -2296,12 +2117,12 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool hasOuter();
-  inline  ::UnrealCore::Object::Builder getOuter();
-  inline void setOuter( ::UnrealCore::Object::Reader value);
-  inline  ::UnrealCore::Object::Builder initOuter();
-  inline void adoptOuter(::capnp::Orphan< ::UnrealCore::Object>&& value);
-  inline ::capnp::Orphan< ::UnrealCore::Object> disownOuter();
+  inline bool hasOwn();
+  inline  ::UnrealCore::Object::Builder getOwn();
+  inline void setOwn( ::UnrealCore::Object::Reader value);
+  inline  ::UnrealCore::Object::Builder initOwn();
+  inline void adoptOwn(::capnp::Orphan< ::UnrealCore::Object>&& value);
+  inline ::capnp::Orphan< ::UnrealCore::Object> disownOwn();
 
   inline bool hasCallObject();
   inline  ::UnrealCore::Object::Builder getCallObject();
@@ -2349,7 +2170,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::UnrealCore::Object::Pipeline getOuter();
+  inline  ::UnrealCore::Object::Pipeline getOwn();
   inline  ::UnrealCore::Object::Pipeline getCallObject();
   inline  ::UnrealCore::Class::Pipeline getUeClass();
 private:
@@ -4164,7 +3985,7 @@ public:
   inline  ::UnrealCore::Object::Reader getOwner() const;
 
   inline bool hasProperty() const;
-  inline  ::UnrealCore::Property::Reader getProperty() const;
+  inline  ::UnrealCore::Argument::Reader getProperty() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -4209,11 +4030,11 @@ public:
   inline ::capnp::Orphan< ::UnrealCore::Object> disownOwner();
 
   inline bool hasProperty();
-  inline  ::UnrealCore::Property::Builder getProperty();
-  inline void setProperty( ::UnrealCore::Property::Reader value);
-  inline  ::UnrealCore::Property::Builder initProperty();
-  inline void adoptProperty(::capnp::Orphan< ::UnrealCore::Property>&& value);
-  inline ::capnp::Orphan< ::UnrealCore::Property> disownProperty();
+  inline  ::UnrealCore::Argument::Builder getProperty();
+  inline void setProperty( ::UnrealCore::Argument::Reader value);
+  inline  ::UnrealCore::Argument::Builder initProperty();
+  inline void adoptProperty(::capnp::Orphan< ::UnrealCore::Argument>&& value);
+  inline ::capnp::Orphan< ::UnrealCore::Argument> disownProperty();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -4235,7 +4056,7 @@ public:
 
   inline  ::UnrealCore::Class::Pipeline getUeClass();
   inline  ::UnrealCore::Object::Pipeline getOwner();
-  inline  ::UnrealCore::Property::Pipeline getProperty();
+  inline  ::UnrealCore::Argument::Pipeline getProperty();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -4436,7 +4257,7 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasProperty() const;
-  inline  ::UnrealCore::Property::Reader getProperty() const;
+  inline  ::UnrealCore::Argument::Reader getProperty() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -4467,11 +4288,11 @@ public:
 #endif  // !CAPNP_LITE
 
   inline bool hasProperty();
-  inline  ::UnrealCore::Property::Builder getProperty();
-  inline void setProperty( ::UnrealCore::Property::Reader value);
-  inline  ::UnrealCore::Property::Builder initProperty();
-  inline void adoptProperty(::capnp::Orphan< ::UnrealCore::Property>&& value);
-  inline ::capnp::Orphan< ::UnrealCore::Property> disownProperty();
+  inline  ::UnrealCore::Argument::Builder getProperty();
+  inline void setProperty( ::UnrealCore::Argument::Reader value);
+  inline  ::UnrealCore::Argument::Builder initProperty();
+  inline void adoptProperty(::capnp::Orphan< ::UnrealCore::Argument>&& value);
+  inline ::capnp::Orphan< ::UnrealCore::Argument> disownProperty();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -4491,7 +4312,7 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-  inline  ::UnrealCore::Property::Pipeline getProperty();
+  inline  ::UnrealCore::Argument::Pipeline getProperty();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -4928,326 +4749,6 @@ inline void UnrealCore::Argument::Builder::setEnumValue( ::int64_t value) {
       ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::UnrealCore::Property::Which UnrealCore::Property::Reader::which() const {
-  return _reader.getDataField<Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline  ::UnrealCore::Property::Which UnrealCore::Property::Builder::which() {
-  return _builder.getDataField<Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline bool UnrealCore::Property::Reader::hasUeClass() const {
-  return !_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline bool UnrealCore::Property::Builder::hasUeClass() {
-  return !_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline  ::UnrealCore::Class::Reader UnrealCore::Property::Reader::getUeClass() const {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Class>::get(_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline  ::UnrealCore::Class::Builder UnrealCore::Property::Builder::getUeClass() {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Class>::get(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-#if !CAPNP_LITE
-inline  ::UnrealCore::Class::Pipeline UnrealCore::Property::Pipeline::getUeClass() {
-  return  ::UnrealCore::Class::Pipeline(_typeless.getPointerField(0));
-}
-#endif  // !CAPNP_LITE
-inline void UnrealCore::Property::Builder::setUeClass( ::UnrealCore::Class::Reader value) {
-  ::capnp::_::PointerHelpers< ::UnrealCore::Class>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
-}
-inline  ::UnrealCore::Class::Builder UnrealCore::Property::Builder::initUeClass() {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Class>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline void UnrealCore::Property::Builder::adoptUeClass(
-    ::capnp::Orphan< ::UnrealCore::Class>&& value) {
-  ::capnp::_::PointerHelpers< ::UnrealCore::Class>::adopt(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::UnrealCore::Class> UnrealCore::Property::Builder::disownUeClass() {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Class>::disown(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-
-inline bool UnrealCore::Property::Reader::hasName() const {
-  return !_reader.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
-}
-inline bool UnrealCore::Property::Builder::hasName() {
-  return !_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::Text::Reader UnrealCore::Property::Reader::getName() const {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-inline  ::capnp::Text::Builder UnrealCore::Property::Builder::getName() {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-inline void UnrealCore::Property::Builder::setName( ::capnp::Text::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
-}
-inline  ::capnp::Text::Builder UnrealCore::Property::Builder::initName(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), size);
-}
-inline void UnrealCore::Property::Builder::adoptName(
-    ::capnp::Orphan< ::capnp::Text>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::Text> UnrealCore::Property::Builder::disownName() {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-
-inline bool UnrealCore::Property::Reader::isBoolValue() const {
-  return which() == UnrealCore::Property::BOOL_VALUE;
-}
-inline bool UnrealCore::Property::Builder::isBoolValue() {
-  return which() == UnrealCore::Property::BOOL_VALUE;
-}
-inline bool UnrealCore::Property::Reader::getBoolValue() const {
-  KJ_IREQUIRE((which() == UnrealCore::Property::BOOL_VALUE),
-              "Must check which() before get()ing a union member.");
-  return _reader.getDataField<bool>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline bool UnrealCore::Property::Builder::getBoolValue() {
-  KJ_IREQUIRE((which() == UnrealCore::Property::BOOL_VALUE),
-              "Must check which() before get()ing a union member.");
-  return _builder.getDataField<bool>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void UnrealCore::Property::Builder::setBoolValue(bool value) {
-  _builder.setDataField<UnrealCore::Property::Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Property::BOOL_VALUE);
-  _builder.setDataField<bool>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool UnrealCore::Property::Reader::isUintValue() const {
-  return which() == UnrealCore::Property::UINT_VALUE;
-}
-inline bool UnrealCore::Property::Builder::isUintValue() {
-  return which() == UnrealCore::Property::UINT_VALUE;
-}
-inline  ::uint64_t UnrealCore::Property::Reader::getUintValue() const {
-  KJ_IREQUIRE((which() == UnrealCore::Property::UINT_VALUE),
-              "Must check which() before get()ing a union member.");
-  return _reader.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint64_t UnrealCore::Property::Builder::getUintValue() {
-  KJ_IREQUIRE((which() == UnrealCore::Property::UINT_VALUE),
-              "Must check which() before get()ing a union member.");
-  return _builder.getDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void UnrealCore::Property::Builder::setUintValue( ::uint64_t value) {
-  _builder.setDataField<UnrealCore::Property::Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Property::UINT_VALUE);
-  _builder.setDataField< ::uint64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool UnrealCore::Property::Reader::isIntValue() const {
-  return which() == UnrealCore::Property::INT_VALUE;
-}
-inline bool UnrealCore::Property::Builder::isIntValue() {
-  return which() == UnrealCore::Property::INT_VALUE;
-}
-inline  ::int64_t UnrealCore::Property::Reader::getIntValue() const {
-  KJ_IREQUIRE((which() == UnrealCore::Property::INT_VALUE),
-              "Must check which() before get()ing a union member.");
-  return _reader.getDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int64_t UnrealCore::Property::Builder::getIntValue() {
-  KJ_IREQUIRE((which() == UnrealCore::Property::INT_VALUE),
-              "Must check which() before get()ing a union member.");
-  return _builder.getDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void UnrealCore::Property::Builder::setIntValue( ::int64_t value) {
-  _builder.setDataField<UnrealCore::Property::Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Property::INT_VALUE);
-  _builder.setDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool UnrealCore::Property::Reader::isStrValue() const {
-  return which() == UnrealCore::Property::STR_VALUE;
-}
-inline bool UnrealCore::Property::Builder::isStrValue() {
-  return which() == UnrealCore::Property::STR_VALUE;
-}
-inline bool UnrealCore::Property::Reader::hasStrValue() const {
-  if (which() != UnrealCore::Property::STR_VALUE) return false;
-  return !_reader.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
-}
-inline bool UnrealCore::Property::Builder::hasStrValue() {
-  if (which() != UnrealCore::Property::STR_VALUE) return false;
-  return !_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::Text::Reader UnrealCore::Property::Reader::getStrValue() const {
-  KJ_IREQUIRE((which() == UnrealCore::Property::STR_VALUE),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
-}
-inline  ::capnp::Text::Builder UnrealCore::Property::Builder::getStrValue() {
-  KJ_IREQUIRE((which() == UnrealCore::Property::STR_VALUE),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
-}
-inline void UnrealCore::Property::Builder::setStrValue( ::capnp::Text::Reader value) {
-  _builder.setDataField<UnrealCore::Property::Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Property::STR_VALUE);
-  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
-}
-inline  ::capnp::Text::Builder UnrealCore::Property::Builder::initStrValue(unsigned int size) {
-  _builder.setDataField<UnrealCore::Property::Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Property::STR_VALUE);
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), size);
-}
-inline void UnrealCore::Property::Builder::adoptStrValue(
-    ::capnp::Orphan< ::capnp::Text>&& value) {
-  _builder.setDataField<UnrealCore::Property::Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Property::STR_VALUE);
-  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::Text> UnrealCore::Property::Builder::disownStrValue() {
-  KJ_IREQUIRE((which() == UnrealCore::Property::STR_VALUE),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
-}
-
-inline bool UnrealCore::Property::Reader::isFloatValue() const {
-  return which() == UnrealCore::Property::FLOAT_VALUE;
-}
-inline bool UnrealCore::Property::Builder::isFloatValue() {
-  return which() == UnrealCore::Property::FLOAT_VALUE;
-}
-inline double UnrealCore::Property::Reader::getFloatValue() const {
-  KJ_IREQUIRE((which() == UnrealCore::Property::FLOAT_VALUE),
-              "Must check which() before get()ing a union member.");
-  return _reader.getDataField<double>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline double UnrealCore::Property::Builder::getFloatValue() {
-  KJ_IREQUIRE((which() == UnrealCore::Property::FLOAT_VALUE),
-              "Must check which() before get()ing a union member.");
-  return _builder.getDataField<double>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void UnrealCore::Property::Builder::setFloatValue(double value) {
-  _builder.setDataField<UnrealCore::Property::Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Property::FLOAT_VALUE);
-  _builder.setDataField<double>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool UnrealCore::Property::Reader::isObject() const {
-  return which() == UnrealCore::Property::OBJECT;
-}
-inline bool UnrealCore::Property::Builder::isObject() {
-  return which() == UnrealCore::Property::OBJECT;
-}
-inline bool UnrealCore::Property::Reader::hasObject() const {
-  if (which() != UnrealCore::Property::OBJECT) return false;
-  return !_reader.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
-}
-inline bool UnrealCore::Property::Builder::hasObject() {
-  if (which() != UnrealCore::Property::OBJECT) return false;
-  return !_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
-}
-inline  ::UnrealCore::Object::Reader UnrealCore::Property::Reader::getObject() const {
-  KJ_IREQUIRE((which() == UnrealCore::Property::OBJECT),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::get(_reader.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
-}
-inline  ::UnrealCore::Object::Builder UnrealCore::Property::Builder::getObject() {
-  KJ_IREQUIRE((which() == UnrealCore::Property::OBJECT),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::get(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
-}
-inline void UnrealCore::Property::Builder::setObject( ::UnrealCore::Object::Reader value) {
-  _builder.setDataField<UnrealCore::Property::Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Property::OBJECT);
-  ::capnp::_::PointerHelpers< ::UnrealCore::Object>::set(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
-}
-inline  ::UnrealCore::Object::Builder UnrealCore::Property::Builder::initObject() {
-  _builder.setDataField<UnrealCore::Property::Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Property::OBJECT);
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::init(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
-}
-inline void UnrealCore::Property::Builder::adoptObject(
-    ::capnp::Orphan< ::UnrealCore::Object>&& value) {
-  _builder.setDataField<UnrealCore::Property::Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Property::OBJECT);
-  ::capnp::_::PointerHelpers< ::UnrealCore::Object>::adopt(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::UnrealCore::Object> UnrealCore::Property::Builder::disownObject() {
-  KJ_IREQUIRE((which() == UnrealCore::Property::OBJECT),
-              "Must check which() before get()ing a union member.");
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::disown(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
-}
-
-inline bool UnrealCore::Property::Reader::isEnumValue() const {
-  return which() == UnrealCore::Property::ENUM_VALUE;
-}
-inline bool UnrealCore::Property::Builder::isEnumValue() {
-  return which() == UnrealCore::Property::ENUM_VALUE;
-}
-inline  ::int64_t UnrealCore::Property::Reader::getEnumValue() const {
-  KJ_IREQUIRE((which() == UnrealCore::Property::ENUM_VALUE),
-              "Must check which() before get()ing a union member.");
-  return _reader.getDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int64_t UnrealCore::Property::Builder::getEnumValue() {
-  KJ_IREQUIRE((which() == UnrealCore::Property::ENUM_VALUE),
-              "Must check which() before get()ing a union member.");
-  return _builder.getDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void UnrealCore::Property::Builder::setEnumValue( ::int64_t value) {
-  _builder.setDataField<UnrealCore::Property::Which>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, UnrealCore::Property::ENUM_VALUE);
-  _builder.setDataField< ::int64_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
-}
-
 inline bool UnrealCore::Method::Reader::hasName() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
@@ -5442,41 +4943,41 @@ inline ::capnp::Orphan< ::capnp::List< ::UnrealCore::Argument,  ::capnp::Kind::S
       ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
-inline bool UnrealCore::NewObjectParams::Reader::hasOuter() const {
+inline bool UnrealCore::NewObjectParams::Reader::hasOwn() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool UnrealCore::NewObjectParams::Builder::hasOuter() {
+inline bool UnrealCore::NewObjectParams::Builder::hasOwn() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::UnrealCore::Object::Reader UnrealCore::NewObjectParams::Reader::getOuter() const {
+inline  ::UnrealCore::Object::Reader UnrealCore::NewObjectParams::Reader::getOwn() const {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::UnrealCore::Object::Builder UnrealCore::NewObjectParams::Builder::getOuter() {
+inline  ::UnrealCore::Object::Builder UnrealCore::NewObjectParams::Builder::getOwn() {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::UnrealCore::Object::Pipeline UnrealCore::NewObjectParams::Pipeline::getOuter() {
+inline  ::UnrealCore::Object::Pipeline UnrealCore::NewObjectParams::Pipeline::getOwn() {
   return  ::UnrealCore::Object::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void UnrealCore::NewObjectParams::Builder::setOuter( ::UnrealCore::Object::Reader value) {
+inline void UnrealCore::NewObjectParams::Builder::setOwn( ::UnrealCore::Object::Reader value) {
   ::capnp::_::PointerHelpers< ::UnrealCore::Object>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::UnrealCore::Object::Builder UnrealCore::NewObjectParams::Builder::initOuter() {
+inline  ::UnrealCore::Object::Builder UnrealCore::NewObjectParams::Builder::initOwn() {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void UnrealCore::NewObjectParams::Builder::adoptOuter(
+inline void UnrealCore::NewObjectParams::Builder::adoptOwn(
     ::capnp::Orphan< ::UnrealCore::Object>&& value) {
   ::capnp::_::PointerHelpers< ::UnrealCore::Object>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::UnrealCore::Object> UnrealCore::NewObjectParams::Builder::disownOuter() {
+inline ::capnp::Orphan< ::UnrealCore::Object> UnrealCore::NewObjectParams::Builder::disownOwn() {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
@@ -5641,41 +5142,41 @@ inline ::capnp::Orphan< ::UnrealCore::Object> UnrealCore::NewObjectResults::Buil
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline bool UnrealCore::DestroyObjectParams::Reader::hasOuter() const {
+inline bool UnrealCore::DestroyObjectParams::Reader::hasOwn() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool UnrealCore::DestroyObjectParams::Builder::hasOuter() {
+inline bool UnrealCore::DestroyObjectParams::Builder::hasOwn() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::UnrealCore::Object::Reader UnrealCore::DestroyObjectParams::Reader::getOuter() const {
+inline  ::UnrealCore::Object::Reader UnrealCore::DestroyObjectParams::Reader::getOwn() const {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::UnrealCore::Object::Builder UnrealCore::DestroyObjectParams::Builder::getOuter() {
+inline  ::UnrealCore::Object::Builder UnrealCore::DestroyObjectParams::Builder::getOwn() {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::UnrealCore::Object::Pipeline UnrealCore::DestroyObjectParams::Pipeline::getOuter() {
+inline  ::UnrealCore::Object::Pipeline UnrealCore::DestroyObjectParams::Pipeline::getOwn() {
   return  ::UnrealCore::Object::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void UnrealCore::DestroyObjectParams::Builder::setOuter( ::UnrealCore::Object::Reader value) {
+inline void UnrealCore::DestroyObjectParams::Builder::setOwn( ::UnrealCore::Object::Reader value) {
   ::capnp::_::PointerHelpers< ::UnrealCore::Object>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::UnrealCore::Object::Builder UnrealCore::DestroyObjectParams::Builder::initOuter() {
+inline  ::UnrealCore::Object::Builder UnrealCore::DestroyObjectParams::Builder::initOwn() {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void UnrealCore::DestroyObjectParams::Builder::adoptOuter(
+inline void UnrealCore::DestroyObjectParams::Builder::adoptOwn(
     ::capnp::Orphan< ::UnrealCore::Object>&& value) {
   ::capnp::_::PointerHelpers< ::UnrealCore::Object>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::UnrealCore::Object> UnrealCore::DestroyObjectParams::Builder::disownOuter() {
+inline ::capnp::Orphan< ::UnrealCore::Object> UnrealCore::DestroyObjectParams::Builder::disownOwn() {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
@@ -5694,41 +5195,41 @@ inline void UnrealCore::DestroyObjectResults::Builder::setResult(bool value) {
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool UnrealCore::CallFunctionParams::Reader::hasOuter() const {
+inline bool UnrealCore::CallFunctionParams::Reader::hasOwn() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool UnrealCore::CallFunctionParams::Builder::hasOuter() {
+inline bool UnrealCore::CallFunctionParams::Builder::hasOwn() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::UnrealCore::Object::Reader UnrealCore::CallFunctionParams::Reader::getOuter() const {
+inline  ::UnrealCore::Object::Reader UnrealCore::CallFunctionParams::Reader::getOwn() const {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::UnrealCore::Object::Builder UnrealCore::CallFunctionParams::Builder::getOuter() {
+inline  ::UnrealCore::Object::Builder UnrealCore::CallFunctionParams::Builder::getOwn() {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::UnrealCore::Object::Pipeline UnrealCore::CallFunctionParams::Pipeline::getOuter() {
+inline  ::UnrealCore::Object::Pipeline UnrealCore::CallFunctionParams::Pipeline::getOwn() {
   return  ::UnrealCore::Object::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void UnrealCore::CallFunctionParams::Builder::setOuter( ::UnrealCore::Object::Reader value) {
+inline void UnrealCore::CallFunctionParams::Builder::setOwn( ::UnrealCore::Object::Reader value) {
   ::capnp::_::PointerHelpers< ::UnrealCore::Object>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::UnrealCore::Object::Builder UnrealCore::CallFunctionParams::Builder::initOuter() {
+inline  ::UnrealCore::Object::Builder UnrealCore::CallFunctionParams::Builder::initOwn() {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void UnrealCore::CallFunctionParams::Builder::adoptOuter(
+inline void UnrealCore::CallFunctionParams::Builder::adoptOwn(
     ::capnp::Orphan< ::UnrealCore::Object>&& value) {
   ::capnp::_::PointerHelpers< ::UnrealCore::Object>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::UnrealCore::Object> UnrealCore::CallFunctionParams::Builder::disownOuter() {
+inline ::capnp::Orphan< ::UnrealCore::Object> UnrealCore::CallFunctionParams::Builder::disownOwn() {
   return ::capnp::_::PointerHelpers< ::UnrealCore::Object>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
@@ -6954,34 +6455,34 @@ inline bool UnrealCore::SetPropertyParams::Builder::hasProperty() {
   return !_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
 }
-inline  ::UnrealCore::Property::Reader UnrealCore::SetPropertyParams::Reader::getProperty() const {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Property>::get(_reader.getPointerField(
+inline  ::UnrealCore::Argument::Reader UnrealCore::SetPropertyParams::Reader::getProperty() const {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::get(_reader.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
-inline  ::UnrealCore::Property::Builder UnrealCore::SetPropertyParams::Builder::getProperty() {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Property>::get(_builder.getPointerField(
+inline  ::UnrealCore::Argument::Builder UnrealCore::SetPropertyParams::Builder::getProperty() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::get(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::UnrealCore::Property::Pipeline UnrealCore::SetPropertyParams::Pipeline::getProperty() {
-  return  ::UnrealCore::Property::Pipeline(_typeless.getPointerField(2));
+inline  ::UnrealCore::Argument::Pipeline UnrealCore::SetPropertyParams::Pipeline::getProperty() {
+  return  ::UnrealCore::Argument::Pipeline(_typeless.getPointerField(2));
 }
 #endif  // !CAPNP_LITE
-inline void UnrealCore::SetPropertyParams::Builder::setProperty( ::UnrealCore::Property::Reader value) {
-  ::capnp::_::PointerHelpers< ::UnrealCore::Property>::set(_builder.getPointerField(
+inline void UnrealCore::SetPropertyParams::Builder::setProperty( ::UnrealCore::Argument::Reader value) {
+  ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::set(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS), value);
 }
-inline  ::UnrealCore::Property::Builder UnrealCore::SetPropertyParams::Builder::initProperty() {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Property>::init(_builder.getPointerField(
+inline  ::UnrealCore::Argument::Builder UnrealCore::SetPropertyParams::Builder::initProperty() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::init(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
 inline void UnrealCore::SetPropertyParams::Builder::adoptProperty(
-    ::capnp::Orphan< ::UnrealCore::Property>&& value) {
-  ::capnp::_::PointerHelpers< ::UnrealCore::Property>::adopt(_builder.getPointerField(
+    ::capnp::Orphan< ::UnrealCore::Argument>&& value) {
+  ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::adopt(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::UnrealCore::Property> UnrealCore::SetPropertyParams::Builder::disownProperty() {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Property>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::UnrealCore::Argument> UnrealCore::SetPropertyParams::Builder::disownProperty() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::disown(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
 
@@ -7105,34 +6606,34 @@ inline bool UnrealCore::GetPropertyResults::Builder::hasProperty() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::UnrealCore::Property::Reader UnrealCore::GetPropertyResults::Reader::getProperty() const {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Property>::get(_reader.getPointerField(
+inline  ::UnrealCore::Argument::Reader UnrealCore::GetPropertyResults::Reader::getProperty() const {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::UnrealCore::Property::Builder UnrealCore::GetPropertyResults::Builder::getProperty() {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Property>::get(_builder.getPointerField(
+inline  ::UnrealCore::Argument::Builder UnrealCore::GetPropertyResults::Builder::getProperty() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::UnrealCore::Property::Pipeline UnrealCore::GetPropertyResults::Pipeline::getProperty() {
-  return  ::UnrealCore::Property::Pipeline(_typeless.getPointerField(0));
+inline  ::UnrealCore::Argument::Pipeline UnrealCore::GetPropertyResults::Pipeline::getProperty() {
+  return  ::UnrealCore::Argument::Pipeline(_typeless.getPointerField(0));
 }
 #endif  // !CAPNP_LITE
-inline void UnrealCore::GetPropertyResults::Builder::setProperty( ::UnrealCore::Property::Reader value) {
-  ::capnp::_::PointerHelpers< ::UnrealCore::Property>::set(_builder.getPointerField(
+inline void UnrealCore::GetPropertyResults::Builder::setProperty( ::UnrealCore::Argument::Reader value) {
+  ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::UnrealCore::Property::Builder UnrealCore::GetPropertyResults::Builder::initProperty() {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Property>::init(_builder.getPointerField(
+inline  ::UnrealCore::Argument::Builder UnrealCore::GetPropertyResults::Builder::initProperty() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 inline void UnrealCore::GetPropertyResults::Builder::adoptProperty(
-    ::capnp::Orphan< ::UnrealCore::Property>&& value) {
-  ::capnp::_::PointerHelpers< ::UnrealCore::Property>::adopt(_builder.getPointerField(
+    ::capnp::Orphan< ::UnrealCore::Argument>&& value) {
+  ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::UnrealCore::Property> UnrealCore::GetPropertyResults::Builder::disownProperty() {
-  return ::capnp::_::PointerHelpers< ::UnrealCore::Property>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::UnrealCore::Argument> UnrealCore::GetPropertyResults::Builder::disownProperty() {
+  return ::capnp::_::PointerHelpers< ::UnrealCore::Argument>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
