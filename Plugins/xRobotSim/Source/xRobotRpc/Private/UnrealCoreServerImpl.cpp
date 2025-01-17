@@ -53,6 +53,12 @@ kj::Promise<void> FUnrealCoreServerImpl::getProperty(GetPropertyContext context)
 	CHECK_RESULT_AND_RETURN(Result)
 }
 
+kj::Promise<void> FUnrealCoreServerImpl::registerCreatedPyObject(RegisterCreatedPyObjectContext context)
+{
+	const auto Result = GameThreadDispatcher<RegisterCreatedPyObjectContext>::EnqueueToGameThreadExec(RegisterCreatedPyObjectInternal, context);
+	CHECK_RESULT_AND_RETURN(Result)
+}
+
 kj::Promise<void> FUnrealCoreServerImpl::findClass(FindClassContext context)
 {
 	return kj::READY_NOW;
@@ -629,8 +635,10 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 	if (Iter != OutParams.end())
 	{
 		auto ReturnTypeName = Iter->first;
-		auto ReturnValue = Iter->second; 
+		auto ReturnValue = Iter->second;
+		// fixme: return ue class type name
 		FuncRet->initUeClass().setTypeName(ReturnTypeName);
+		FuncRet->setName("return_value");
 
 		if (ReturnTypeName == "bool")
 		{
@@ -668,7 +676,13 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 
 			// 解决思路：
 			// 在then函数中传入端侧的test对象指针地址，并且将其存入ObjectHolder中
-			// 
+			//
+			// 解决思路2：
+			// 直接在server端返回uobject对象，在client端接受后，创建新的pyobject，然后立即将pyobject和uobject注册到object holder
+			auto InitObject = FuncRet->initObject();
+			InitObject.setAddress(reinterpret_cast<uint64>(ReturnValue));
+			InitObject.setName("");
+			FuncRet->setObject(InitObject);
 		}
 		else if (ReturnTypeName == "void")
 		{
@@ -775,4 +789,25 @@ ErrorInfo FUnrealCoreServerImpl::UnregisterOverrideClassInternal(UnregisterOverr
 	return true;
 }
 
+ErrorInfo FUnrealCoreServerImpl::RegisterCreatedPyObjectInternal(RegisterCreatedPyObjectContext context)
+{
+	const auto PyObject = context.getParams().getPyObject();
+	const auto UnrealObject = context.getParams().getUnrealObject();
+	const auto UeClass = context.getParams().getUeClass();
+
+	const FString ClassName = UTF8_TO_TCHAR(UeClass.getTypeName().cStr());
+	void* PyObjectPtr = reinterpret_cast<void*>(PyObject.getAddress());
+	void* UnrealObjectPtr = reinterpret_cast<void*>(UnrealObject.getAddress());
+
+	FStructTypeContainer* TypeContainer = FCoreUtils::LoadUEStructType(ClassName);
+	if (!TypeContainer)
+	{
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Can not load type container for %s"), *ClassName));
+	}
+	
+	FObjectHolder::Get().RegisterToRetainer(PyObjectPtr, UnrealObjectPtr, TypeContainer->GetMetaTypeName(), ClassName);
+
+	return true;
+}
 

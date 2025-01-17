@@ -86,6 +86,8 @@ protected:
 
 	virtual kj::Promise<void> getProperty(GetPropertyContext context) override;
 
+	virtual kj::Promise<void> registerCreatedPyObject(RegisterCreatedPyObjectContext context) override;
+
 	static ErrorInfo NewObjectInternal(NewObjectContext context);
 
 	static ErrorInfo DestroyObjectInternal(DestroyObjectContext context);
@@ -117,6 +119,8 @@ protected:
 	static ErrorInfo RegisterOverrideClassInternal(RegisterOverrideClassContext context);
 
 	static ErrorInfo UnregisterOverrideClassInternal(UnregisterOverrideClassContext context);
+
+	static ErrorInfo RegisterCreatedPyObjectInternal(RegisterCreatedPyObjectContext context);
 };
 
 template<typename T>
