@@ -28,21 +28,6 @@ interface UnrealCore
         }
     }
 
-    struct Property
-    {
-        ueClass @0 :Class;
-        name @1 :Text;
-        union {
-            boolValue @2 :Bool;
-            uintValue @3 :UInt64;
-            intValue @4 :Int64;
-            strValue @5 :Text;
-            floatValue @6 :Float64;
-            object @7 :Object;
-            enumValue @8 :Int64;
-        }
-    }
-
     struct Method
     {
         name @0 :Text;
@@ -76,6 +61,6 @@ interface UnrealCore
     registerOverrideClass @11 (ueClass :Class, parent :Class, methods :List(Method)) -> ();
     unregisterOverrideClass @12 (ueClass :Class, parent :Class) -> ();
 
-    setProperty @13 (ueClass :Class, owner :Object, property :Property) -> ();
-    getProperty @14 (ueClass :Class, owner :Object, propertyName :Text) -> (property :Property);
+    setProperty @13 (ueClass :Class, owner :Object, property :Argument) -> ();
+    getProperty @14 (ueClass :Class, owner :Object, propertyName :Text) -> (property :Argument);
 }
