@@ -71,7 +71,7 @@ uint32 FRpcServerRunnable::Run()
 	// {
 		auto IoContext = kj::setupAsyncIo();
 		kj::Network& Network = IoContext.provider->getNetwork();
-		kj::Own<kj::NetworkAddress> Addr = Network.parseAddress("127.0.0.1:6003").wait(IoContext.waitScope);
+		kj::Own<kj::NetworkAddress> Addr = Network.parseAddress("127.0.0.1:60003").wait(IoContext.waitScope);
 		Listener = Addr->listen();
 
 		capnp::TwoPartyServer Server(kj::heap<FUnrealCoreServerImpl>());

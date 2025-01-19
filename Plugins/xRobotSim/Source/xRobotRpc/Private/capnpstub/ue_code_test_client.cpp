@@ -12,7 +12,7 @@ struct Vector2D
     {
         auto request = Client->newObjectRequest();
         request.getUeClass().setTypeName("Vector2D");
-        request.getOuter().setAddress(reinterpret_cast<uint64_t>(this));
+        request.getOwn().setAddress(reinterpret_cast<uint64_t>(this));
         request.setFlags(0x00);
         request.setObjName("TestVector2D");
         auto ConstructArgs = request.initConstructArgs(2);
@@ -34,7 +34,7 @@ struct Vector2D
     ~Vector2D()
     {
         auto destroyRequest = Client->destroyObjectRequest();
-        destroyRequest.initOuter().setAddress(reinterpret_cast<uint64_t>(this));
+        destroyRequest.initOwn().setAddress(reinterpret_cast<uint64_t>(this));
 
         auto promise = destroyRequest.send();
         auto res = promise.wait(*waitScope);
@@ -118,8 +118,8 @@ public:
     {
         auto request = Client->newObjectRequest();
         request.getUeClass().setTypeName("MyObject");
-        request.getOuter().setAddress(reinterpret_cast<uint64_t>(this));
-        request.getOuter().setName("MyObject");
+        request.getOwn().setAddress(reinterpret_cast<uint64_t>(this));
+        request.getOwn().setName("MyObject");
 
         request.setFlags(0x00);
         request.setObjName("TestMyObject");
@@ -134,7 +134,7 @@ public:
     ~MyObject()
     {
         auto destroyRequest = Client->destroyObjectRequest();
-        destroyRequest.initOuter().setAddress(reinterpret_cast<uint64_t>(this));
+        destroyRequest.initOwn().setAddress(reinterpret_cast<uint64_t>(this));
 
         auto promise = destroyRequest.send();
         auto res = promise.wait(*waitScope);
@@ -151,7 +151,7 @@ public:
     int32_t Add(int32_t a, int32_t b)
     {
         auto callReq = Client->callFunctionRequest();
-        auto outer = callReq.initOuter();
+        auto outer = callReq.initOwn();
         outer.setAddress(reinterpret_cast<uint64_t>(this));
         outer.setName("TestMyObject");
 
@@ -173,7 +173,7 @@ public:
     int32_t TestVector(Vector2D* vector)
     {
         auto callReq = Client->callFunctionRequest();
-        auto outer = callReq.initOuter();
+        auto outer = callReq.initOwn();
         outer.setAddress(reinterpret_cast<uint64_t>(this));
         outer.setName("TestMyObject");
 

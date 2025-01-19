@@ -596,6 +596,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 			}
 			default:
 				break;
+				break;
 		}
 	}
 
