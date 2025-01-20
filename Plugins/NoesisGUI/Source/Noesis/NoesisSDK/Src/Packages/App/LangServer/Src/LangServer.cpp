@@ -407,7 +407,7 @@ static void TryConnect(double time)
 
         for (int p = UdpPortRangeBegin; p < UdpPortRangeEnd; ++p)
         {
-            gBroadcastSocket.Broadcast(gAnnouncementMessage.Str(), gAnnouncementMessage.Size(), p);
+            // gBroadcastSocket.Broadcast(gAnnouncementMessage.Str(), gAnnouncementMessage.Size(), p);
         }
     }
 

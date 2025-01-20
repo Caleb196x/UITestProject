@@ -4,6 +4,7 @@
 
 int32 UMyObject::Add(int32 a, int32 b)
 {
+	UE_LOG(LogUnrealPython, Display, TEXT("a: %d, b: %d"), a, b)
 	return a + b;
 }
 

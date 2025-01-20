@@ -600,7 +600,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 		}
 	}
 
-	std::vector<std::pair<std::string /* type name */, void*>> OutParams;
+	std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>> OutParams;
 	UnrealCore::Argument::Builder* FuncRet = nullptr;
 	capnp::List<UnrealCore::Argument>::Builder InitOutParams;
 	
@@ -636,64 +636,10 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 	if (Iter != OutParams.end())
 	{
 		auto ReturnTypeName = Iter->first;
-		auto ReturnValue = Iter->second;
-		// fixme: return ue class type name
-		FuncRet->initUeClass().setTypeName(ReturnTypeName);
-		FuncRet->setName("return_value");
-
-		if (ReturnTypeName == "bool")
-		{
-			bool* Result = static_cast<bool*>(ReturnValue);
-			FuncRet->setBoolValue(*Result);
-		}
-		else if (ReturnTypeName == "int")
-		{
-			int64_t* Result = static_cast<int64_t*>(ReturnValue);
-			FuncRet->setIntValue(*Result);
-		}
-		else if (ReturnTypeName == "uint")
-		{
-			uint64_t* Result = static_cast<uint64_t*>(ReturnValue);
-			FuncRet->setUintValue(*Result);
-		}
-		else if (ReturnTypeName == "double")
-		{
-			double* Result = static_cast<double*>(ReturnValue);
-			FuncRet->setFloatValue(*Result);
-		}
-		else if (ReturnTypeName == "str")
-		{
-			const char* Result = static_cast<const char*>(ReturnValue);
-			FuncRet->setStrValue(Result);
-		}
-		else if (ReturnTypeName == "object")
-		{
-			// auto Object =
-			// 如果返回值是当前函数调用分配的对象，在端侧该怎么处理？
-			// 例如：
-			// 端侧有个对象类型UTestObject的一个函数声明： UMainActor* CreateOtherActor(FString Name);
-			// 调用时 UMainActor* test = obj->CreateOtherActor("Hello");
-			// 那这个test对象在端侧的内存地址如何传递到ue侧？
-
-			// 解决思路：
-			// 在then函数中传入端侧的test对象指针地址，并且将其存入ObjectHolder中
-			//
-			// 解决思路2：
-			// 直接在server端返回uobject对象，在client端接受后，创建新的pyobject，然后立即将pyobject和uobject注册到object holder
-			auto InitObject = FuncRet->initObject();
-			InitObject.setAddress(reinterpret_cast<uint64>(ReturnValue));
-			InitObject.setName("");
-			FuncRet->setObject(InitObject);
-		}
-		else if (ReturnTypeName == "void")
-		{
-			FuncRet->initUeClass().setTypeName("void");
-		}
-		else if (ReturnTypeName == "enum")
-		{
-			int64_t* Result = static_cast<int64_t*>(ReturnValue);
-			FuncRet->setEnumValue(*Result);
-		}
+		auto UeTypeWithValuePair = Iter->second;
+		auto UeType = UeTypeWithValuePair.first;
+		auto Value = UeTypeWithValuePair.second;
+		ParseTypeAndSetValue(FuncRet, ReturnTypeName, UeType, Value);
 
 		++Iter;
 	}
@@ -702,36 +648,13 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 	{
 		auto OutParam = *Iter;
 		auto TypeName = OutParam.first;
-		auto Value = OutParam.second;
-
+		auto UeTypeWithValue = OutParam.second;
+		auto UeType = UeTypeWithValue.first;
+		auto Value = UeTypeWithValue.second;
 		InitOutParams[i].initUeClass().setTypeName(TypeName);
-
-		if (TypeName == "bool")
-		{
-			bool* Result = static_cast<bool*>(Value);
-			InitOutParams[i].setBoolValue(*Result);
-		}
-		else if (TypeName == "int")
-		{
-			int64_t* Result = static_cast<int64_t*>(Value);
-			InitOutParams[i].setIntValue(*Result);
-		}
-		else if (TypeName == "uint")
-		{
-			uint64_t* Result = static_cast<uint64_t*>(Value);
-			InitOutParams[i].setUintValue(*Result);
-		}
-		else if (TypeName == "double")
-		{
-			double* Result = static_cast<double*>(Value);
-			InitOutParams[i].setFloatValue(*Result);
-		}
-		else if (TypeName == "str")
-		{
-			const char* Result = static_cast<const char*>(Value);
-			InitOutParams[i].setStrValue(Result);
-		}
-		else if (TypeName == "object")
+		ParseTypeAndSetValue(FuncRet, TypeName, UeType, Value);
+		
+		/*else if (TypeName == "object")
 		{
 			// find outer object from ObjectHolder
 			auto OutObj = InitOutParams[i].initObject();
@@ -739,7 +662,7 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 			UObject* ResultPtr = static_cast<UObject*>(Value);
 			void* ObjPtr = FObjectHolder::Get().GetGrpcObject(ResultPtr);
 			OutObj.setAddress(reinterpret_cast<uint64_t>(ObjPtr));
-		}
+		}*/
 	}
 
 	return true;
@@ -812,3 +735,122 @@ ErrorInfo FUnrealCoreServerImpl::RegisterCreatedPyObjectInternal(RegisterCreated
 	return true;
 }
 
+void FUnrealCoreServerImpl::ParseTypeAndSetValue(UnrealCore::Argument::Builder* RetValue,
+		const std::string& RpcType, const std::string& UeType, void* Value)
+{
+	// fixme@Caleb196x: return ue class type name
+	RetValue->initUeClass().setTypeName(UeType);
+	RetValue->setName("return_value");
+
+	if (RpcType == "bool")
+	{
+		bool* Result = static_cast<bool*>(Value);
+		RetValue->setBoolValue(*Result);
+		FMemory::Free(Result);
+	}
+	else if (RpcType == "int")
+	{
+		if (UeType == "int32" || UeType == "int32_t"
+			|| UeType == "int16" || UeType == "int16_t"
+			|| UeType == "int8" || UeType == "int8_t")
+		{
+			int32_t* Result = static_cast<int32_t*>(Value);
+			RetValue->setIntValue(*Result);
+			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
+			FMemory::Free(Result);
+		}
+		else if (UeType == "int64" || UeType == "int64_t")
+		{
+			int64_t* Result = static_cast<int64_t*>(Value);
+			RetValue->setIntValue(*Result);
+			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
+			FMemory::Free(Result);
+		}
+	}
+	else if (RpcType == "uint")
+	{
+		if (UeType == "uint32" || UeType == "uint32_t"
+			|| UeType == "uint16" || UeType == "uint16_t"
+			|| UeType == "uint8" || UeType == "uint8_t")
+		{
+			uint32_t* Result = static_cast<uint32_t*>(Value);
+			RetValue->setIntValue(*Result);
+			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
+			FMemory::Free(Result);
+		}
+		else if (UeType == "int64" || UeType == "int64_t")
+		{
+			uint64_t* Result = static_cast<uint64_t*>(Value);
+			RetValue->setIntValue(*Result);
+			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
+			FMemory::Free(Result);
+		}
+	}
+	else if (RpcType == "double")
+	{
+		if (UeType == "float")
+		{
+			float* Result = static_cast<float*>(Value);
+			RetValue->setFloatValue(*Result);
+			FMemory::Free(Result);
+		}
+		else
+		{
+			double* Result = static_cast<double*>(Value);
+			RetValue->setFloatValue(*Result);
+			FMemory::Free(Result);
+		}
+	}
+	else if (RpcType == "str")
+	{
+		if (UeType == "FString")
+		{
+			FString* Result = static_cast<FString*>(Value);
+			RetValue->setStrValue(TCHAR_TO_UTF8(**Result));
+			FMemory::Free(Result);
+		}
+		else if (UeType == "FText")
+		{
+			FText* Result = static_cast<FText*>(Value);
+			const FString Str = Result->ToString();
+			RetValue->setStrValue(TCHAR_TO_UTF8(*Str));
+			FMemory::Free(Result);
+		}
+		else if (UeType == "FName")
+		{
+			FName* Result = static_cast<FName*>(Value);
+			const FString Str = Result->ToString();
+			RetValue->setStrValue(TCHAR_TO_UTF8(*Str));
+			FMemory::Free(Result);
+		}
+	}
+	else if (RpcType == "object")
+	{
+		// auto Object =
+		// 如果返回值是当前函数调用分配的对象，在端侧该怎么处理？
+		// 例如：
+		// 端侧有个对象类型UTestObject的一个函数声明： UMainActor* CreateOtherActor(FString Name);
+		// 调用时 UMainActor* test = obj->CreateOtherActor("Hello");
+		// 那这个test对象在端侧的内存地址如何传递到ue侧？
+
+		// 解决思路：
+		// 在then函数中传入端侧的test对象指针地址，并且将其存入ObjectHolder中
+		//
+		// 解决思路2：
+		// 直接在server端返回uobject对象，在client端接受后，创建新的pyobject，然后立即将pyobject和uobject注册到object holder
+		auto InitObject = RetValue->initObject();
+		InitObject.setAddress(reinterpret_cast<uint64>(Value));
+		InitObject.setName(""); // todo@Caleb196x: 设置变量名
+		RetValue->setObject(InitObject);
+	}
+	else if (RpcType == "void")
+	{
+		RetValue->initUeClass().setTypeName("void");
+	}
+	else if (RpcType == "enum")
+	{
+		int32_t* Result = static_cast<int32_t*>(Value);
+		RetValue->setEnumValue(*Result);
+		FMemory::Free(Result);
+	}
+}

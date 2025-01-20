@@ -144,7 +144,15 @@ std::string FCoreUtils::ConvertUeTypeNameToRpcTypeName(const FString& TypeName)
 		{"uint64", "uint"},
 		{"float", "float"},
 		{"double", "float"},
-		{"bool", "bool"}
+		{"bool", "bool"},
+		{"int8_t", "int"},
+		{"int16_t", "int"},
+		{"int32_t", "int"},
+		{"int64_t", "int"},
+		{"uint8_t", "uint"},
+		{"uint16_t", "uint"},
+		{"uint32_t", "uint"},
+		{"uint64_t", "uint"},
 	};
 
 	if (TypeMapping.contains(InName))

@@ -121,6 +121,9 @@ protected:
 	static ErrorInfo UnregisterOverrideClassInternal(UnregisterOverrideClassContext context);
 
 	static ErrorInfo RegisterCreatedPyObjectInternal(RegisterCreatedPyObjectContext context);
+
+	static void ParseTypeAndSetValue(UnrealCore::Argument::Builder* RetValue,
+		const std::string& RpcType, const std::string& UeType, void* Value);
 };
 
 template<typename T>
@@ -133,7 +136,7 @@ public:
 		std::promise<ResultWithException<T>> Promise;
 		auto Future = Promise.get_future();
 		UE_LOG(LogUnrealPython, Warning, TEXT("Enqueue lambda function to game thread"));
-		// fixme@caleb196x: task graph maybe time consuming (大约会等待300ms)
+		// fixme@caleb196x: task graph maybe time consuming (大约会等待300ms，修改成事件队列的形式，每个tick取出函数调用，在game thread下执行) 
 		AsyncTask(ENamedThreads::GameThread, [&Promise, Context, Func = std::move(Func)]()
 		{
 			UE_LOG(LogUnrealPython, Warning, TEXT("Step into lambda function"));
