@@ -34,7 +34,7 @@ public:
 	void MTestArrayParam(UMyObject* array);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TestVector", ScriptName = "MTestArrayParam"), Category="Test")
-	int32 TestVector(FVector Vector);
+	int32 TestVector(FVector2D Vector);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TestVector", ScriptName = "MTestArrayParam"), Category="Test")
 	void TestEnum(EMyEnum MyEnum);

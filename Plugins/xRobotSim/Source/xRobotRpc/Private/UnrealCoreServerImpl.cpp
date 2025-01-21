@@ -583,8 +583,9 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 				void* Pointer = reinterpret_cast<void*>(Param.getObject().getAddress());
 				UE_LOG(LogUnrealPython, Display, TEXT("CallFunction for class %s and pass by object type %s"), *ClassName, *TypeName)
 				// TODO: support cpp native type
-				FObjectHolder::FUEObject* ObjPointer = FObjectHolder::Get().GetUObject(Pointer);
-				PassToParams.push_back(ObjPointer->Ptr);
+				FObjectHolder::FUEObject* ObjPointer = FObjectHolder::Get().GetUObject(Pointer); // fixme@Caleb196x: crash when passing into a null pointer
+				if (ObjPointer)
+					PassToParams.push_back(ObjPointer->Ptr);
 				break;
 			}
 			case UnrealCore::Argument::ENUM_VALUE:
@@ -595,7 +596,6 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 				break;
 			}
 			default:
-				break;
 				break;
 		}
 	}
