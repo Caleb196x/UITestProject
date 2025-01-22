@@ -24,6 +24,11 @@ T* FindAnyType(const TCHAR* InShortName)
 #endif
 }
 
+FORCEINLINE int32 GetSizeWithAlignment(FProperty* InProperty)
+{
+	return Align(InProperty->GetSize(), InProperty->GetMinAlignment());
+}
+
 template <typename T>
 T* FindAnyType(const FString& InShortName)
 {

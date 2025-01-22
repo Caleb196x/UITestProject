@@ -44,3 +44,12 @@ void UMyObject::TestEnum(EMyEnum MyEnum)
 {
 	UE_LOG(LogTemp, Display, TEXT("Test UEnum enum value is %d"), MyEnum)
 }
+
+void UMyObject::TestActorArray(TArray<AActor> Array)
+{
+	UE_LOG(LogTemp, Display, TEXT("TestActorArray is %d"), Array.Num())
+	for (const auto Actor : Array)
+	{
+		UE_LOG(LogTemp, Display, TEXT("TestActorArray get actor name: %s"), *Actor.GetName())
+	}
+}

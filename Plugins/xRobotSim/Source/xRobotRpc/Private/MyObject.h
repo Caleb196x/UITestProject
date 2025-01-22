@@ -38,4 +38,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TestVector", ScriptName = "MTestArrayParam"), Category="Test")
 	void TestEnum(EMyEnum MyEnum);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TestArray", ScriptName = "MTestArrayParam"), Category="Test")
+	void TestActorArray(TArray<AActor> Array);
 };

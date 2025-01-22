@@ -235,7 +235,7 @@ ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 				}
 				case UnrealCore::Argument::ENUM_VALUE:
 				{
-					int64* EnumPtr = new int64(Arg.getEnumValue());
+					int32* EnumPtr = new int32(Arg.getEnumValue());
 					AutoFreer.AddPtr("enum", EnumPtr);
 					Args.Add(EnumPtr);
 					break;
