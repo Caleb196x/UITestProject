@@ -735,6 +735,38 @@ ErrorInfo FUnrealCoreServerImpl::RegisterCreatedPyObjectInternal(RegisterCreated
 	return true;
 }
 
+ErrorInfo FUnrealCoreServerImpl::NewContainerInternal()
+{
+	// input from client
+	const void* Own = nullptr;
+	const FString ContainerType = "Array";
+	const FString KeyPropertyName = "TypeName";
+	const FString ValuePropertyName = "TypeName";
+
+	// 根据type name，区分内置类型，反射类型，容器类型，分别创建不同property
+
+	// 根据容器类型，创建容器FScriptMap, FScriptSet, FScriptArray对象指针
+
+	// 添加容器对象指针到内存管理器
+
+	// 返回容器对象指针
+	
+	return true;
+}
+
+ErrorInfo FUnrealCoreServerImpl::DestroyContainerInternal()
+{
+	const void* Own = nullptr;
+
+	// 从内存管理器中查找容器对象指针
+
+	// 调用Empty操作函数，清空容器
+
+	// 销毁容器对象指针
+	
+	return true;
+}
+
 void FUnrealCoreServerImpl::ParseTypeAndSetValue(UnrealCore::Argument::Builder* RetValue,
 		const std::string& RpcType, const std::string& UeType, void* Value)
 {
