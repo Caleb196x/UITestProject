@@ -122,6 +122,10 @@ protected:
 
 	static ErrorInfo RegisterCreatedPyObjectInternal(RegisterCreatedPyObjectContext context);
 
+	static ErrorInfo NewContainerInternal();
+
+	static ErrorInfo DestroyContainerInternal();
+
 	static void ParseTypeAndSetValue(UnrealCore::Argument::Builder* RetValue,
 		const std::string& RpcType, const std::string& UeType, void* Value);
 };
