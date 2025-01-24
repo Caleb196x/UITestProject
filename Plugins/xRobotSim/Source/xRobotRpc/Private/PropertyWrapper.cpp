@@ -259,8 +259,8 @@ public:
 		CHECK_PTR(DestValuePtr, FEnumPropertyWrapper)
 		CHECK_PTR(SrcValuePtr, FEnumPropertyWrapper)
 		
-		const int64* Src = static_cast<const int64*>(SrcValuePtr);
-		const int64 Val = *Src;
+		const int32* Src = static_cast<const int32*>(SrcValuePtr);
+		const int32 Val = *Src;
 		EnumProperty->GetUnderlyingProperty()->SetIntPropertyValue(DestValuePtr, static_cast<uint64>(Val));
 		return true;
 	}
