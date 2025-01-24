@@ -90,24 +90,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\liumi\\.nuget\\packages\\": {},
-    "E:\\Software\\Microsoft\\VisualStudio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Admin\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\AI_UI\\UITestProject\\Plugins\\xRobotSim\\Source\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj",
+      "projectUniqueName": "D:\\WorkSpace\\UITestProject\\Plugins\\xRobotSim\\Source\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj",
       "projectName": "CSharpParamDefaultValueMetas",
-      "projectPath": "F:\\AI_UI\\UITestProject\\Plugins\\xRobotSim\\Source\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj",
-      "packagesPath": "C:\\Users\\liumi\\.nuget\\packages\\",
-      "outputPath": "F:\\AI_UI\\UITestProject\\Plugins\\xRobotSim\\Source\\CSharpParamDefaultValueMetas\\obj\\",
+      "projectPath": "D:\\WorkSpace\\UITestProject\\Plugins\\xRobotSim\\Source\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj",
+      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+      "outputPath": "D:\\WorkSpace\\UITestProject\\Plugins\\xRobotSim\\Source\\CSharpParamDefaultValueMetas\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "E:\\Software\\Microsoft\\VisualStudio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\liumi\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -154,7 +149,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "F:\\UnrealEngine\\UE_5.4\\Engine\\Binaries\\ThirdParty\\DotNet\\6.0.302\\windows\\sdk\\6.0.302\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "D:\\WorkSpace\\tongtestunrealengine\\Engine\\Binaries\\ThirdParty\\DotNet\\6.0.302\\windows\\sdk\\6.0.302\\RuntimeIdentifierGraph.json"
       }
     }
   }

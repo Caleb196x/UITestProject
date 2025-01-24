@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "RpcException.h"
-#include "TypeContainerFactory.h"
+#include "TypeAdapterFactory.h"
 
-TMap<UField*, FStructTypeContainer*> FCoreUtils::ClassTypeContainerCache = {};
+TMap<UField*, FStructTypeAdapter*> FCoreUtils::StructsTypeAdapterCache = {};
 
-FStructTypeContainer* FCoreUtils::LoadUEStructType(const FString& TypeName)
+FStructTypeAdapter* FCoreUtils::LoadUEStructType(const FString& TypeName)
 {
 	// find
 	UField* Type = FindAnyType<UClass>(TypeName);
@@ -36,16 +36,16 @@ FStructTypeContainer* FCoreUtils::LoadUEStructType(const FString& TypeName)
 	}
 
 	// find type container in cache map
-	if (ClassTypeContainerCache.Contains(Type))
+	if (StructsTypeAdapterCache.Contains(Type))
 	{
-		return ClassTypeContainerCache[Type];
+		return StructsTypeAdapterCache[Type];
 	}
 	
 	// create new type container
 	if (const auto Struct = Cast<UStruct>(Type))
 	{
-		FStructTypeContainer* NewTypeContainer = FTypeContainerFactory::CreateStructType(Struct); // TODO: create type container
-		ClassTypeContainerCache.Add(Type, NewTypeContainer);
+		FStructTypeAdapter* NewTypeContainer = FTypeContainerFactory::CreateStructType(Struct); // TODO: create type container
+		StructsTypeAdapterCache.Add(Type, NewTypeContainer);
 		return NewTypeContainer;
 	}
 
@@ -76,7 +76,7 @@ UEnum* FCoreUtils::LoadUEEnumType(const FString& EnumTypeName)
 }
 
 // todo: impl more reliable
-FStructTypeContainer* FCoreUtils::GetUEStructType(const FString& TypeName)
+FStructTypeAdapter* FCoreUtils::GetUEStructType(const FString& TypeName)
 {
 	UField* Type = FindAnyType<UClass>(TypeName);
 
@@ -114,9 +114,9 @@ FStructTypeContainer* FCoreUtils::GetUEStructType(const FString& TypeName)
 	}
 
 	// find type container in cache map
-	if (ClassTypeContainerCache.Contains(Type))
+	if (StructsTypeAdapterCache.Contains(Type))
 	{
-		return ClassTypeContainerCache[Type];
+		return StructsTypeAdapterCache[Type];
 	}
 	else
 	{

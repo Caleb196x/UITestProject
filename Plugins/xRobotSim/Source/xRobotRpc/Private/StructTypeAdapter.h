@@ -4,15 +4,15 @@
 #include "FunctionWrapper.h"
 #include "PropertyWrapper.h"
 
-class FStructTypeContainer
+class FStructTypeAdapter
 {
 public:
-	explicit FStructTypeContainer(UStruct* InStruct) : Struct(InStruct)
+	explicit FStructTypeAdapter(UStruct* InStruct) : Struct(InStruct)
 	{
 		Init();
 	}
 
-	virtual ~FStructTypeContainer() {}
+	virtual ~FStructTypeAdapter() {}
 	
 	// malloc a new object of this type
 	virtual void* New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs = {}) = 0;
@@ -41,32 +41,32 @@ protected:
 	TArray<std::shared_ptr<FPropertyWrapper>> Properties;
 };
 
-class FScriptStructTypeContainer : public FStructTypeContainer
+class FScriptStructTypeAdapter : public FStructTypeAdapter
 {
 public:
-	explicit FScriptStructTypeContainer(UScriptStruct* InScriptStruct) : FStructTypeContainer(InScriptStruct) {}
+	explicit FScriptStructTypeAdapter(UScriptStruct* InScriptStruct) : FStructTypeAdapter(InScriptStruct) {}
 	
 	virtual void* New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs={}) override;
 
 	virtual FString GetMetaTypeName() override { return "UScriptStruct"; }
 
-	virtual ~FScriptStructTypeContainer() override {}
+	virtual ~FScriptStructTypeAdapter() override {}
 
 	static void* Alloc(UScriptStruct* InScriptStruct);
 	
 	static void Free(TWeakObjectPtr<UStruct> InStruct, void* InPtr);
 };
 
-class FClassTypeContainer : public FStructTypeContainer
+class FClassTypeAdapter : public FStructTypeAdapter
 {
 public:
-	explicit FClassTypeContainer(UClass* InClass) : FStructTypeContainer(InClass) {}
+	explicit FClassTypeAdapter(UClass* InClass) : FStructTypeAdapter(InClass) {}
 	
 	virtual void* New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs = {}) override;
 
 	virtual FString GetMetaTypeName() override { return "UClass"; }
 
-	virtual ~FClassTypeContainer() override {}
+	virtual ~FClassTypeAdapter() override {}
 };
 
 

@@ -59,6 +59,18 @@ kj::Promise<void> FUnrealCoreServerImpl::registerCreatedPyObject(RegisterCreated
 	CHECK_RESULT_AND_RETURN(Result)
 }
 
+kj::Promise<void> FUnrealCoreServerImpl::newContainer(NewContainerContext context)
+{
+	const auto Result = GameThreadDispatcher<NewContainerContext>::EnqueueToGameThreadExec(NewContainerInternal, context);
+	CHECK_RESULT_AND_RETURN(Result)
+}
+
+kj::Promise<void> FUnrealCoreServerImpl::destroyContainer(DestroyContainerContext context)
+{
+	const auto Result = GameThreadDispatcher<DestroyContainerContext>::EnqueueToGameThreadExec(DestroyContainerInternal, context);
+	CHECK_RESULT_AND_RETURN(Result)
+}
+
 kj::Promise<void> FUnrealCoreServerImpl::findClass(FindClassContext context)
 {
 	return kj::READY_NOW;
@@ -175,7 +187,7 @@ ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 	// TODO: handle create object failure
 	if (!Obj)
 	{
-		FStructTypeContainer* TypeContainer = FCoreUtils::LoadUEStructType(ClassName);
+		FStructTypeAdapter* TypeContainer = FCoreUtils::LoadUEStructType(ClassName);
 		if (!TypeContainer)
 		{
 			return ErrorInfo(__FILE__, __LINE__,
@@ -295,7 +307,7 @@ ErrorInfo FUnrealCoreServerImpl::SetPropertyInternal(SetPropertyContext context)
 	}
 
 	const FString OwnerClassTypeName = UTF8_TO_TCHAR(OwnerClass.getTypeName().cStr());
-	FStructTypeContainer* TypeContainer = FCoreUtils::LoadUEStructType(OwnerClassTypeName);
+	FStructTypeAdapter* TypeContainer = FCoreUtils::LoadUEStructType(OwnerClassTypeName);
 	if (!TypeContainer)
 	{
 		return ErrorInfo(__FILE__, __LINE__,
@@ -368,7 +380,7 @@ ErrorInfo FUnrealCoreServerImpl::GetPropertyInternal(GetPropertyContext context)
 	}
 
 	const FString OwnerClassTypeName = UTF8_TO_TCHAR(OwnerClass.getTypeName().cStr());
-	FStructTypeContainer* TypeContainer = FCoreUtils::LoadUEStructType(OwnerClassTypeName);
+	FStructTypeAdapter* TypeContainer = FCoreUtils::LoadUEStructType(OwnerClassTypeName);
 	if (!TypeContainer)
 	{
 		return ErrorInfo(__FILE__, __LINE__,
@@ -723,7 +735,7 @@ ErrorInfo FUnrealCoreServerImpl::RegisterCreatedPyObjectInternal(RegisterCreated
 	void* PyObjectPtr = reinterpret_cast<void*>(PyObject.getAddress());
 	void* UnrealObjectPtr = reinterpret_cast<void*>(UnrealObject.getAddress());
 
-	FStructTypeContainer* TypeContainer = FCoreUtils::LoadUEStructType(ClassName);
+	FStructTypeAdapter* TypeContainer = FCoreUtils::LoadUEStructType(ClassName);
 	if (!TypeContainer)
 	{
 		return ErrorInfo(__FILE__, __LINE__,
@@ -735,14 +747,26 @@ ErrorInfo FUnrealCoreServerImpl::RegisterCreatedPyObjectInternal(RegisterCreated
 	return true;
 }
 
-ErrorInfo FUnrealCoreServerImpl::NewContainerInternal()
+ErrorInfo FUnrealCoreServerImpl::NewContainerInternal(NewContainerContext context)
 {
 	// input from client
-	const void* Own = nullptr;
-	const FString ContainerType = "Array";
-	const FString KeyPropertyName = "TypeName";
-	const FString ValuePropertyName = "TypeName";
+	const auto Own = context.getParams().getOwn();
+	void* const ClientObject = reinterpret_cast<void* const>(Own.getAddress());
+	
+	const FString ContainerType = UTF8_TO_TCHAR(context.getParams().getContainerType().getTypeName().cStr());
 
+	FString KeyPropertyTypeName;
+	FString ValuePropertyTypeName;
+	if (ContainerType.Equals("Map") && context.getParams().hasKeyType())
+	{
+		KeyPropertyTypeName = UTF8_TO_TCHAR(context.getParams().getKeyType().getTypeName().cStr());
+		ValuePropertyTypeName = UTF8_TO_TCHAR(context.getParams().getValueType().getTypeName().cStr());
+	}
+	else
+	{
+		ValuePropertyTypeName = UTF8_TO_TCHAR(context.getParams().getValueType().getTypeName().cStr());
+	}
+	
 	// 根据type name，区分内置类型，反射类型，容器类型，分别创建不同property
 
 	// 根据容器类型，创建容器FScriptMap, FScriptSet, FScriptArray对象指针
@@ -754,7 +778,7 @@ ErrorInfo FUnrealCoreServerImpl::NewContainerInternal()
 	return true;
 }
 
-ErrorInfo FUnrealCoreServerImpl::DestroyContainerInternal()
+ErrorInfo FUnrealCoreServerImpl::DestroyContainerInternal(DestroyContainerContext context)
 {
 	const void* Own = nullptr;
 

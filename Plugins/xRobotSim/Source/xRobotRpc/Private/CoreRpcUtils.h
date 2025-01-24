@@ -1,5 +1,5 @@
 #pragma once
-#include "StructTypeContainer.h"
+#include "StructTypeAdapter.h"
 
 #define RELEASED_UOBJECT ((UObject*) 12)
 #define RELEASED_UOBJECT_MEMBER ((void*) 12)
@@ -38,11 +38,24 @@ T* FindAnyType(const FString& InShortName)
 class FCoreUtils
 {
 public:
-	static FStructTypeContainer* LoadUEStructType(const FString& TypeName);
+	~FCoreUtils() { ClearClassTypeContainerCache(); }
+	
+	static void ClearClassTypeContainerCache()
+	{
+		for (const auto& Pair : StructsTypeAdapterCache)
+		{
+			FStructTypeAdapter* Adapter = Pair.Value;
+			delete Adapter;
+			Adapter = nullptr;
+		}
+		StructsTypeAdapterCache.Empty();
+	}
+	
+	static FStructTypeAdapter* LoadUEStructType(const FString& TypeName);
 
 	static UEnum* LoadUEEnumType(const FString& EnumTypeName);
 
-	static FStructTypeContainer* GetUEStructType(const FString& TypeName);
+	static FStructTypeAdapter* GetUEStructType(const FString& TypeName);
 
 	static std::string ConvertUeTypeNameToRpcTypeName(const FString& TypeName);
 
@@ -52,6 +65,6 @@ public:
 	}
 
 private:
-	static TMap<UField*, FStructTypeContainer*> ClassTypeContainerCache;
+	static TMap<UField*, FStructTypeAdapter*> StructsTypeAdapterCache;
 };
 

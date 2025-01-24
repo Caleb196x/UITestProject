@@ -1,7 +1,7 @@
-#include "StructTypeContainer.h"
+#include "StructTypeAdapter.h"
 #include "UnrealPythonRpcLog.h"
 
-void FStructTypeContainer::Init()
+void FStructTypeAdapter::Init()
 {
 	// TODO: process native cpp type
 	
@@ -20,7 +20,7 @@ void FStructTypeContainer::Init()
 	}
 }
 
-std::shared_ptr<FFunctionWrapper> FStructTypeContainer::FindFunction(const FString& FuncName)
+std::shared_ptr<FFunctionWrapper> FStructTypeAdapter::FindFunction(const FString& FuncName)
 {
 	const FName Name = FName(*FuncName);
 	if (!FunctionsMap.Contains(Name))
@@ -31,7 +31,7 @@ std::shared_ptr<FFunctionWrapper> FStructTypeContainer::FindFunction(const FStri
 	return FunctionsMap.FindChecked(Name);
 }
 
-std::shared_ptr<FPropertyWrapper> FStructTypeContainer::FindProperty(const FString& PropertyName)
+std::shared_ptr<FPropertyWrapper> FStructTypeAdapter::FindProperty(const FString& PropertyName)
 {
 	const FName Name = FName(*PropertyName);
 	if (!PropertiesMap.Contains(Name))
@@ -43,7 +43,7 @@ std::shared_ptr<FPropertyWrapper> FStructTypeContainer::FindProperty(const FStri
 	return PropertiesMap.FindChecked(Name);
 }
 
-void FStructTypeContainer::CreateFunctionWrapper(UFunction* InFunction)
+void FStructTypeAdapter::CreateFunctionWrapper(UFunction* InFunction)
 {
 	const FName FuncName = InFunction->GetFName();
 	if (!FunctionsMap.Contains(FuncName))
@@ -53,7 +53,7 @@ void FStructTypeContainer::CreateFunctionWrapper(UFunction* InFunction)
 	}
 }
 
-void FStructTypeContainer::CreatePropertyWrapper(FProperty* InProperty)
+void FStructTypeAdapter::CreatePropertyWrapper(FProperty* InProperty)
 {
 	const FName PropName = InProperty->GetFName();
 	if (!PropertiesMap.Contains(PropName))
@@ -66,7 +66,7 @@ void FStructTypeContainer::CreatePropertyWrapper(FProperty* InProperty)
 	}
 }
 
-void* FScriptStructTypeContainer::New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs)
+void* FScriptStructTypeAdapter::New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs)
 {
 	void* Memory = Alloc(static_cast<UScriptStruct*>(Struct.Get()));
 	const int Count = ConstructArgs.Num() < Properties.Num() ? ConstructArgs.Num() : Properties.Num();
@@ -78,21 +78,21 @@ void* FScriptStructTypeContainer::New(FString Name, uint64 ObjectFlags, TArray<v
 	return Memory;
 }
 
-void* FScriptStructTypeContainer::Alloc(UScriptStruct* InScriptStruct)
+void* FScriptStructTypeAdapter::Alloc(UScriptStruct* InScriptStruct)
 {
 	void* ScriptStructMemory = new char[InScriptStruct->GetStructureSize()];
 	InScriptStruct->InitializeStruct(ScriptStructMemory);
 	return ScriptStructMemory;
 }
 
-void FScriptStructTypeContainer::Free(TWeakObjectPtr<UStruct> InStruct, void* InPtr)
+void FScriptStructTypeAdapter::Free(TWeakObjectPtr<UStruct> InStruct, void* InPtr)
 {
 	if (InStruct.IsValid())
 		InStruct->DestroyStruct(InPtr);
 	delete[] static_cast<char*>(InPtr);
 }
 
-void* FClassTypeContainer::New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs)
+void* FClassTypeAdapter::New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs)
 {
 	UClass* Class = static_cast<UClass*>(Struct.Get());
 	UObject* Outer = GetTransientPackage();

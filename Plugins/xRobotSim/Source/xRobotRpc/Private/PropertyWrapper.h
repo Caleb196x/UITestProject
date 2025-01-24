@@ -77,6 +77,8 @@ public:
 		return true;
 	}
 
+	FORCEINLINE void DestroyValue(void* Dest) const { Property->DestroyValue(Dest); }
+
 	FORCEINLINE FString GetCppType() const { return Property->GetCPPType(); }
 	
 protected:

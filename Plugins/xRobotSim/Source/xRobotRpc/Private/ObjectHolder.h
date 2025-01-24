@@ -1,7 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "CoreRpcUtils.h"
-#include "StructTypeContainer.h"
+#include "StructTypeAdapter.h"
 
 class FObjectHolder
 {

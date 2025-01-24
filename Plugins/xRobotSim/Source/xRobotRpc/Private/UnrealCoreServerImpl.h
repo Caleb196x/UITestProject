@@ -88,6 +88,12 @@ protected:
 
 	virtual kj::Promise<void> registerCreatedPyObject(RegisterCreatedPyObjectContext context) override;
 
+	virtual kj::Promise<void> newContainer(NewContainerContext context) override;
+
+	virtual kj::Promise<void> destroyContainer(DestroyContainerContext context) override;
+
+	/****************************Internal functions*********************************************/
+
 	static ErrorInfo NewObjectInternal(NewObjectContext context);
 
 	static ErrorInfo DestroyObjectInternal(DestroyObjectContext context);
@@ -122,9 +128,9 @@ protected:
 
 	static ErrorInfo RegisterCreatedPyObjectInternal(RegisterCreatedPyObjectContext context);
 
-	static ErrorInfo NewContainerInternal();
+	static ErrorInfo NewContainerInternal(NewContainerContext context);
 
-	static ErrorInfo DestroyContainerInternal();
+	static ErrorInfo DestroyContainerInternal(DestroyContainerContext context);
 
 	static void ParseTypeAndSetValue(UnrealCore::Argument::Builder* RetValue,
 		const std::string& RpcType, const std::string& UeType, void* Value);
