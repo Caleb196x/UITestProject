@@ -9,6 +9,7 @@ public class UnrealEnginePython : ModuleRules
 
     // leave this string as empty for triggering auto-discovery of python installations...
     private string pythonHome = "C:/Users/Admin/AppData/Local/Programs/Python/Python312";
+    // E:/Software/Python
     // otherwise specify the path of your python installation
     //private string pythonHome = "C:/Program Files/Python36";
     // this is an example for Homebrew on Mac
