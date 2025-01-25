@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "CoreRpcUtils.h"
 #include "StructTypeAdapter.h"
+#include "ContainerTypeAdapter.h"
 
 class FObjectHolder
 {
@@ -46,10 +47,17 @@ public:
 		}
 		else if (UEObject.MetaTypeName.Equals("UScriptStruct"))
 		{
-			if (const FStructTypeContainer* TypeContainer = FCoreUtils::GetUEStructType(UEObject.ClassName))
+			if (const FStructTypeAdapter* TypeContainer = FCoreUtils::GetUEStructType(UEObject.ClassName))
 			{
 				
-				FScriptStructTypeContainer::Free(TypeContainer->GetStruct(), UEObject.Ptr);
+				FScriptStructTypeAdapter::Free(TypeContainer->GetStruct(), UEObject.Ptr);
+			}
+		}
+		else if (UEObject.MetaTypeName.Equals("Container"))
+		{
+			if (!FContainerTypeAdapter::DestroyContainer(UEObject.Ptr, UEObject.ClassName))
+			{
+				UE_LOG(LogUnrealPython, Error, TEXT("Unrecognized container type %s, destory container fail."), *UEObject.ClassName);
 			}
 		}
 		

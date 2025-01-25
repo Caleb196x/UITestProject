@@ -16,7 +16,6 @@ FORCEINLINE int32  GetSizeWithAlignment(FProperty* InProperty)
 }
 }
 
-
 struct FScriptArrayExtension
 {
 	FScriptArray Data;
@@ -183,40 +182,112 @@ struct FScriptMapExtension
 	}
 };
 
+USTRUCT(noexport)
+struct FPropertyMetaRoot
+{
+};
+
+class FContainerElementTypePropertyManager
+{
+public:
+	static FContainerElementTypePropertyManager& Get()
+	{
+		static FContainerElementTypePropertyManager Manager;
+		return Manager;
+	}
+	
+	FContainerElementTypePropertyManager()
+	{
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 1) || ENGINE_MAJOR_VERSION > 5
+		// fixme@Caleb196x: rename path
+		PropertyMetaRoot = FindObject<UScriptStruct>(nullptr, TEXT("/Script/xRobotRpc.PropertyMetaRoot")); 
+#else
+		PropertyMetaRoot = FindObject<UScriptStruct>(ANY_PACKAGE, TEXT("PropertyMetaRoot"));
+#endif
+
+		Init();
+	}
+	
+	~FContainerElementTypePropertyManager()
+	{
+		Deinit();
+	}
+
+	FProperty* GetPropertyFromTypeName(const FString& PropertyTypeName);
+private:
+	
+	void Init();
+	void Deinit() { /* do nothing */ }
+
+	UScriptStruct* PropertyMetaRoot;
+	TMap<FString, FProperty*> PropertiesCacheMap;
+};
+
 
 class FContainerTypeAdapter
 {
 public:
-	using OperatorFunction = std::function<void(const std::vector<void*>&, )>;
-	
-	void* NewContainer(const FString& TypeName, FProperty* InValueProp, FProperty* InKeyProp = nullptr);
+	using OperatorFunction = std::function<void(void* ,const std::vector<void*>&,
+		std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>&)>;
 
-	template<typename ContainerType>
-	void CallOperator(ContainerType* Container, const FString& OperatorName, const std::vector<void*>& Params)
-	{
-		
-	}
+	FContainerTypeAdapter() { Init(); }
+	
+	static void* NewContainer(const FString& TypeName, FProperty* InValueProp, FProperty* InKeyProp = nullptr);
+
+	static bool DestroyContainer(void* Container, const FString& TypeName);
+	
+	static bool CallOperator(void* Container, const FString& TypeName,  const FString& OperatorName, const std::vector<void*>& Params,
+		std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>& Outputs);
+
+	static void Init();
 
 	static TMap<FString, OperatorFunction> ArrayOperatorFunctions;
 	static TMap<FString, OperatorFunction> SetOperatorFunctions;
 	static TMap<FString, OperatorFunction> MapOperatorFunctions;
 };
 
+#define DECLARE_CONTAINER_OPERATOR_FUNCTION(func) \
+	static void func(void* ,const std::vector<void*>&, \
+			std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>&); \
+
 class FArrayContainerAdapter
 {
 public:
-	static void Add();
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Num)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Add)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Get)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Set)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Contains)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(FindIndex)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(RemoveAt)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(IsValidIndex)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Empty)
 };
 
 class FSetContainerTypeAdapter
 {
 public:
-	// 实现各类操作函数
-	
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Num)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Add)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Get)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Contains)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(FindIndex)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(RemoveAt)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(GetMaxIndex)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(IsValidIndex)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Empty)
 };
 
 class FMapContainerTypeAdapter
 {
 public:
-	// 实现各类操作函数
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Num)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Add)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Get)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Set)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(RemoveAt)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(GetMaxIndex)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(IsValidIndex)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(GetKey)
+	DECLARE_CONTAINER_OPERATOR_FUNCTION(Empty)
 };

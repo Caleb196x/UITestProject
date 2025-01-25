@@ -14,8 +14,3 @@ FStructTypeAdapter* FTypeContainerFactory::CreateStructType(UStruct* InStruct)
 	// fixme not support type
 	return nullptr;
 }
-
-FContainerTypeAdapter* FTypeContainerFactory::CreateContainerType(const FString& ContainerType)
-{
-	return new FContainerTypeAdapter();
-}

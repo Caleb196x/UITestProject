@@ -6,7 +6,6 @@ class FTypeContainerFactory
 {
 public:
 	static FStructTypeAdapter* CreateStructType(UStruct* InStruct);
-
-	static FContainerTypeAdapter* CreateContainerType(const FString& ContainerType);
+	
 };
 

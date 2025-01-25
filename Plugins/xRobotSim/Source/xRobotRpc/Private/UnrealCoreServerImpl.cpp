@@ -1,5 +1,6 @@
 #include "UnrealCoreServerImpl.h"
 
+#include "ContainerTypeAdapter.h"
 #include "CoreRpcUtils.h"
 #include "ObjectHolder.h"
 #include "UObject/UnrealTypePrivate.h"
@@ -755,38 +756,67 @@ ErrorInfo FUnrealCoreServerImpl::NewContainerInternal(NewContainerContext contex
 	
 	const FString ContainerType = UTF8_TO_TCHAR(context.getParams().getContainerType().getTypeName().cStr());
 
-	FString KeyPropertyTypeName;
-	FString ValuePropertyTypeName;
+	FProperty* KeyProp = nullptr;
+	FProperty* ValProp = nullptr;
 	if (ContainerType.Equals("Map") && context.getParams().hasKeyType())
 	{
-		KeyPropertyTypeName = UTF8_TO_TCHAR(context.getParams().getKeyType().getTypeName().cStr());
-		ValuePropertyTypeName = UTF8_TO_TCHAR(context.getParams().getValueType().getTypeName().cStr());
+		const FString KeyPropertyTypeName = UTF8_TO_TCHAR(context.getParams().getKeyType().getTypeName().cStr());
+		const FString ValuePropertyTypeName = UTF8_TO_TCHAR(context.getParams().getValueType().getTypeName().cStr());
+		KeyProp = FContainerElementTypePropertyManager::Get().GetPropertyFromTypeName(KeyPropertyTypeName);
+		ValProp = FContainerElementTypePropertyManager::Get().GetPropertyFromTypeName(ValuePropertyTypeName);
+		if (!ValProp)
+		{
+			return ErrorInfo(__FILE__, __LINE__,
+				FString::Printf(TEXT("Can not load value property %s"), *ValuePropertyTypeName));
+		}
+		if (!KeyProp)
+		{
+			return ErrorInfo(__FILE__, __LINE__,
+				FString::Printf(TEXT("Can not load key property %s"), *KeyPropertyTypeName));
+		}
 	}
 	else
 	{
-		ValuePropertyTypeName = UTF8_TO_TCHAR(context.getParams().getValueType().getTypeName().cStr());
+		const FString ValuePropertyTypeName = UTF8_TO_TCHAR(context.getParams().getValueType().getTypeName().cStr());
+		ValProp = FContainerElementTypePropertyManager::Get().GetPropertyFromTypeName(ValuePropertyTypeName);
+		if (!ValProp)
+		{
+			return ErrorInfo(__FILE__, __LINE__,
+				FString::Printf(TEXT("Can not load value property %s"), *ValuePropertyTypeName));
+		}
+	}
+	// todo@Caleb196x: consider the property type is container type
+	// 根据type name，区分内置类型，反射类型，容器类型，分别创建不同property
+	void* Container = FContainerTypeAdapter::NewContainer(ContainerType, ValProp, KeyProp);
+	if (!Container)
+	{
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Failed to create container %s, maybe not support this container type"), *ContainerType));
 	}
 	
-	// 根据type name，区分内置类型，反射类型，容器类型，分别创建不同property
-
-	// 根据容器类型，创建容器FScriptMap, FScriptSet, FScriptArray对象指针
-
-	// 添加容器对象指针到内存管理器
-
-	// 返回容器对象指针
+	FObjectHolder::FUEObject* Holder = FObjectHolder::Get().RegisterToRetainer(ClientObject, Container, "Container", ContainerType);
+	
+	auto ResultObj = context.getResults().initContainer();
+	ResultObj.setAddress(reinterpret_cast<uint64_t>(Holder->Ptr));
+	ResultObj.setName(""); // todo@Calbel196x: maybe generate a random container name
 	
 	return true;
 }
 
 ErrorInfo FUnrealCoreServerImpl::DestroyContainerInternal(DestroyContainerContext context)
 {
-	const void* Own = nullptr;
+	const auto Own = context.getParams().getOwn();
+	void* const ClientObject = reinterpret_cast<void* const>(Own.getAddress());
 
 	// 从内存管理器中查找容器对象指针
+	void* ContainerPtr = FObjectHolder::Get().GetUObject(ClientObject);
+	if (!ContainerPtr)
+	{
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Can not find container object from ClientObject %p"), ClientObject));
+	}
 
-	// 调用Empty操作函数，清空容器
-
-	// 销毁容器对象指针
+	FObjectHolder::Get().RemoveFromRetainer(ContainerPtr);
 	
 	return true;
 }
