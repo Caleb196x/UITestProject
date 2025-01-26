@@ -105,9 +105,7 @@ protected:
 	static ErrorInfo CallFunctionInternal(CallFunctionContext context);
 
 	static ErrorInfo CallStaticFunctionInternal(CallStaticFunctionContext context);
-
-	static ErrorInfo CallFunctionCommon(CallFunctionContext* ObjectCallContext, CallStaticFunctionContext* StaticCallContext, bool bIsStaticFunc);
-
+	
 	static ErrorInfo FindClassInternal(FindClassContext context);
 
 	static ErrorInfo LoadClassInternal(LoadClassContext context);
@@ -131,9 +129,6 @@ protected:
 	static ErrorInfo NewContainerInternal(NewContainerContext context);
 
 	static ErrorInfo DestroyContainerInternal(DestroyContainerContext context);
-
-	static void ParseTypeAndSetValue(UnrealCore::Argument::Builder* RetValue,
-		const std::string& RpcType, const std::string& UeType, void* Value);
 };
 
 template<typename T>

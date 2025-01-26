@@ -66,10 +66,10 @@ void FStructTypeAdapter::CreatePropertyWrapper(FProperty* InProperty)
 	}
 }
 
-void* FScriptStructTypeAdapter::New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs)
+void* FScriptStructTypeAdapter::New(FString Name, uint64 ObjectFlags, std::vector<void*> ConstructArgs)
 {
 	void* Memory = Alloc(static_cast<UScriptStruct*>(Struct.Get()));
-	const int Count = ConstructArgs.Num() < Properties.Num() ? ConstructArgs.Num() : Properties.Num();
+	const int Count = ConstructArgs.size() < Properties.Num() ? ConstructArgs.size() : Properties.Num();
 	for (int i = 0; i < Count; ++i)
 	{
 		Properties[i]->CopyToUeValueInContainer(ConstructArgs[i], Memory);
@@ -92,7 +92,7 @@ void FScriptStructTypeAdapter::Free(TWeakObjectPtr<UStruct> InStruct, void* InPt
 	delete[] static_cast<char*>(InPtr);
 }
 
-void* FClassTypeAdapter::New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs)
+void* FClassTypeAdapter::New(FString Name, uint64 ObjectFlags, std::vector<void*> ConstructArgs)
 {
 	UClass* Class = static_cast<UClass*>(Struct.Get());
 	UObject* Outer = GetTransientPackage();

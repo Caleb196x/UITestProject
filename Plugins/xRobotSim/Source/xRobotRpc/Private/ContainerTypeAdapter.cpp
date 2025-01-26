@@ -99,8 +99,6 @@ void FContainerTypeAdapter::Init()
 	MapOperatorFunctions.Add("IsValidIndex", &FMapContainerTypeAdapter::IsValidIndex);
 	MapOperatorFunctions.Add("GetKey", &FMapContainerTypeAdapter::GetKey);
 	MapOperatorFunctions.Add("Empty", &FMapContainerTypeAdapter::Empty);
-
-	// setup builtin type property
 	
 }
 
@@ -257,4 +255,172 @@ FProperty* FContainerElementTypePropertyManager::GetPropertyFromTypeName(const F
 	
 	PropertiesCacheMap.Add(PropertyTypeName, Ret);
 	return Ret;
+}
+
+/******************* Operator functions ********************/
+
+// Array
+void FArrayContainerAdapter::Add(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FArrayContainerAdapter::Contains(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FArrayContainerAdapter::Empty(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FArrayContainerAdapter::Get(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FArrayContainerAdapter::Num(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FArrayContainerAdapter::Set(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FArrayContainerAdapter::FindIndex(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FArrayContainerAdapter::RemoveAt(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FArrayContainerAdapter::IsValidIndex(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+// Set
+void FSetContainerTypeAdapter::Add(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FSetContainerTypeAdapter::Contains(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FSetContainerTypeAdapter::Empty(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FSetContainerTypeAdapter::Get(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FSetContainerTypeAdapter::Num(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FSetContainerTypeAdapter::FindIndex(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FSetContainerTypeAdapter::RemoveAt(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FSetContainerTypeAdapter::IsValidIndex(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FSetContainerTypeAdapter::GetMaxIndex(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+
+// Map
+void FMapContainerTypeAdapter::Add(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FMapContainerTypeAdapter::Get(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FMapContainerTypeAdapter::Empty(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FMapContainerTypeAdapter::Num(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FMapContainerTypeAdapter::Set(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FMapContainerTypeAdapter::GetKey(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FMapContainerTypeAdapter::RemoveAt(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FMapContainerTypeAdapter::GetMaxIndex(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
+}
+
+void FMapContainerTypeAdapter::IsValidIndex(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	
 }

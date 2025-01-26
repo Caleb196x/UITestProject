@@ -117,6 +117,8 @@ kj::Promise<void> FUnrealCoreServerImpl::staticClass(StaticClassContext context)
 	return kj::READY_NOW;
 }
 
+/******************** <Utils start> ******************************/
+
 struct AutoMemoryFreer
 {
 	void AddPtr(const FString& TypeName, void* Ptr)
@@ -166,6 +168,248 @@ struct AutoMemoryFreer
 	}
 };
 
+
+static bool ParseInputParamsToTypeFreeData(const capnp::List<UnrealCore::Argument>::Reader& InFuncParam,
+											std::vector<void*>& OutParsedData, AutoMemoryFreer& AutoFreer)
+{
+	for (const auto& Param : InFuncParam)
+	{
+		const FString ParamClassName = UTF8_TO_TCHAR(Param.getUeClass().getTypeName().cStr());
+		switch (Param.which())
+		{
+			case UnrealCore::Argument::INT_VALUE:
+			{
+				int64* DataPtr = new int64(Param.getIntValue());
+				AutoFreer.AddPtr("int", DataPtr);
+				OutParsedData.push_back(DataPtr);
+				break;
+			}
+			case UnrealCore::Argument::STR_VALUE:
+			{
+				FString* DataPtr = new FString(UTF8_TO_TCHAR(Param.getStrValue().cStr()));
+				AutoFreer.AddPtr("str", DataPtr);
+				OutParsedData.push_back(DataPtr);
+				break;
+			}
+			case UnrealCore::Argument::UINT_VALUE:
+			{
+				uint64* DataPtr = new uint64(Param.getUintValue());
+				AutoFreer.AddPtr("uint", DataPtr);
+				OutParsedData.push_back(DataPtr);
+				break;
+			}
+			case UnrealCore::Argument::FLOAT_VALUE:
+			{
+				double* DataPtr = new double(Param.getFloatValue());
+				AutoFreer.AddPtr("float", DataPtr);
+				OutParsedData.push_back(DataPtr);
+				break;
+			}
+			case UnrealCore::Argument::BOOL_VALUE:
+			{
+				bool* DataPtr = new bool(Param.getBoolValue());
+				AutoFreer.AddPtr("bool", DataPtr);
+				OutParsedData.push_back(DataPtr);
+				break;
+			}
+			case UnrealCore::Argument::OBJECT:
+			{
+				FString TypeName = UTF8_TO_TCHAR(Param.getUeClass().getTypeName().cStr());
+				void* Pointer = reinterpret_cast<void*>(Param.getObject().getAddress());
+				// TODO: support cpp native type
+				// fixme@Caleb196x: crash when passing into a null pointer
+				// fixme@Caleb196x: 如果没有获取到ObjPointer，那么获取的指针就有问题，导致传递的参数也会有问题；
+				if (const FObjectHolder::FUEObject* ObjPointer = FObjectHolder::Get().GetUObject(Pointer))
+					OutParsedData.push_back(ObjPointer->Ptr);
+				else
+				{
+					return false;
+				}
+					
+				break;
+			}
+			case UnrealCore::Argument::ENUM_VALUE:
+			{
+				int64* EnumPtr = new int64(Param.getEnumValue());
+				AutoFreer.AddPtr("enum", EnumPtr);
+				OutParsedData.push_back(EnumPtr);
+				break;
+			}
+			default:
+				break;
+		}
+	}
+
+	return true;
+}
+
+
+void ParseTypeAndSetValueForReturn(UnrealCore::Argument::Builder* RetValue,
+		const std::string& RpcType, const std::string& UeType, void* Value)
+{
+	// fixme@Caleb196x: return ue class type name
+	RetValue->initUeClass().setTypeName(UeType);
+	RetValue->setName("return_value");
+
+	if (RpcType == "bool")
+	{
+		bool* Result = static_cast<bool*>(Value);
+		RetValue->setBoolValue(*Result);
+		FMemory::Free(Result);
+	}
+	else if (RpcType == "int")
+	{
+		if (UeType == "int32" || UeType == "int32_t"
+			|| UeType == "int16" || UeType == "int16_t"
+			|| UeType == "int8" || UeType == "int8_t")
+		{
+			int32_t* Result = static_cast<int32_t*>(Value);
+			RetValue->setIntValue(*Result);
+			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
+			FMemory::Free(Result);
+		}
+		else if (UeType == "int64" || UeType == "int64_t")
+		{
+			int64_t* Result = static_cast<int64_t*>(Value);
+			RetValue->setIntValue(*Result);
+			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
+			FMemory::Free(Result);
+		}
+	}
+	else if (RpcType == "uint")
+	{
+		if (UeType == "uint32" || UeType == "uint32_t"
+			|| UeType == "uint16" || UeType == "uint16_t"
+			|| UeType == "uint8" || UeType == "uint8_t")
+		{
+			uint32_t* Result = static_cast<uint32_t*>(Value);
+			RetValue->setIntValue(*Result);
+			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
+			FMemory::Free(Result);
+		}
+		else if (UeType == "int64" || UeType == "int64_t")
+		{
+			uint64_t* Result = static_cast<uint64_t*>(Value);
+			RetValue->setIntValue(*Result);
+			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
+			FMemory::Free(Result);
+		}
+	}
+	else if (RpcType == "double")
+	{
+		if (UeType == "float")
+		{
+			float* Result = static_cast<float*>(Value);
+			RetValue->setFloatValue(*Result);
+			FMemory::Free(Result);
+		}
+		else
+		{
+			double* Result = static_cast<double*>(Value);
+			RetValue->setFloatValue(*Result);
+			FMemory::Free(Result);
+		}
+	}
+	else if (RpcType == "str")
+	{
+		if (UeType == "FString")
+		{
+			FString* Result = static_cast<FString*>(Value);
+			RetValue->setStrValue(TCHAR_TO_UTF8(**Result));
+			FMemory::Free(Result);
+		}
+		else if (UeType == "FText")
+		{
+			FText* Result = static_cast<FText*>(Value);
+			const FString Str = Result->ToString();
+			RetValue->setStrValue(TCHAR_TO_UTF8(*Str));
+			FMemory::Free(Result);
+		}
+		else if (UeType == "FName")
+		{
+			FName* Result = static_cast<FName*>(Value);
+			const FString Str = Result->ToString();
+			RetValue->setStrValue(TCHAR_TO_UTF8(*Str));
+			FMemory::Free(Result);
+		}
+	}
+	else if (RpcType == "object")
+	{
+		// auto Object =
+		// 如果返回值是当前函数调用分配的对象，在端侧该怎么处理？
+		// 例如：
+		// 端侧有个对象类型UTestObject的一个函数声明： UMainActor* CreateOtherActor(FString Name);
+		// 调用时 UMainActor* test = obj->CreateOtherActor("Hello");
+		// 那这个test对象在端侧的内存地址如何传递到ue侧？
+
+		// 解决思路：
+		// 在then函数中传入端侧的test对象指针地址，并且将其存入ObjectHolder中
+		//
+		// 解决思路2：
+		// 直接在server端返回uobject对象，在client端接受后，创建新的pyobject，然后立即将pyobject和uobject注册到object holder
+		auto InitObject = RetValue->initObject();
+		InitObject.setAddress(reinterpret_cast<uint64>(Value));
+		InitObject.setName(""); // todo@Caleb196x: 设置变量名
+		RetValue->setObject(InitObject);
+	}
+	else if (RpcType == "void")
+	{
+		RetValue->initUeClass().setTypeName("void");
+	}
+	else if (RpcType == "enum")
+	{
+		int32_t* Result = static_cast<int32_t*>(Value);
+		RetValue->setEnumValue(*Result);
+		FMemory::Free(Result);
+	}
+}
+
+static void SetupRpcReturnAndOutputParams(
+		const std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>& OutParams,
+		capnp::List<UnrealCore::Argument>::Builder& RpcOutParams,
+		UnrealCore::Argument::Builder& RpcRet
+	)
+{
+		
+	auto Iter = OutParams.begin();
+	if (Iter != OutParams.end())
+	{
+		auto ReturnTypeName = Iter->first;
+		auto UeTypeWithValuePair = Iter->second;
+		auto UeType = UeTypeWithValuePair.first;
+		auto Value = UeTypeWithValuePair.second;
+		ParseTypeAndSetValueForReturn(&RpcRet, ReturnTypeName, UeType, Value);
+
+		++Iter;
+	}
+	
+	for (int i = 0; i < OutParams.size() && Iter != OutParams.end(); ++i, ++Iter)
+	{
+		auto OutParam = *Iter;
+		auto TypeName = OutParam.first;
+		auto UeTypeWithValue = OutParam.second;
+		auto UeType = UeTypeWithValue.first;
+		auto Value = UeTypeWithValue.second;
+		
+		auto RetParam = RpcOutParams[i];
+		RetParam.initUeClass().setTypeName(TypeName);
+		ParseTypeAndSetValueForReturn(&RetParam, TypeName, UeType, Value);
+		
+		/*else if (TypeName == "object")
+		{
+			// find outer object from ObjectHolder
+			auto OutObj = InitOutParams[i].initObject();
+
+			UObject* ResultPtr = static_cast<UObject*>(Value);
+			void* ObjPtr = FObjectHolder::Get().GetGrpcObject(ResultPtr);
+			OutObj.setAddress(reinterpret_cast<uint64_t>(ObjPtr));
+		}*/
+	}
+
+}
+
+/******************** <Utils end> ******************************/
+
 ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 {
 	const auto AllocClass = context.getParams().getUeClass();
@@ -196,67 +440,13 @@ ErrorInfo FUnrealCoreServerImpl::NewObjectInternal(NewObjectContext context)
 		}
 
 		// todo: pass to construct arguments
-		TArray<void*> Args;
-		for (const auto& Arg : ConstructArgs)
+		std::vector<void*> Args;
+		if (!ParseInputParamsToTypeFreeData(ConstructArgs, Args, AutoFreer))
 		{
-			switch (Arg.which())
-			{
-				case UnrealCore::Argument::INT_VALUE:
-				{
-					int64* DataPtr = new int64(Arg.getIntValue());
-					AutoFreer.AddPtr("int", DataPtr);
-					Args.Add(DataPtr);
-					break;
-				}
-				case UnrealCore::Argument::STR_VALUE:
-				{
-					FString* DataPtr = new FString(UTF8_TO_TCHAR(Arg.getStrValue().cStr()));
-					AutoFreer.AddPtr("str", DataPtr);
-					Args.Add(DataPtr);
-					break;
-				}
-				case UnrealCore::Argument::UINT_VALUE:
-				{
-					uint64* DataPtr = new uint64(Arg.getUintValue());
-					AutoFreer.AddPtr("uint", DataPtr);
-					Args.Add(DataPtr);
-					break;
-				}
-				case UnrealCore::Argument::FLOAT_VALUE:
-				{
-					double* DataPtr = new double(Arg.getFloatValue());
-					AutoFreer.AddPtr("float", DataPtr);
-					Args.Add(DataPtr);
-					break;
-				}
-				case UnrealCore::Argument::BOOL_VALUE:
-				{
-					bool* DataPtr = new bool(Arg.getBoolValue());
-					AutoFreer.AddPtr("bool", DataPtr);
-					Args.Add(DataPtr);
-					break;
-				}
-				case UnrealCore::Argument::OBJECT:
-				{
-					FString TypeName = UTF8_TO_TCHAR(Arg.getUeClass().getTypeName().cStr());
-					void* Pointer = reinterpret_cast<void*>(Arg.getObject().getAddress());
-					UE_LOG(LogUnrealPython, Display, TEXT("NewObject for class %s and pass by object type %s"), *ClassName, *TypeName)
-					// TODO: support cpp native type
-					FObjectHolder::FUEObject* ObjPointer = FObjectHolder::Get().GetUObject(Pointer);
-					Args.Add(ObjPointer->Ptr);
-					break;
-				}
-				case UnrealCore::Argument::ENUM_VALUE:
-				{
-					int32* EnumPtr = new int32(Arg.getEnumValue());
-					AutoFreer.AddPtr("enum", EnumPtr);
-					Args.Add(EnumPtr);
-					break;
-				}
-				default:
-					break;
-			}
+			return ErrorInfo(__FILE__, __LINE__,
+				FString::Printf(TEXT("A non-existent object pointer was encountered while parsing a function parameter.")));
 		}
+		
 		void* NewObjPtr = TypeContainer->New(ClassName, Flags, Args);
 		
 		Obj = FObjectHolder::Get().RegisterToRetainer(ClientHolder, NewObjPtr, TypeContainer->GetMetaTypeName(), ClassName);
@@ -477,66 +667,94 @@ ErrorInfo FUnrealCoreServerImpl::GetPropertyInternal(GetPropertyContext context)
 
 ErrorInfo FUnrealCoreServerImpl::CallFunctionInternal(CallFunctionContext context)
 {
-	return CallFunctionCommon(&context, nullptr, false);
-}
+	// parse pass in params
+	auto Owner = context.getParams().getOwn();
+	auto CallObject = context.getParams().getCallObject();
+	FString FunctionName = UTF8_TO_TCHAR(context.getParams().getFuncName().cStr());
+	auto InFuncParams = context.getParams().getParams();
+	FString ClassName = UTF8_TO_TCHAR(context.getParams().getUeClass().getTypeName().cStr());
 
-ErrorInfo FUnrealCoreServerImpl::CallStaticFunctionInternal(CallStaticFunctionContext context)
-{
-	return CallFunctionCommon(nullptr, &context, true);
-}
-
-ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectCallContext, CallStaticFunctionContext* StaticCallContext, bool bIsStaticFunc)
-{
-	FString ClassName;
-	FString FunctionName;
-	capnp::List<UnrealCore::Argument>::Reader InFuncParam;
 	FObjectHolder::FUEObject* FoundObject = nullptr;
-	
-	if (!bIsStaticFunc)
+	void* ClientHolder = reinterpret_cast<void*>(Owner.getAddress());
+	if (!FObjectHolder::Get().HasObject(ClientHolder))
 	{
-		auto Owner = ObjectCallContext->getParams().getOwn();
-		auto CallObject = ObjectCallContext->getParams().getCallObject();
-		auto InFuncName = ObjectCallContext->getParams().getFuncName().cStr();
-		auto Class = ObjectCallContext->getParams().getUeClass();
-		InFuncParam = ObjectCallContext->getParams().getParams();
+		// throw exception to client
+		return ErrorInfo(__FILE__, __LINE__,
+			"Can not find the object in system's object holder, run newObject at first.");
+	}
 
-		void* ClientHolder = reinterpret_cast<void*>(Owner.getAddress());
-		if (!FObjectHolder::Get().HasObject(ClientHolder))
-		{
-			// throw exception to client
-			return ErrorInfo(__FILE__, __LINE__,
-				"Can not find the object in system's object holder, run newObject at first.");
-		}
-
-		FoundObject = FObjectHolder::Get().GetUObject(ClientHolder);
-		UObject* PassedInObject = reinterpret_cast<UObject*>(CallObject.getAddress());
-		FunctionName = UTF8_TO_TCHAR(InFuncName);
-		
-		if (FoundObject->Ptr != PassedInObject)
-		{
-			return ErrorInfo(__FILE__, __LINE__,
-				FString::Printf(TEXT("Call function %s failed, the object found in object holder %p is not equal to passed by caller %p"),
-					*FunctionName, FoundObject, PassedInObject));
-		}
-
-		ClassName = UTF8_TO_TCHAR(Class.getTypeName().cStr());
+	FoundObject = FObjectHolder::Get().GetUObject(ClientHolder);
+	UObject* PassedInObject = reinterpret_cast<UObject*>(CallObject.getAddress());
 	
-		if (!ClassName.Equals(FoundObject->ClassName))
+	if (FoundObject->Ptr != PassedInObject)
+	{
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Call function %s failed, the object found in object holder %p is not equal to passed by caller %p"),
+				*FunctionName, FoundObject, PassedInObject));
+	}
+	
+	if (!ClassName.Equals(FoundObject->ClassName))
+	{
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Class name passed from client: %s is not equal to class name saved in object holder: %s"),
+				*ClassName, *FoundObject->ClassName));
+	}
+
+	AutoMemoryFreer AutoFreer;
+
+	// TODO: use any at beta it maybe has some performance issue
+	std::vector<void*> PassToParams;
+	if (!ParseInputParamsToTypeFreeData(InFuncParams, PassToParams, AutoFreer /* add new ptr to freer */))
+	{
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("A non-existent object pointer was encountered while parsing a function parameter.")));
+	}
+
+	std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>> OutParams;
+
+	if (FoundObject && FoundObject->MetaTypeName.Equals("UClass"))
+	{
+		auto* TypeContainer = FCoreUtils::GetUEStructType(ClassName);
+		if (!TypeContainer)
 		{
 			return ErrorInfo(__FILE__, __LINE__,
-				FString::Printf(TEXT("Class name passed from client: %s is not equal to class name saved in object holder: %s"),
-					*ClassName, *FoundObject->ClassName));
+				FString::Printf(TEXT("Can not find type container for class %s"), *ClassName));
+		}
+		auto FuncWrapper = TypeContainer->FindFunction(FunctionName);
+		
+		UObject* ObjPtr = static_cast<UObject*>(FoundObject->Ptr);
+		FuncWrapper->Call(ObjPtr, PassToParams, OutParams);
+	}
+	else if (FoundObject && FoundObject->MetaTypeName.Equals("Container"))
+	{
+		if (!FContainerTypeAdapter::CallOperator(FoundObject->Ptr, FoundObject->ClassName,
+							FunctionName, PassToParams, OutParams))
+		{
+			return ErrorInfo(__FILE__, __LINE__,
+				FString::Printf(TEXT("Run container function %s failed, maybe not support for this container type %s"),
+					*FunctionName, *FoundObject->ClassName));
 		}
 	}
 	else
 	{
-		auto InFuncName = StaticCallContext->getParams().getFuncName().cStr();
-		auto Class = StaticCallContext->getParams().getUeClass();
-		InFuncParam = StaticCallContext->getParams().getParams();
-		ClassName = UTF8_TO_TCHAR(Class.getTypeName().cStr());
-		FunctionName = UTF8_TO_TCHAR(InFuncName);
+		return ErrorInfo(__FILE__, __LINE__,
+			FString::Printf(TEXT("Can not call function  %s on %s, only call function on the UClass"),
+				*FunctionName, *FoundObject->ClassName));
 	}
 
+	auto Ret = context.getResults().initReturn();
+	auto InitOutParams = context.getResults().initOutParams(OutParams.size() - 1);
+	SetupRpcReturnAndOutputParams(OutParams, InitOutParams, Ret);
+
+	return true;
+}
+
+ErrorInfo FUnrealCoreServerImpl::CallStaticFunctionInternal(CallStaticFunctionContext context)
+{
+	auto InFuncParam = context.getParams().getParams();
+	FString ClassName = UTF8_TO_TCHAR(context.getParams().getUeClass().getTypeName().cStr());
+	FString FunctionName = UTF8_TO_TCHAR(context.getParams().getFuncName().cStr());
+	
 	auto* TypeContainer = FCoreUtils::GetUEStructType(ClassName);
 	if (!TypeContainer)
 	{
@@ -550,133 +768,15 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionCommon(CallFunctionContext* ObjectC
 
 	// TODO: use any at beta it maybe has some performance issue
 	std::vector<void*> PassToParams;
-	for (const auto& Param : InFuncParam)
-	{
-		const FString ParamClassName = UTF8_TO_TCHAR(Param.getUeClass().getTypeName().cStr());
-		switch (Param.which())
-		{
-			case UnrealCore::Argument::INT_VALUE:
-			{
-				int64* DataPtr = new int64(Param.getIntValue());
-				AutoFreer.AddPtr("int", DataPtr);
-				PassToParams.push_back(DataPtr);
-				break;
-			}
-			case UnrealCore::Argument::STR_VALUE:
-			{
-				FString* DataPtr = new FString(UTF8_TO_TCHAR(Param.getStrValue().cStr()));
-				AutoFreer.AddPtr("str", DataPtr);
-				PassToParams.push_back(DataPtr);
-				break;
-			}
-			case UnrealCore::Argument::UINT_VALUE:
-			{
-				uint64* DataPtr = new uint64(Param.getUintValue());
-				AutoFreer.AddPtr("uint", DataPtr);
-				PassToParams.push_back(DataPtr);
-				break;
-			}
-			case UnrealCore::Argument::FLOAT_VALUE:
-			{
-				double* DataPtr = new double(Param.getFloatValue());
-				AutoFreer.AddPtr("float", DataPtr);
-				PassToParams.push_back(DataPtr);
-				break;
-			}
-			case UnrealCore::Argument::BOOL_VALUE:
-			{
-				bool* DataPtr = new bool(Param.getBoolValue());
-				AutoFreer.AddPtr("bool", DataPtr);
-				PassToParams.push_back(DataPtr);
-				break;
-			}
-			case UnrealCore::Argument::OBJECT:
-			{
-				FString TypeName = UTF8_TO_TCHAR(Param.getUeClass().getTypeName().cStr());
-				void* Pointer = reinterpret_cast<void*>(Param.getObject().getAddress());
-				UE_LOG(LogUnrealPython, Display, TEXT("CallFunction for class %s and pass by object type %s"), *ClassName, *TypeName)
-				// TODO: support cpp native type
-				FObjectHolder::FUEObject* ObjPointer = FObjectHolder::Get().GetUObject(Pointer); // fixme@Caleb196x: crash when passing into a null pointer
-				if (ObjPointer)
-					PassToParams.push_back(ObjPointer->Ptr);
-				break;
-			}
-			case UnrealCore::Argument::ENUM_VALUE:
-			{
-				int64* EnumPtr = new int64(Param.getEnumValue());
-				AutoFreer.AddPtr("enum", EnumPtr);
-				PassToParams.push_back(EnumPtr);
-				break;
-			}
-			default:
-				break;
-		}
-	}
+	ParseInputParamsToTypeFreeData(InFuncParam, PassToParams, AutoFreer);
 
 	std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>> OutParams;
-	UnrealCore::Argument::Builder* FuncRet = nullptr;
-	capnp::List<UnrealCore::Argument>::Builder InitOutParams;
 	
-	if (!bIsStaticFunc)
-	{
-		if (FoundObject && FoundObject->MetaTypeName.Equals("UClass"))
-		{
-			UObject* ObjPtr = static_cast<UObject*>(FoundObject->Ptr);
-			FuncWrapper->Call(ObjPtr, PassToParams, OutParams);
-		}
-		else
-		{
-			return ErrorInfo(__FILE__, __LINE__,
-				FString::Printf(TEXT("Can not call function  %s on %s, only call function on the UClass"),
-					*FunctionName, *FoundObject->ClassName));
-		}
-
-		auto Ret = ObjectCallContext->getResults().initReturn();
-		FuncRet = &Ret;
-		
-		InitOutParams = ObjectCallContext->getResults().initOutParams(OutParams.size() - 1);
-	}
-	else
-	{
-		FuncWrapper->CallStatic(PassToParams, OutParams);
-		auto Ret = StaticCallContext->getResults().initReturn();
-		FuncRet = &Ret;
-
-		InitOutParams = StaticCallContext->getResults().initOutParams(OutParams.size() - 1);
-	}
+	FuncWrapper->CallStatic(PassToParams, OutParams);
 	
-	auto Iter = OutParams.begin();
-	if (Iter != OutParams.end())
-	{
-		auto ReturnTypeName = Iter->first;
-		auto UeTypeWithValuePair = Iter->second;
-		auto UeType = UeTypeWithValuePair.first;
-		auto Value = UeTypeWithValuePair.second;
-		ParseTypeAndSetValue(FuncRet, ReturnTypeName, UeType, Value);
-
-		++Iter;
-	}
-	
-	for (int i = 0; i < OutParams.size() && Iter != OutParams.end(); ++i, ++Iter)
-	{
-		auto OutParam = *Iter;
-		auto TypeName = OutParam.first;
-		auto UeTypeWithValue = OutParam.second;
-		auto UeType = UeTypeWithValue.first;
-		auto Value = UeTypeWithValue.second;
-		InitOutParams[i].initUeClass().setTypeName(TypeName);
-		ParseTypeAndSetValue(FuncRet, TypeName, UeType, Value);
-		
-		/*else if (TypeName == "object")
-		{
-			// find outer object from ObjectHolder
-			auto OutObj = InitOutParams[i].initObject();
-
-			UObject* ResultPtr = static_cast<UObject*>(Value);
-			void* ObjPtr = FObjectHolder::Get().GetGrpcObject(ResultPtr);
-			OutObj.setAddress(reinterpret_cast<uint64_t>(ObjPtr));
-		}*/
-	}
+	auto Ret = context.getResults().initReturn();
+	auto InitOutParams = context.getResults().initOutParams(OutParams.size() - 1);
+	SetupRpcReturnAndOutputParams(OutParams, InitOutParams, Ret);
 
 	return true;
 }
@@ -819,124 +919,4 @@ ErrorInfo FUnrealCoreServerImpl::DestroyContainerInternal(DestroyContainerContex
 	FObjectHolder::Get().RemoveFromRetainer(ContainerPtr);
 	
 	return true;
-}
-
-void FUnrealCoreServerImpl::ParseTypeAndSetValue(UnrealCore::Argument::Builder* RetValue,
-		const std::string& RpcType, const std::string& UeType, void* Value)
-{
-	// fixme@Caleb196x: return ue class type name
-	RetValue->initUeClass().setTypeName(UeType);
-	RetValue->setName("return_value");
-
-	if (RpcType == "bool")
-	{
-		bool* Result = static_cast<bool*>(Value);
-		RetValue->setBoolValue(*Result);
-		FMemory::Free(Result);
-	}
-	else if (RpcType == "int")
-	{
-		if (UeType == "int32" || UeType == "int32_t"
-			|| UeType == "int16" || UeType == "int16_t"
-			|| UeType == "int8" || UeType == "int8_t")
-		{
-			int32_t* Result = static_cast<int32_t*>(Value);
-			RetValue->setIntValue(*Result);
-			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
-			FMemory::Free(Result);
-		}
-		else if (UeType == "int64" || UeType == "int64_t")
-		{
-			int64_t* Result = static_cast<int64_t*>(Value);
-			RetValue->setIntValue(*Result);
-			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
-			FMemory::Free(Result);
-		}
-	}
-	else if (RpcType == "uint")
-	{
-		if (UeType == "uint32" || UeType == "uint32_t"
-			|| UeType == "uint16" || UeType == "uint16_t"
-			|| UeType == "uint8" || UeType == "uint8_t")
-		{
-			uint32_t* Result = static_cast<uint32_t*>(Value);
-			RetValue->setIntValue(*Result);
-			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
-			FMemory::Free(Result);
-		}
-		else if (UeType == "int64" || UeType == "int64_t")
-		{
-			uint64_t* Result = static_cast<uint64_t*>(Value);
-			RetValue->setIntValue(*Result);
-			UE_LOG(LogUnrealPython, Warning, TEXT("int value: %lld"), *Result)
-			FMemory::Free(Result);
-		}
-	}
-	else if (RpcType == "double")
-	{
-		if (UeType == "float")
-		{
-			float* Result = static_cast<float*>(Value);
-			RetValue->setFloatValue(*Result);
-			FMemory::Free(Result);
-		}
-		else
-		{
-			double* Result = static_cast<double*>(Value);
-			RetValue->setFloatValue(*Result);
-			FMemory::Free(Result);
-		}
-	}
-	else if (RpcType == "str")
-	{
-		if (UeType == "FString")
-		{
-			FString* Result = static_cast<FString*>(Value);
-			RetValue->setStrValue(TCHAR_TO_UTF8(**Result));
-			FMemory::Free(Result);
-		}
-		else if (UeType == "FText")
-		{
-			FText* Result = static_cast<FText*>(Value);
-			const FString Str = Result->ToString();
-			RetValue->setStrValue(TCHAR_TO_UTF8(*Str));
-			FMemory::Free(Result);
-		}
-		else if (UeType == "FName")
-		{
-			FName* Result = static_cast<FName*>(Value);
-			const FString Str = Result->ToString();
-			RetValue->setStrValue(TCHAR_TO_UTF8(*Str));
-			FMemory::Free(Result);
-		}
-	}
-	else if (RpcType == "object")
-	{
-		// auto Object =
-		// 如果返回值是当前函数调用分配的对象，在端侧该怎么处理？
-		// 例如：
-		// 端侧有个对象类型UTestObject的一个函数声明： UMainActor* CreateOtherActor(FString Name);
-		// 调用时 UMainActor* test = obj->CreateOtherActor("Hello");
-		// 那这个test对象在端侧的内存地址如何传递到ue侧？
-
-		// 解决思路：
-		// 在then函数中传入端侧的test对象指针地址，并且将其存入ObjectHolder中
-		//
-		// 解决思路2：
-		// 直接在server端返回uobject对象，在client端接受后，创建新的pyobject，然后立即将pyobject和uobject注册到object holder
-		auto InitObject = RetValue->initObject();
-		InitObject.setAddress(reinterpret_cast<uint64>(Value));
-		InitObject.setName(""); // todo@Caleb196x: 设置变量名
-		RetValue->setObject(InitObject);
-	}
-	else if (RpcType == "void")
-	{
-		RetValue->initUeClass().setTypeName("void");
-	}
-	else if (RpcType == "enum")
-	{
-		int32_t* Result = static_cast<int32_t*>(Value);
-		RetValue->setEnumValue(*Result);
-		FMemory::Free(Result);
-	}
 }

@@ -41,7 +41,7 @@ struct FScriptArrayExtension
 
 	FORCEINLINE uint8* GetData(int32 ElementSize, int32 Index)
 	{
-		return static_cast<uint8*>(Data.GetData() + Index * ElementSize);
+		return static_cast<uint8*>(Data.GetData()) + Index * ElementSize;
 	}
 
 	FORCEINLINE void Destruct(int32 Index, int32 Counts = 1)

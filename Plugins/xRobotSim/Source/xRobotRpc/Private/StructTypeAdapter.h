@@ -15,7 +15,7 @@ public:
 	virtual ~FStructTypeAdapter() {}
 	
 	// malloc a new object of this type
-	virtual void* New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs = {}) = 0;
+	virtual void* New(FString Name, uint64 ObjectFlags, std::vector<void*> ConstructArgs = {}) = 0;
 
 	virtual FString GetMetaTypeName() = 0;
 
@@ -46,7 +46,7 @@ class FScriptStructTypeAdapter : public FStructTypeAdapter
 public:
 	explicit FScriptStructTypeAdapter(UScriptStruct* InScriptStruct) : FStructTypeAdapter(InScriptStruct) {}
 	
-	virtual void* New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs={}) override;
+	virtual void* New(FString Name, uint64 ObjectFlags, std::vector<void*> ConstructArgs={}) override;
 
 	virtual FString GetMetaTypeName() override { return "UScriptStruct"; }
 
@@ -62,7 +62,7 @@ class FClassTypeAdapter : public FStructTypeAdapter
 public:
 	explicit FClassTypeAdapter(UClass* InClass) : FStructTypeAdapter(InClass) {}
 	
-	virtual void* New(FString Name, uint64 ObjectFlags, TArray<void*> ConstructArgs = {}) override;
+	virtual void* New(FString Name, uint64 ObjectFlags, std::vector<void*> ConstructArgs = {}) override;
 
 	virtual FString GetMetaTypeName() override { return "UClass"; }
 
