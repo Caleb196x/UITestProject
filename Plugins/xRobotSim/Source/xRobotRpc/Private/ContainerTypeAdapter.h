@@ -227,7 +227,7 @@ private:
 class FContainerTypeAdapter
 {
 public:
-	using OperatorFunction = std::function<void(void* ,const std::vector<void*>&,
+	using OperatorFunction = std::function<bool(void* ,const std::vector<void*>&,
 		std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>&)>;
 
 	FContainerTypeAdapter() { Init(); }
@@ -247,7 +247,7 @@ public:
 };
 
 #define DECLARE_CONTAINER_OPERATOR_FUNCTION(func) \
-	static void func(void* ,const std::vector<void*>&, \
+	static bool func(void* ,const std::vector<void*>&, \
 			std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>&); \
 
 class FArrayContainerAdapter
