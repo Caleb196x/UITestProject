@@ -10,7 +10,7 @@ void* FContainerTypeAdapter::NewContainer(const FString& TypeName, FProperty* In
 	{
 		if (InKeyProp)
 		{
-			return new FScriptMapExtension(InKeyProp, InValueProp);
+			return new FScriptMapExtension(InKeyProp, InValueProp); // fixme@Caleb196x: initialize elements
 		}
 			
 		UE_LOG(LogUnrealPython, Error, TEXT("Failed to create FScriptMapExtension, key property is invalid"));
@@ -114,7 +114,7 @@ bool FContainerTypeAdapter::CallOperator(void* Container, const FString& TypeNam
 			return false;
 		}
 			
-		ArrayOperatorFunctions[OperatorName](Container, Params, Outputs);
+		return ArrayOperatorFunctions[OperatorName](Container, Params, Outputs);
 	}
 	else if (TypeName.Equals("Set"))
 	{
@@ -124,7 +124,7 @@ bool FContainerTypeAdapter::CallOperator(void* Container, const FString& TypeNam
 			return false;
 		}
 
-		SetOperatorFunctions[OperatorName](Container, Params, Outputs);
+		return SetOperatorFunctions[OperatorName](Container, Params, Outputs);
 	}
 	else if (TypeName.Equals("Map"))
 	{
@@ -134,7 +134,7 @@ bool FContainerTypeAdapter::CallOperator(void* Container, const FString& TypeNam
 			return false;
 		}
 
-		MapOperatorFunctions[OperatorName](Container, Params, Outputs);
+		return MapOperatorFunctions[OperatorName](Container, Params, Outputs);
 	}
 	else
 	{
@@ -259,10 +259,27 @@ FProperty* FContainerElementTypePropertyManager::GetPropertyFromTypeName(const F
 
 /******************* Operator functions ********************/
 
+#define SET_CONTAINER_INNER_PROPERTY(name) \
+		FScriptArrayExtension* ArrayContainer = static_cast<FScriptArrayExtension*>(Container); \
+		auto name = ArrayContainer->ValueProperty; \
+		if (!name->IsPropertyValid()) \
+		{ \
+			return false; \
+		} \
+
 // Array
 bool FArrayContainerAdapter::Add(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_CONTAINER_INNER_PROPERTY(InnerProp)
+
+	const int32 ElementNum = InputParams.size();
+	AddUninitialized(&ArrayContainer->Data, GetSizeWithAlignment(InnerProp->GetProperty()), ElementNum);
+	for (int i = 0; i < ElementNum; ++i)
+	{
+		
+	}
+
 	return true;
 }
 
@@ -293,6 +310,10 @@ bool FArrayContainerAdapter::Num(void* Container, const std::vector<void*>& Inpu
 bool FArrayContainerAdapter::Set(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_CONTAINER_INNER_PROPERTY(InnerProp)
+
+	
+	
 	return true;
 }
 

@@ -254,6 +254,9 @@ class FArrayContainerAdapter
 {
 public:
 	DECLARE_CONTAINER_OPERATOR_FUNCTION(Num)
+
+	// Add(element1, element2, ...)
+	// 
 	DECLARE_CONTAINER_OPERATOR_FUNCTION(Add)
 	DECLARE_CONTAINER_OPERATOR_FUNCTION(Get)
 	DECLARE_CONTAINER_OPERATOR_FUNCTION(Set)
@@ -262,6 +265,15 @@ public:
 	DECLARE_CONTAINER_OPERATOR_FUNCTION(RemoveAt)
 	DECLARE_CONTAINER_OPERATOR_FUNCTION(IsValidIndex)
 	DECLARE_CONTAINER_OPERATOR_FUNCTION(Empty)
+
+	FORCEINLINE static int32 AddUninitialized(FScriptArray* ScriptArray, int32 ElementSize, int32 Count)
+	{
+#if ENGINE_MAJOR_VERSION > 4
+		return ScriptArray->Add(Count, ElementSize, __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+#else
+		return ScriptArray->Add(Count, ElementSize);
+#endif
+	}
 };
 
 class FSetContainerTypeAdapter
