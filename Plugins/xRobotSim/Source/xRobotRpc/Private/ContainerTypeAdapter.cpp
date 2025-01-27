@@ -259,7 +259,7 @@ FProperty* FContainerElementTypePropertyManager::GetPropertyFromTypeName(const F
 
 /******************* Operator functions ********************/
 
-#define SET_CONTAINER_INNER_PROPERTY(name) \
+#define SET_ARRAY_CONTAINER_INNER_PROPERTY(name) \
 		FScriptArrayExtension* ArrayContainer = static_cast<FScriptArrayExtension*>(Container); \
 		auto name = ArrayContainer->ValueProperty; \
 		if (!name->IsPropertyValid()) \
@@ -271,13 +271,15 @@ FProperty* FContainerElementTypePropertyManager::GetPropertyFromTypeName(const F
 bool FArrayContainerAdapter::Add(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_CONTAINER_INNER_PROPERTY(InnerProp)
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp)
 
 	const int32 ElementNum = InputParams.size();
-	AddUninitialized(&ArrayContainer->Data, GetSizeWithAlignment(InnerProp->GetProperty()), ElementNum);
+	const int32 Index =AddUninitialized(&ArrayContainer->Data, GetSizeWithAlignment(InnerProp->GetProperty()), ElementNum);
 	for (int i = 0; i < ElementNum; ++i)
 	{
-		
+		uint8* Data = ArrayContainer->GetData(ElementNum, Index + i);
+		InnerProp->GetProperty()->InitializeValue(Data);
+		InnerProp->CopyToUeValueInContainer(InputParams[i], Data);
 	}
 
 	return true;
@@ -286,6 +288,21 @@ bool FArrayContainerAdapter::Add(void* Container, const std::vector<void*>& Inpu
 bool FArrayContainerAdapter::Contains(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp)
+
+	int32 Index = FindIndexInternal(Container, InputParams);
+
+	bool* ResPtr = new bool();
+	if (INDEX_NONE == Index)
+	{
+		*ResPtr = false;
+	}
+	else
+	{
+		*ResPtr = true;
+	}
+	Outs.push_back(std::make_pair("bool", std::make_pair("bool", ResPtr)));
+	
 	return true;
 }
 
@@ -310,7 +327,7 @@ bool FArrayContainerAdapter::Num(void* Container, const std::vector<void*>& Inpu
 bool FArrayContainerAdapter::Set(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_CONTAINER_INNER_PROPERTY(InnerProp)
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp)
 
 	
 	
@@ -320,7 +337,49 @@ bool FArrayContainerAdapter::Set(void* Container, const std::vector<void*>& Inpu
 bool FArrayContainerAdapter::FindIndex(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	const int32 Index = FindIndexInternal(Container, InputParams);
+
+	int32* ResPtr = new int32();
+	*ResPtr = Index;
+	Outs.push_back(std::make_pair("int", std::make_pair("int32", ResPtr)));
+	
 	return true;
+}
+
+int32 FArrayContainerAdapter::FindIndexInternal(void* Container, const std::vector<void*>& InputParams)
+{
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp)
+
+	int32 Result = INDEX_NONE;
+	if (!InnerProp->IsPropertyValid())
+	{
+		return Result;
+	}
+
+	if (InputParams.size() == 0)
+	{
+		return Result;
+	}
+
+	FProperty* Property = InnerProp->GetProperty();
+	void* Dest = FMemory_Alloca(GetSizeWithAlignment(Property));
+	Property->InitializeValue(Dest);
+	InnerProp->CopyToUeValueInContainer(InputParams[0], Dest);
+
+	const int32 Num = ArrayContainer->Data.Num();
+	for (int32 i = 0; i < Num; ++i)
+	{
+		uint8* Src = ArrayContainer->GetData(GetSizeWithAlignment(Property), i);
+		if (Property->Identical(Src, Dest))
+		{
+			Result = i;
+			break;
+		}
+	}
+	Property->DestroyValue(Dest);
+
+	// todo@Caleb196x: maybe free dest memory
+	return Result;
 }
 
 bool FArrayContainerAdapter::RemoveAt(void* Container, const std::vector<void*>& InputParams,

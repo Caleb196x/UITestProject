@@ -266,6 +266,8 @@ public:
 	DECLARE_CONTAINER_OPERATOR_FUNCTION(IsValidIndex)
 	DECLARE_CONTAINER_OPERATOR_FUNCTION(Empty)
 
+protected:
+	
 	FORCEINLINE static int32 AddUninitialized(FScriptArray* ScriptArray, int32 ElementSize, int32 Count)
 	{
 #if ENGINE_MAJOR_VERSION > 4
@@ -274,6 +276,8 @@ public:
 		return ScriptArray->Add(Count, ElementSize);
 #endif
 	}
+	
+	static int32 FindIndexInternal(void* Container, const std::vector<void*>& InputParams);
 };
 
 class FSetContainerTypeAdapter
