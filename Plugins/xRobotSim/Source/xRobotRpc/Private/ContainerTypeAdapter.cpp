@@ -142,7 +142,6 @@ bool FContainerTypeAdapter::CallOperator(void* Container, const FString& TypeNam
 		return false;
 	}
 
-	return true;
 }
 
 #define ADD_BUILTIN_PROPERTY_TYPE(type, name) \
@@ -259,9 +258,9 @@ FProperty* FContainerElementTypePropertyManager::GetPropertyFromTypeName(const F
 
 /******************* Operator functions ********************/
 
-#define SET_ARRAY_CONTAINER_INNER_PROPERTY(name) \
-		FScriptArrayExtension* ArrayContainer = static_cast<FScriptArrayExtension*>(Container); \
-		auto name = ArrayContainer->ValueProperty; \
+#define SET_ARRAY_CONTAINER_INNER_PROPERTY(name, container) \
+		FScriptArrayExtension* container = static_cast<FScriptArrayExtension*>(Container); \
+		auto name = container->ValueProperty; \
 		if (!name->IsPropertyValid()) \
 		{ \
 			return false; \
@@ -271,10 +270,10 @@ FProperty* FContainerElementTypePropertyManager::GetPropertyFromTypeName(const F
 bool FArrayContainerAdapter::Add(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp)
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp, ArrayContainer)
 
 	const int32 ElementNum = InputParams.size();
-	const int32 Index =AddUninitialized(&ArrayContainer->Data, GetSizeWithAlignment(InnerProp->GetProperty()), ElementNum);
+	const int32 Index =AddUninitialized(&ArrayContainer->InnerArray, GetSizeWithAlignment(InnerProp->GetProperty()), ElementNum);
 	for (int i = 0; i < ElementNum; ++i)
 	{
 		uint8* Data = ArrayContainer->GetData(ElementNum, Index + i);
@@ -288,7 +287,7 @@ bool FArrayContainerAdapter::Add(void* Container, const std::vector<void*>& Inpu
 bool FArrayContainerAdapter::Contains(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp)
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp, ArrayContainer)
 
 	int32 Index = FindIndexInternal(Container, InputParams);
 
@@ -309,27 +308,83 @@ bool FArrayContainerAdapter::Contains(void* Container, const std::vector<void*>&
 bool FArrayContainerAdapter::Empty(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp, ArrayContainer)
+
+	ArrayContainer->Empty();
+	
 	return true;
 }
 
 bool FArrayContainerAdapter::Get(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp, ArrayContainer)
+
+	int Index = 0;
+	if (InputParams.size() > 0)
+	{
+		const int32* InputIndex = static_cast<int32*>(InputParams[0]);
+		Index = *InputIndex;
+	}
+
+	if (Index < 0 || Index > ArrayContainer->InnerArray.Num())
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Index %d out of range when get array element"), Index);
+		return false;
+	}
+
+	uint8* DataPtr = ArrayContainer->GetData(GetSizeWithAlignment(InnerProp->GetProperty()), Index);
+
+	auto PropSize = InnerProp->GetProperty()->GetSize();
+	void* RetVal = FMemory::Malloc(PropSize); // fixme@Caleb196x: free memory
+	FMemory::Memzero(RetVal, PropSize); // fixme@Caleb196x: need type information to free memory
+	InnerProp->ReadUeValueInContainer(DataPtr, RetVal);
+
+	// todo@Caleb196x: Set Outs
+	
 	return true;
 }
 
 bool FArrayContainerAdapter::Num(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp, ArrayContainer)
+
+	const int32 ArrayNum = ArrayContainer->InnerArray.Num();
+	int32* RetVal = new int32(ArrayNum);
+	Outs.push_back(std::make_pair("int", std::make_pair("int", RetVal)));
+	
 	return true;
 }
 
 bool FArrayContainerAdapter::Set(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp)
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp, ArrayContainer)
 
+	int Index = 0;
+	if (InputParams.size() > 0)
+	{
+		const int32* InputIndex = static_cast<int32*>(InputParams[0]);
+		Index = *InputIndex;
+	}
+
+	if (Index < 0 || Index > ArrayContainer->InnerArray.Num())
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Index %d out of range when set array element"), Index);
+		return false;
+	}
+
+	if (InputParams.size() < 2)
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Input parameters must contain new element value"));
+		return false;
+	}
 	
+	uint8* DataPtr = ArrayContainer->GetData(GetSizeWithAlignment(InnerProp->GetProperty()), Index);
+
+	InnerProp->GetProperty()->InitializeValue(DataPtr);
+	InnerProp->CopyToUeValueInContainer(InputParams[1], DataPtr);
 	
 	return true;
 }
@@ -348,7 +403,7 @@ bool FArrayContainerAdapter::FindIndex(void* Container, const std::vector<void*>
 
 int32 FArrayContainerAdapter::FindIndexInternal(void* Container, const std::vector<void*>& InputParams)
 {
-	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp)
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp, ArrayContainer)
 
 	int32 Result = INDEX_NONE;
 	if (!InnerProp->IsPropertyValid())
@@ -366,7 +421,7 @@ int32 FArrayContainerAdapter::FindIndexInternal(void* Container, const std::vect
 	Property->InitializeValue(Dest);
 	InnerProp->CopyToUeValueInContainer(InputParams[0], Dest);
 
-	const int32 Num = ArrayContainer->Data.Num();
+	const int32 Num = ArrayContainer->InnerArray.Num();
 	for (int32 i = 0; i < Num; ++i)
 	{
 		uint8* Src = ArrayContainer->GetData(GetSizeWithAlignment(Property), i);
@@ -385,67 +440,262 @@ int32 FArrayContainerAdapter::FindIndexInternal(void* Container, const std::vect
 bool FArrayContainerAdapter::RemoveAt(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp, ArrayContainer)
+	
+	int Index = 0;
+	if (InputParams.size() > 0)
+	{
+		const int32* InputIndex = static_cast<int32*>(InputParams[0]);
+		Index = *InputIndex;
+	}
+
+	if (Index < 0 || Index > ArrayContainer->InnerArray.Num())
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Index %d out of range when remove array element"), Index);
+		return false;
+	}
+
+	ArrayContainer->Destruct(Index);
+#if ENGINE_MAJOR_VERSION > 4
+	ArrayContainer->InnerArray.Remove(Index, 1, GetSizeWithAlignment(InnerProp->GetProperty()), __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+#else
+	ArrayContainer->InnerArray.Remove(Index, 1, GetSizeWithAlignment(InnerProp->GetProperty()));
+#endif
+	
 	return true;
 }
 
 bool FArrayContainerAdapter::IsValidIndex(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp, ArrayContainer)
+	
+	int Index = 0;
+	if (InputParams.size() > 0)
+	{
+		const int32* InputIndex = static_cast<int32*>(InputParams[0]);
+		Index = *InputIndex;
+	}
+
+	bool* ResPtr = new bool(ArrayContainer->InnerArray.IsValidIndex(Index));
+	Outs.push_back(std::make_pair("bool", std::make_pair("bool", ResPtr)));
+	
 	return true;
 }
+
+#define SET_SET_CONTAINER_INNER_PROPERTY(name, container) \
+		FScriptSetExtension* container = static_cast<FScriptSetExtension*>(Container); \
+		auto name = container->ValueProperty; \
+		if (!name->IsPropertyValid()) \
+		{ \
+			return false; \
+		} \
+
+int32 FindIndexInner(FScriptSetExtension* SetContainer, const std::vector<void*>& InputParams);
 
 // Set
 bool FSetContainerTypeAdapter::Add(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	return true;
-}
+	SET_SET_CONTAINER_INNER_PROPERTY(InnerProp, SetContainer)
 
-bool FSetContainerTypeAdapter::Contains(void* Container, const std::vector<void*>& InputParams,
-			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
-{
+	if (InputParams.size() == 0)
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Input is empty when add new set's element."))
+		return false;
+	}
+	
+	FProperty* Property = InnerProp->GetProperty();
+	void* Dest = FMemory_Alloca(GetSizeWithAlignment(Property));
+	Property->InitializeValue(Dest);
+	InnerProp->CopyToUeValueInContainer(InputParams[0], Dest);
+	auto ScriptSetLayout = SetContainer->GetScriptSetLayout();
+	SetContainer->InnerSet.Add(
+		Dest, ScriptSetLayout,
+		[Property](const void* Element) { return Property->GetValueTypeHash(Element); },
+		[Property](const void* A, const void* B) { return Property->Identical(A, B); },
+		[Property, Dest](void* Element){ Property->InitializeValue(Element); Property->CopySingleValue(Element, Dest);},
+		[Property](void* Element) { Property->DestroyValue(Element); }
+	);
+
+	Property->DestroyValue(Dest);
+	
 	return true;
 }
 
 bool FSetContainerTypeAdapter::Empty(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(InnerProp, SetContainer)
+
+	SetContainer->Empty();
+	
 	return true;
 }
 
 bool FSetContainerTypeAdapter::Get(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(InnerProp, SetContainer)
+
+	int32 Index = 0;
+	if (InputParams.size() > 0)
+	{
+		const int32* InputIndex = static_cast<int32*>(InputParams[0]);
+		Index = *InputIndex;
+	}
+
+	if (!SetContainer->InnerSet.IsValidIndex(Index))
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Invalid set index"))
+		return false;
+	}
+
+	auto SetLayout = SetContainer->GetScriptSetLayout();
+	void* Data = SetContainer->InnerSet.GetData(Index, SetLayout);
+
+	auto PropSize = InnerProp->GetProperty()->GetSize(); // fixme@Caleb196x: maybe need align memory size
+	void* RetVal = FMemory::Malloc(PropSize); // fixme@Caleb196x: free memory
+	FMemory::Memzero(RetVal, PropSize); // fixme@Caleb196x: need type information to free memory
+	InnerProp->CopyToUeValueInContainer(Data, RetVal);
+
+	// todo@Caleb196x: Set Outs
+	
 	return true;
 }
 
 bool FSetContainerTypeAdapter::Num(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(InnerProp, SetContainer)
+
+	int32 SetNum = SetContainer->InnerSet.Num();
+	int32* RetPtr = new int32(SetNum);
+	Outs.push_back(std::make_pair("int", std::make_pair("int32", RetPtr)));
+	
+	return true;
+}
+
+bool FSetContainerTypeAdapter::Contains(void* Container, const std::vector<void*>& InputParams,
+			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
+{
+	SET_SET_CONTAINER_INNER_PROPERTY(InnerProp, SetContainer)
+	
+	if (InputParams.size() == 0)
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Need element value in input params."))
+		return false;
+	}
+
+	int32 Index = FindIndexInner(SetContainer, InputParams);
+	bool* ResPtr = new bool();
+	if (INDEX_NONE == Index)
+	{
+		*ResPtr = false;
+	}
+	else
+	{
+		*ResPtr = true;
+	}
+	
+	Outs.push_back(std::make_pair("bool", std::make_pair("bool", ResPtr)));
+	
 	return true;
 }
 
 bool FSetContainerTypeAdapter::FindIndex(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(InnerProp, SetContainer)
+	
+	if (InputParams.size() == 0)
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Need element value in input params."))
+		return false;
+	}
+
+	int32 Index = FindIndexInner(SetContainer, InputParams);
+	int32* ResPtr = new int32(Index);
+
+	Outs.push_back(std::make_pair("int", std::make_pair("int32", ResPtr)));
+	
 	return true;
+}
+
+int32 FindIndexInner(FScriptSetExtension* SetContainer, const std::vector<void*>& InputParams)
+{
+	check(InputParams.size() > 0)
+	
+	int32 Index = INDEX_NONE;
+	FProperty* InnerProperty = SetContainer->ValueProperty->GetProperty();
+	void* DataPtr = FMemory_Alloca(GetSizeWithAlignment(InnerProperty));
+	InnerProperty->InitializeValue(DataPtr);
+
+	SetContainer->ValueProperty->CopyToUeValueInContainer(InputParams[0], DataPtr);
+
+	auto SetLayout = SetContainer->GetScriptSetLayout();
+	Index = SetContainer->InnerSet.FindIndex(DataPtr, SetLayout,
+	[InnerProperty](const void* Element) { return InnerProperty->GetValueTypeHash(Element); },
+	[InnerProperty](const void* A, const void* B) { return InnerProperty->Identical(A, B); }
+	);
+
+	InnerProperty->DestroyValue(DataPtr);
+	
+	return Index;
 }
 
 bool FSetContainerTypeAdapter::RemoveAt(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(InnerProp, SetContainer)
+	
+	int Index = 0;
+	if (InputParams.size() > 0)
+	{
+		const int32* InputIndex = static_cast<int32*>(InputParams[0]);
+		Index = *InputIndex;
+	}
+
+	if (!SetContainer->InnerSet.IsValidIndex(Index))
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Invalid set index"))
+		return false;
+	}
+
+	auto ScriptSetLayout = SetContainer->GetScriptSetLayout();
+	SetContainer->Destruct(Index);
+	SetContainer->InnerSet.RemoveAt(Index, ScriptSetLayout);
+	
 	return true;
 }
 
 bool FSetContainerTypeAdapter::IsValidIndex(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(InnerProp, SetContainer)
+	
+	int Index = 0;
+	if (InputParams.size() > 0)
+	{
+		const int32* InputIndex = static_cast<int32*>(InputParams[0]);
+		Index = *InputIndex;
+	}
+
+	bool* ResPtr = new bool(SetContainer->InnerSet.IsValidIndex(Index));
+	Outs.push_back(std::make_pair("bool", std::make_pair("bool", ResPtr)));
 	return true;
 }
 
 bool FSetContainerTypeAdapter::GetMaxIndex(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(InnerProp, SetContainer)
+
+	uint32 MaxIndex = SetContainer->InnerSet.GetMaxIndex();
+
+	uint32* ResPtr = new uint32(MaxIndex);
+	Outs.push_back(std::make_pair("uint", std::make_pair("uint32", ResPtr)));
+	
 	return true;
 }
 

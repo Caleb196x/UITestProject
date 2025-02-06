@@ -287,7 +287,7 @@ void FFunctionWrapper::FastCall(
 		
 		auto PropSize = Return->GetProperty()->GetSize();
 		void* RetVal = FMemory::Malloc(PropSize); // fixme@Caleb196x: free memory
-		FMemory::Memzero(RetVal, PropSize);
+		FMemory::Memzero(RetVal, PropSize); // fixme@Caleb196x: need type information to free memory
 		if (!Return->ReadUeValueInContainer(StackParams, RetVal))
 		{
 			UE_LOG(LogUnrealPython, Error, TEXT("Copy to ue value failed, property: %s"), *Return->GetProperty()->GetName());

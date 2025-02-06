@@ -18,7 +18,7 @@ FORCEINLINE int32  GetSizeWithAlignment(FProperty* InProperty)
 
 struct FScriptArrayExtension
 {
-	FScriptArray Data;
+	FScriptArray InnerArray;
 
 	std::shared_ptr<FPropertyWrapper> ValueProperty;
 
@@ -41,7 +41,7 @@ struct FScriptArrayExtension
 
 	FORCEINLINE uint8* GetData(int32 ElementSize, int32 Index)
 	{
-		return static_cast<uint8*>(Data.GetData()) + Index * ElementSize;
+		return static_cast<uint8*>(InnerArray.GetData()) + Index * ElementSize;
 	}
 
 	FORCEINLINE void Destruct(int32 Index, int32 Counts = 1)
@@ -57,9 +57,9 @@ struct FScriptArrayExtension
 
 	FORCEINLINE void Empty()
 	{
-		Destruct(0, Data.Num());
+		Destruct(0, InnerArray.Num());
 #if ENGINE_MAJOR_VERSION > 4
-		Data.Empty(0, GetSizeWithAlignment(ValueProperty->GetProperty()),
+		InnerArray.Empty(0, GetSizeWithAlignment(ValueProperty->GetProperty()),
 			__STDCPP_DEFAULT_NEW_ALIGNMENT__);
 #else
 		Data.Empty(0, GetSizeWithAlignment(Property));
@@ -70,7 +70,7 @@ struct FScriptArrayExtension
 
 struct FScriptSetExtension
 {
-	FScriptSet Data;
+	FScriptSet InnerSet;
 	
 	std::shared_ptr<FPropertyWrapper> ValueProperty;
 	
@@ -93,14 +93,14 @@ struct FScriptSetExtension
 	FORCEINLINE FScriptSetLayout GetScriptSetLayout() const
 	{
 		FProperty* Property = ValueProperty->GetProperty();
-		return Data.GetScriptLayout(Property->GetSize(), Property->GetMinAlignment());
+		return InnerSet.GetScriptLayout(Property->GetSize(), Property->GetMinAlignment());
 	}
 
 	FORCEINLINE void Empty()
 	{
 		auto ScriptSetLayout = GetScriptSetLayout();
-		Destruct(0, Data.Num());
-		Data.Empty(0, ScriptSetLayout);
+		Destruct(0, InnerSet.Num());
+		InnerSet.Empty(0, ScriptSetLayout);
 	}
 
 	FORCEINLINE void Destruct(int32 Index, int32 Counts = 1)
@@ -108,7 +108,7 @@ struct FScriptSetExtension
 		auto ScriptSetLayout = GetScriptSetLayout();
 		for (int32 i = Index; i < Counts; ++i)
 		{
-			void* Dest = Data.GetData(i, ScriptSetLayout);
+			void* Dest = InnerSet.GetData(i, ScriptSetLayout);
 			ValueProperty->DestroyValue(Dest);
 		}
 	}
