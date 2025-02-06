@@ -94,7 +94,7 @@ void FContainerTypeAdapter::Init()
 	MapOperatorFunctions.Add("Get", &FMapContainerTypeAdapter::Get);
 	MapOperatorFunctions.Add("Add", &FMapContainerTypeAdapter::Add);
 	MapOperatorFunctions.Add("Set", &FMapContainerTypeAdapter::Set);
-	MapOperatorFunctions.Add("RemoveAt", &FMapContainerTypeAdapter::RemoveAt);
+	MapOperatorFunctions.Add("Remove", &FMapContainerTypeAdapter::Remove);
 	MapOperatorFunctions.Add("GetMaxIndex", &FMapContainerTypeAdapter::GetMaxIndex);
 	MapOperatorFunctions.Add("IsValidIndex", &FMapContainerTypeAdapter::IsValidIndex);
 	MapOperatorFunctions.Add("GetKey", &FMapContainerTypeAdapter::GetKey);
@@ -762,24 +762,69 @@ bool FMapContainerTypeAdapter::Add(void* Container, const std::vector<void*>& In
 bool FMapContainerTypeAdapter::Get(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+	
+	if (InputParams.size() == 0)
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Need key in input params when get map value."))
+		return false;
+	}
+	
+	FProperty* KeyProperty = KeyProp->GetProperty();
+	FProperty* ValProperty = ValueProp->GetProperty();
+
+	void* KeyPtr = FMemory_Alloca(GetSizeWithAlignment(KeyProperty));
+	KeyProp->GetProperty()->InitializeValue(KeyPtr);
+	KeyProp->CopyToUeValueInContainer(InputParams[0], KeyPtr);
+
+	auto SetLayout = MapContainer->GetScriptMapLayout();
+	void* ValPtr = MapContainer->InnerMap.FindValue(
+		KeyPtr, SetLayout,
+		[KeyProperty](const void* ElementKey) { return KeyProperty->GetValueTypeHash(ElementKey); },
+		[KeyProperty](const void* A, const void* B) { return KeyProperty->Identical(A, B); }
+	);
+
+	if (ValPtr)
+	{
+		auto PropSize = ValProperty->GetSize(); // fixme@Caleb196x: maybe need align memory size
+		void* RetVal = FMemory::Malloc(PropSize); // fixme@Caleb196x: free memory
+		FMemory::Memzero(RetVal, PropSize); // fixme@Caleb196x: need type information to free memory
+		ValueProp->CopyToUeValueInContainer(ValPtr, RetVal);
+
+		// todo@Caleb196x: Set Outs
+	}
+
+	KeyProperty->DestroyValue(KeyPtr);
+	
 	return true;
 }
 
 bool FMapContainerTypeAdapter::Empty(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+
+	MapContainer->Empty();
+	
 	return true;
 }
 
 bool FMapContainerTypeAdapter::Num(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+
+	const int32 MapNum = MapContainer->InnerMap.Num();
+	int32* RetPtr = new int32(MapNum);
+	Outs.push_back(std::make_pair("int", std::make_pair("int32", RetPtr)));
+	
 	return true;
 }
 
 bool FMapContainerTypeAdapter::Set(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	Add(Container, InputParams, Outs);
 	return true;
 }
 
@@ -789,20 +834,71 @@ bool FMapContainerTypeAdapter::GetKey(void* Container, const std::vector<void*>&
 	return true;
 }
 
-bool FMapContainerTypeAdapter::RemoveAt(void* Container, const std::vector<void*>& InputParams,
+bool FMapContainerTypeAdapter::Remove(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+
+	if (InputParams.size() == 0)
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Must input key in input params when remove map element."))
+		return false;
+	}
+	
+	FProperty* KeyProperty = KeyProp->GetProperty();
+	
+	void* KeyPtr = FMemory_Alloca(GetSizeWithAlignment(KeyProperty));
+	KeyProperty->InitializeValue(KeyPtr);
+	KeyProp->CopyToUeValueInContainer(InputParams[0], KeyPtr);
+
+	auto SetLayout = MapContainer->GetScriptMapLayout();
+	int32 Index = MapContainer->InnerMap.FindPairIndex(
+		KeyPtr, SetLayout,
+		[KeyProperty](const void* Key) { return KeyProperty->GetValueTypeHash(Key); },
+		[KeyProperty](const void* A, const void* B) { return KeyProperty->Identical(A, B); }
+	);
+
+	if (Index == INDEX_NONE)
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Can not find key"))
+		return false;
+	}
+
+	MapContainer->Destruct(Index);
+	MapContainer->InnerMap.RemoveAt(Index, SetLayout);
+
+	KeyProperty->DestroyValue(KeyPtr);
+	
 	return true;
 }
 
 bool FMapContainerTypeAdapter::GetMaxIndex(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+	
+	const int32 MaxIndex = MapContainer->InnerMap.GetMaxIndex();
+	int32* RetPtr = new int32(MaxIndex);
+	Outs.push_back(std::make_pair("int", std::make_pair("int32", RetPtr)));
+	
 	return true;
 }
 
 bool FMapContainerTypeAdapter::IsValidIndex(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+
+	if (InputParams.size() == 0)
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Must input key when check index."))
+		return false;
+	}
+
+	int32* Index = static_cast<int32*>(InputParams[0]);
+
+	bool* ResPtr = new bool(MapContainer->InnerMap.IsValidIndex(*Index));
+	Outs.push_back(std::make_pair("bool", std::make_pair("bool", ResPtr)));
+	
 	return true;
 }
