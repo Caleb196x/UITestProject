@@ -699,11 +699,63 @@ bool FSetContainerTypeAdapter::GetMaxIndex(void* Container, const std::vector<vo
 	return true;
 }
 
+#define SET_SET_CONTAINER_INNER_PROPERTY(key, value, container) \
+		FScriptMapExtension* container = static_cast<FScriptMapExtension*>(Container); \
+		auto value = container->ValueProperty; \
+		auto key = container->KeyProperty; \
+		if (!value->IsPropertyValid() || !key->IsPropertyValid()) \
+		{ \
+		  return false; \
+		} \
 
 // Map
 bool FMapContainerTypeAdapter::Add(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+
+	if (InputParams.size() < 2)
+	{
+		UE_LOG(LogUnrealPython, Error, TEXT("Must input key and value in input params."))
+		return false;
+	}
+
+	FProperty* KeyProperty = KeyProp->GetProperty();
+	FProperty* ValProperty = ValueProp->GetProperty();
+
+	void* KeyPtr = FMemory_Alloca(GetSizeWithAlignment(KeyProperty));
+	KeyProp->GetProperty()->InitializeValue(KeyPtr);
+
+	void* ValPtr = FMemory_Alloca(GetSizeWithAlignment(ValProperty));
+	ValueProp->GetProperty()->InitializeValue(ValPtr);
+
+	KeyProp->CopyToUeValueInContainer(InputParams[0], KeyPtr);
+	ValueProp->CopyToUeValueInContainer(InputParams[1], ValPtr);
+
+	auto SetLayout = MapContainer->GetScriptMapLayout();
+
+	MapContainer->InnerMap.Add(
+		KeyPtr, ValPtr, SetLayout,
+		[KeyProperty](const void* ElementKey) { return KeyProperty->GetValueTypeHash(ElementKey); },
+		[KeyProperty](const void* A, const void* B) { return KeyProperty->Identical(A, B); },
+		[KeyProperty, KeyPtr](void* NewElementKey)
+		{
+			KeyProperty->InitializeValue(NewElementKey);
+			KeyProperty->CopySingleValue(NewElementKey, KeyPtr);
+		},
+		[ValProperty, ValPtr](void* NewElementValue)
+		{
+			ValProperty->InitializeValue(NewElementValue);
+			ValProperty->CopySingleValue(NewElementValue, ValPtr);
+		},
+		[ValProperty, ValPtr](void* ExistingElementValue) { ValProperty->CopySingleValue(ExistingElementValue, ValPtr); },
+		[KeyProperty](void* ElementKey) { KeyProperty->DestroyValue(ElementKey); },
+		[ValProperty](void* ElementValue) { ValProperty->DestroyValue(ElementValue); }
+	);
+
+	KeyProperty->DestroyValue(KeyPtr);
+	ValProperty->DestroyValue(ValPtr);
+	
 	return true;
 }
 

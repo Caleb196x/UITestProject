@@ -116,7 +116,7 @@ struct FScriptSetExtension
 
 struct FScriptMapExtension
 {
-	FScriptMap Data;
+	FScriptMap InnerMap;
 
 	std::shared_ptr<FPropertyWrapper> KeyProperty;
 
@@ -145,7 +145,7 @@ struct FScriptMapExtension
 	{
 		FProperty* KeyProp = KeyProperty->GetProperty();
 		FProperty* ValProp = ValueProperty->GetProperty();
-		return Data.GetScriptLayout(KeyProp->GetSize(), KeyProp->GetMinAlignment(),
+		return InnerMap.GetScriptLayout(KeyProp->GetSize(), KeyProp->GetMinAlignment(),
 									ValProp->GetSize(), ValProp->GetMinAlignment());
 	}
 
@@ -163,9 +163,9 @@ struct FScriptMapExtension
 		auto MapLayout = GetScriptMapLayout();
 		for (int32 i = Index; i < Count; ++i)
 		{
-			if (Data.IsValidIndex(i))
+			if (InnerMap.IsValidIndex(i))
 			{
-				uint8* Dest = static_cast<uint8*>(Data.GetData(i, MapLayout));
+				uint8* Dest = static_cast<uint8*>(InnerMap.GetData(i, MapLayout));
 				void* Key = Dest + GetKeyOffset(MapLayout);
 				void* Val = Dest + MapLayout.ValueOffset;
 				KeyProperty->DestroyValue(Key);
@@ -177,8 +177,8 @@ struct FScriptMapExtension
 	FORCEINLINE void Empty()
 	{
 		auto MapLayout = GetScriptMapLayout();
-		Destruct(0, Data.Num());
-		Data.Empty(0, MapLayout);
+		Destruct(0, InnerMap.Num());
+		InnerMap.Empty(0, MapLayout);
 	}
 };
 
