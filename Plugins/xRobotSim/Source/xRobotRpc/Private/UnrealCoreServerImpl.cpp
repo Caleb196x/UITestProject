@@ -721,18 +721,24 @@ ErrorInfo FUnrealCoreServerImpl::CallFunctionInternal(CallFunctionContext contex
 				FString::Printf(TEXT("Can not find type container for class %s"), *ClassName));
 		}
 		auto FuncWrapper = TypeContainer->FindFunction(FunctionName);
+		if (!FuncWrapper)
+		{
+			return ErrorInfo(__FILE__, __LINE__,
+				FString::Printf(TEXT("Can not find function %s for class %s"), *FunctionName, *ClassName));
+		}
 		
 		UObject* ObjPtr = static_cast<UObject*>(FoundObject->Ptr);
 		FuncWrapper->Call(ObjPtr, PassToParams, OutParams);
 	}
 	else if (FoundObject && FoundObject->MetaTypeName.Equals("Container"))
 	{
+		FString ErrorMessage;
 		if (!FContainerTypeAdapter::CallOperator(FoundObject->Ptr, FoundObject->ClassName,
-							FunctionName, PassToParams, OutParams))
+							FunctionName, PassToParams, OutParams, ErrorMessage))
 		{
 			return ErrorInfo(__FILE__, __LINE__,
-				FString::Printf(TEXT("Run container function %s failed, maybe not support for this container type %s"),
-					*FunctionName, *FoundObject->ClassName));
+				FString::Printf(TEXT("Run container operator function %s failed, failure reason %s"),
+					*FunctionName, *ErrorMessage));
 		}
 	}
 	else

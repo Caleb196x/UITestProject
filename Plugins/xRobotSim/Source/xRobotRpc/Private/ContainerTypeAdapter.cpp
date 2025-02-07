@@ -3,6 +3,7 @@
 TMap<FString, FContainerTypeAdapter::OperatorFunction> FContainerTypeAdapter::ArrayOperatorFunctions = {};
 TMap<FString, FContainerTypeAdapter::OperatorFunction> FContainerTypeAdapter::SetOperatorFunctions = {};
 TMap<FString, FContainerTypeAdapter::OperatorFunction> FContainerTypeAdapter::MapOperatorFunctions = {};
+FString FContainerTypeAdapter::CallOperatorErrorMessage = "";
 
 void* FContainerTypeAdapter::NewContainer(const FString& TypeName, FProperty* InValueProp, FProperty* InKeyProp)
 {
@@ -716,7 +717,7 @@ bool FSetContainerTypeAdapter::GetMaxIndex(void* Container, const std::vector<vo
 	return true;
 }
 
-#define SET_SET_CONTAINER_INNER_PROPERTY(key, value, container) \
+#define SET_MAP_CONTAINER_INNER_PROPERTY(key, value, container) \
 		FScriptMapExtension* container = static_cast<FScriptMapExtension*>(Container); \
 		auto value = container->ValueProperty; \
 		auto key = container->KeyProperty; \
@@ -729,7 +730,7 @@ bool FSetContainerTypeAdapter::GetMaxIndex(void* Container, const std::vector<vo
 bool FMapContainerTypeAdapter::Add(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+	SET_MAP_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
 
 	if (InputParams.size() < 2)
 	{
@@ -779,7 +780,7 @@ bool FMapContainerTypeAdapter::Add(void* Container, const std::vector<void*>& In
 bool FMapContainerTypeAdapter::Get(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+	SET_MAP_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
 	
 	if (InputParams.size() == 0)
 	{
@@ -823,7 +824,7 @@ bool FMapContainerTypeAdapter::Get(void* Container, const std::vector<void*>& In
 bool FMapContainerTypeAdapter::Empty(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+	SET_MAP_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
 
 	MapContainer->Empty();
 	
@@ -833,7 +834,7 @@ bool FMapContainerTypeAdapter::Empty(void* Container, const std::vector<void*>& 
 bool FMapContainerTypeAdapter::Num(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+	SET_MAP_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
 
 	const int32 MapNum = MapContainer->InnerMap.Num();
 	int32* RetPtr = new int32(MapNum);
@@ -858,7 +859,7 @@ bool FMapContainerTypeAdapter::GetKey(void* Container, const std::vector<void*>&
 bool FMapContainerTypeAdapter::Remove(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+	SET_MAP_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
 
 	if (InputParams.size() == 0)
 	{
@@ -896,7 +897,7 @@ bool FMapContainerTypeAdapter::Remove(void* Container, const std::vector<void*>&
 bool FMapContainerTypeAdapter::GetMaxIndex(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+	SET_MAP_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
 	
 	const int32 MaxIndex = MapContainer->InnerMap.GetMaxIndex();
 	int32* RetPtr = new int32(MaxIndex);
@@ -908,7 +909,7 @@ bool FMapContainerTypeAdapter::GetMaxIndex(void* Container, const std::vector<vo
 bool FMapContainerTypeAdapter::IsValidIndex(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
-	SET_SET_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
+	SET_MAP_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
 
 	if (InputParams.size() == 0)
 	{
