@@ -237,13 +237,17 @@ public:
 	static bool DestroyContainer(void* Container, const FString& TypeName);
 	
 	static bool CallOperator(void* Container, const FString& TypeName,  const FString& OperatorName, const std::vector<void*>& Params,
-		std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>& Outputs);
+		std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>& Outputs, FString& OutErrMsg);
 
 	static void Init();
+
+	FORCEINLINE static void SetErrorMessage(const FString& Message) { CallOperatorErrorMessage = Message; }
 
 	static TMap<FString, OperatorFunction> ArrayOperatorFunctions;
 	static TMap<FString, OperatorFunction> SetOperatorFunctions;
 	static TMap<FString, OperatorFunction> MapOperatorFunctions;
+
+	static FString CallOperatorErrorMessage;
 };
 
 #define DECLARE_CONTAINER_OPERATOR_FUNCTION(func) \

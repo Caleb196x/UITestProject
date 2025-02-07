@@ -104,44 +104,53 @@ void FContainerTypeAdapter::Init()
 
 bool FContainerTypeAdapter::CallOperator(void* Container, const FString& TypeName,
 	const FString& OperatorName, const std::vector<void*>& Params,
-	std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>& Outputs)
+	std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>& Outputs, FString& OutErrMsg)
 {
+	bool CallResult = false;
+	CallOperatorErrorMessage = "";
 	if (TypeName.Equals("Array"))
 	{
 		if (!ArrayOperatorFunctions.Contains(OperatorName))
 		{
-			UE_LOG(LogUnrealPython, Error, TEXT("Not exist operator function %s for array"), *OperatorName)
+			OutErrMsg = FString::Printf(TEXT("Not exist operator function %s for array"), *OperatorName);
+			UE_LOG(LogUnrealPython, Error, TEXT("%s"), *OutErrMsg)
 			return false;
 		}
 			
-		return ArrayOperatorFunctions[OperatorName](Container, Params, Outputs);
+		CallResult = ArrayOperatorFunctions[OperatorName](Container, Params, Outputs);
+		OutErrMsg = CallOperatorErrorMessage;
 	}
 	else if (TypeName.Equals("Set"))
 	{
 		if (!SetOperatorFunctions.Contains(OperatorName))
 		{
-			UE_LOG(LogUnrealPython, Error, TEXT("Not exist operator function %s for set"), *OperatorName)
+			OutErrMsg = FString::Printf(TEXT("Not exist operator function %s for set"), *OperatorName);
+			UE_LOG(LogUnrealPython, Error, TEXT("%s"), *OutErrMsg)
 			return false;
 		}
 
-		return SetOperatorFunctions[OperatorName](Container, Params, Outputs);
+		CallResult = SetOperatorFunctions[OperatorName](Container, Params, Outputs);
+		OutErrMsg = CallOperatorErrorMessage;
 	}
 	else if (TypeName.Equals("Map"))
 	{
 		if (!MapOperatorFunctions.Contains(OperatorName))
 		{
-			UE_LOG(LogUnrealPython, Error, TEXT("Not exist operator function %s for map"), *OperatorName)
+			OutErrMsg = FString::Printf(TEXT("Not exist operator function %s for map"), *OperatorName);
+			UE_LOG(LogUnrealPython, Error, TEXT("%s"), *OutErrMsg)
 			return false;
 		}
 
-		return MapOperatorFunctions[OperatorName](Container, Params, Outputs);
+		CallResult = MapOperatorFunctions[OperatorName](Container, Params, Outputs);
+		OutErrMsg = CallOperatorErrorMessage;
 	}
 	else
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Not support container type %s"), *TypeName)
-		return false;
+		OutErrMsg = FString::Printf(TEXT("Not support container type %s"), *TypeName);
+		UE_LOG(LogUnrealPython, Error, TEXT("%s"), *OutErrMsg)
 	}
 
+	return CallResult;
 }
 
 #define ADD_BUILTIN_PROPERTY_TYPE(type, name) \
@@ -329,18 +338,23 @@ bool FArrayContainerAdapter::Get(void* Container, const std::vector<void*>& Inpu
 
 	if (Index < 0 || Index > ArrayContainer->InnerArray.Num())
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Index %d out of range when get array element"), Index);
+		FContainerTypeAdapter::SetErrorMessage(FString::Printf(TEXT("Index %d out of range when get array element"), Index));
 		return false;
 	}
 
-	uint8* DataPtr = ArrayContainer->GetData(GetSizeWithAlignment(InnerProp->GetProperty()), Index);
+	FProperty* Property = InnerProp->GetProperty();
 
-	auto PropSize = InnerProp->GetProperty()->GetSize();
+	uint8* DataPtr = ArrayContainer->GetData(GetSizeWithAlignment(Property), Index);
+
+	auto PropSize = Property->GetSize();
 	void* RetVal = FMemory::Malloc(PropSize); // fixme@Caleb196x: free memory
 	FMemory::Memzero(RetVal, PropSize); // fixme@Caleb196x: need type information to free memory
 	InnerProp->ReadUeValueInContainer(DataPtr, RetVal);
-
-	// todo@Caleb196x: Set Outs
+	
+	const FString OutParamTypeName = Property->GetCPPType();
+	const std::string StdOutParamTypeName = TCHAR_TO_UTF8(*OutParamTypeName);
+	const std::string OutParamTypeNameStr = FCoreUtils::ConvertUeTypeNameToRpcTypeName(OutParamTypeName);
+	Outs.push_back(std::make_pair(OutParamTypeNameStr, std::make_pair(StdOutParamTypeName, RetVal)));
 	
 	return true;
 }
@@ -371,13 +385,13 @@ bool FArrayContainerAdapter::Set(void* Container, const std::vector<void*>& Inpu
 
 	if (Index < 0 || Index > ArrayContainer->InnerArray.Num())
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Index %d out of range when set array element"), Index);
+		FContainerTypeAdapter::SetErrorMessage(FString::Printf(TEXT("Index %d out of range when set array element"), Index));
 		return false;
 	}
 
 	if (InputParams.size() < 2)
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Input parameters must contain new element value"));
+		FContainerTypeAdapter::SetErrorMessage(TEXT("Input parameters must contain a new element value"));
 		return false;
 	}
 	
@@ -451,7 +465,7 @@ bool FArrayContainerAdapter::RemoveAt(void* Container, const std::vector<void*>&
 
 	if (Index < 0 || Index > ArrayContainer->InnerArray.Num())
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Index %d out of range when remove array element"), Index);
+		FContainerTypeAdapter::SetErrorMessage(FString::Printf(TEXT("Index %d out of range when remove array element"), Index));
 		return false;
 	}
 
@@ -559,7 +573,10 @@ bool FSetContainerTypeAdapter::Get(void* Container, const std::vector<void*>& In
 	FMemory::Memzero(RetVal, PropSize); // fixme@Caleb196x: need type information to free memory
 	InnerProp->CopyToUeValueInContainer(Data, RetVal);
 
-	// todo@Caleb196x: Set Outs
+	const FString OutParamTypeName = InnerProp->GetProperty()->GetCPPType();
+	const std::string StdOutParamTypeName = TCHAR_TO_UTF8(*OutParamTypeName);
+	const std::string OutParamTypeNameStr = FCoreUtils::ConvertUeTypeNameToRpcTypeName(OutParamTypeName);
+	Outs.push_back(std::make_pair(OutParamTypeNameStr, std::make_pair(StdOutParamTypeName, RetVal)));
 	
 	return true;
 }
@@ -790,8 +807,12 @@ bool FMapContainerTypeAdapter::Get(void* Container, const std::vector<void*>& In
 		void* RetVal = FMemory::Malloc(PropSize); // fixme@Caleb196x: free memory
 		FMemory::Memzero(RetVal, PropSize); // fixme@Caleb196x: need type information to free memory
 		ValueProp->CopyToUeValueInContainer(ValPtr, RetVal);
-
-		// todo@Caleb196x: Set Outs
+		
+		const FString OutParamTypeName = ValProperty->GetCPPType();
+		const std::string StdOutParamTypeName = TCHAR_TO_UTF8(*OutParamTypeName);
+		const std::string OutParamTypeNameStr = FCoreUtils::ConvertUeTypeNameToRpcTypeName(OutParamTypeName);
+		Outs.push_back(std::make_pair(OutParamTypeNameStr, std::make_pair(StdOutParamTypeName, RetVal)));
+	
 	}
 
 	KeyProperty->DestroyValue(KeyPtr);
