@@ -515,7 +515,7 @@ bool FSetContainerTypeAdapter::Add(void* Container, const std::vector<void*>& In
 
 	if (InputParams.size() == 0)
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Input is empty when add new set's element."))
+		FContainerTypeAdapter::SetErrorMessage(TEXT("Input is empty when add new set's element."));
 		return false;
 	}
 	
@@ -561,7 +561,7 @@ bool FSetContainerTypeAdapter::Get(void* Container, const std::vector<void*>& In
 
 	if (!SetContainer->InnerSet.IsValidIndex(Index))
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Invalid set index"))
+		FContainerTypeAdapter::SetErrorMessage(TEXT("Invalid set index"));
 		return false;
 	}
 
@@ -600,7 +600,7 @@ bool FSetContainerTypeAdapter::Contains(void* Container, const std::vector<void*
 	
 	if (InputParams.size() == 0)
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Need element value in input params."))
+		FContainerTypeAdapter::SetErrorMessage(TEXT("Need element value in input params."));
 		return false;
 	}
 
@@ -627,7 +627,7 @@ bool FSetContainerTypeAdapter::FindIndex(void* Container, const std::vector<void
 	
 	if (InputParams.size() == 0)
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Need element value in input params."))
+		FContainerTypeAdapter::SetErrorMessage(TEXT("Need element value in input params."));
 		return false;
 	}
 
@@ -675,7 +675,7 @@ bool FSetContainerTypeAdapter::RemoveAt(void* Container, const std::vector<void*
 
 	if (!SetContainer->InnerSet.IsValidIndex(Index))
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Invalid set index"))
+		FContainerTypeAdapter::SetErrorMessage(TEXT("Invalid set index"));
 		return false;
 	}
 
@@ -733,7 +733,7 @@ bool FMapContainerTypeAdapter::Add(void* Container, const std::vector<void*>& In
 
 	if (InputParams.size() < 2)
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Must input key and value in input params."))
+		FContainerTypeAdapter::SetErrorMessage(TEXT("Must input key and value in input params."));
 		return false;
 	}
 
@@ -783,7 +783,7 @@ bool FMapContainerTypeAdapter::Get(void* Container, const std::vector<void*>& In
 	
 	if (InputParams.size() == 0)
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Need key in input params when get map value."))
+		FContainerTypeAdapter::SetErrorMessage(TEXT("Need key in input params when get map value."));
 		return false;
 	}
 	
@@ -862,7 +862,7 @@ bool FMapContainerTypeAdapter::Remove(void* Container, const std::vector<void*>&
 
 	if (InputParams.size() == 0)
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Must input key in input params when remove map element."))
+		FContainerTypeAdapter::SetErrorMessage(TEXT("Must input key in input params when remove map element."));
 		return false;
 	}
 	
@@ -881,7 +881,7 @@ bool FMapContainerTypeAdapter::Remove(void* Container, const std::vector<void*>&
 
 	if (Index == INDEX_NONE)
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Can not find key"))
+		FContainerTypeAdapter::SetErrorMessage(TEXT("Can not find key"));
 		return false;
 	}
 
@@ -912,7 +912,7 @@ bool FMapContainerTypeAdapter::IsValidIndex(void* Container, const std::vector<v
 
 	if (InputParams.size() == 0)
 	{
-		UE_LOG(LogUnrealPython, Error, TEXT("Must input key when check index."))
+		FContainerTypeAdapter::SetErrorMessage(TEXT("Must input key when check index."));
 		return false;
 	}
 
