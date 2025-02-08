@@ -1,21 +1,53 @@
 #include "UnrealCoreServerImpl.h"
-
 #include "ContainerTypeAdapter.h"
 #include "CoreRpcUtils.h"
 #include "ObjectHolder.h"
-#include "UObject/UnrealTypePrivate.h"
+
+#if PLATFORM_WINDOWS
+#include <windows.h>
+#else
+#include <string>
+#include <iconv.h>
+#endif
+
+kj::String ConvertWStringToKjHeapString(const FString& WideStr) {
+	std::wstring TmpStr = *WideStr; 
+#if PLATFORM_WINDOWS
+	int Utf8Size = WideCharToMultiByte(CP_UTF8, 0, TmpStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+	std::vector<char> utf8Buffer(Utf8Size);
+	WideCharToMultiByte(CP_UTF8, 0, TmpStr.c_str(), -1, utf8Buffer.data(), Utf8Size, nullptr, nullptr);
+    
+	return kj::heapString(utf8Buffer.data());
+#else
+	iconv_t conv = iconv_open("UTF-8", sizeof(wchar_t) == 2 ? "UTF-16LE" : "UTF-32LE");
+	if (conv == (iconv_t)-1) return kj::heapString("");
+
+	size_t inBytes = TmpStr.size() * sizeof(wchar_t);
+	size_t outBytes = inBytes * 2;  
+	std::vector<char> buffer(outBytes);
+
+	char* inBuf = (char*)TmpStr.data();
+	char* outBuf = buffer.data();
+	iconv(conv, &inBuf, &inBytes, &outBuf, &outBytes);
+	iconv_close(conv);
+
+	return kj::heapString(buffer.data());
+	
+#endif
+}
 
 #define CHECK_RESULT_AND_RETURN(Result) \
 	context = Result.Context; \
 	if (!Result.Info.bIsSuccess) \
 	{ \
 		return kj::Promise<void>(kj::Exception(kj::Exception::Type::FAILED, \
-			Result.Info.FileCStr(), Result.Info.Line, kj::str(Result.Info.MessageCStr()))); \
+			Result.Info.FileCStr(), Result.Info.Line, ConvertWStringToKjHeapString(Result.Info.Message))); \
 	} \
 	else \
 	{ \
 		return kj::READY_NOW; \
 	} \
+
 
 kj::Promise<void> FUnrealCoreServerImpl::newObject(NewObjectContext context)
 {

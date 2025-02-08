@@ -2,7 +2,6 @@
 #include <functional>
 #include <future>
 
-#include "RpcException.h"
 #include "UnrealPythonRpcLog.h"
 #include "capnpstub/ue_core.capnp.h"
 #include "kj/async-io.h"
