@@ -56,8 +56,8 @@ void FXmlUIToolsModule::StartupModule()
 	*/
 	UXmlUmgGenerator* Generator = NewObject<UXmlUmgGenerator>();
 	Generator->BuildAllWidgetClassList(nullptr);
-	UUserWidget* UserWidget = NewObject<UUserWidget>();
-	UWidgetTree* WidgetTree = Generator->GenerateWidgetTree(UserWidget, Tree);
+	/*UUserWidget* UserWidget = NewObject<UUserWidget>();
+	UWidgetTree* WidgetTree = Generator->GenerateWidgetTree(UserWidget, Tree);*/
 }
 
 void FXmlUIToolsModule::ShutdownModule()
