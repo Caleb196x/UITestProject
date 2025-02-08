@@ -95,7 +95,7 @@ void FRpcServerRunnable::Exit()
 void FRpcServerRunnable::Stop()
 {
 	bRunningServer = false;
-	Listener.attach();
+	// Listener.attach();
 	Listener = nullptr;
 }
 

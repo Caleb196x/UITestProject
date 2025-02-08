@@ -22,9 +22,10 @@ struct FScriptArrayExtension
 
 	std::shared_ptr<FPropertyWrapper> ValueProperty;
 
-	FORCEINLINE FScriptArrayExtension(FProperty* InProperty)
+	FORCEINLINE FScriptArrayExtension(FProperty* InProperty, int32 Counts = 1)
 	{
 		ValueProperty = FPropertyWrapper::Create(InProperty);
+		Construct(Counts);
 	}
 
 	FORCEINLINE ~FScriptArrayExtension()
@@ -42,6 +43,18 @@ struct FScriptArrayExtension
 	FORCEINLINE uint8* GetData(int32 ElementSize, int32 Index)
 	{
 		return static_cast<uint8*>(InnerArray.GetData()) + Index * ElementSize;
+	}
+
+	FORCEINLINE void Construct(int32 Counts)
+	{
+		FProperty* Property = ValueProperty->GetProperty();
+		const int32 ElementSize = GetSizeWithAlignment(Property);
+		
+#if ENGINE_MAJOR_VERSION > 4
+		InnerArray.Add(Counts, ElementSize, __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+#else
+		InnerArray.Add(Counts, ElementSize);
+#endif
 	}
 
 	FORCEINLINE void Destruct(int32 Index, int32 Counts = 1)
@@ -229,8 +242,6 @@ class FContainerTypeAdapter
 public:
 	using OperatorFunction = std::function<bool(void* ,const std::vector<void*>&,
 		std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>&)>;
-
-	FContainerTypeAdapter() { Init(); }
 	
 	static void* NewContainer(const FString& TypeName, FProperty* InValueProp, FProperty* InKeyProp = nullptr);
 
@@ -248,6 +259,7 @@ public:
 	static TMap<FString, OperatorFunction> MapOperatorFunctions;
 
 	static FString CallOperatorErrorMessage;
+	static bool bIsInitialized;
 };
 
 #define DECLARE_CONTAINER_OPERATOR_FUNCTION(func) \
@@ -270,7 +282,6 @@ public:
 	DECLARE_CONTAINER_OPERATOR_FUNCTION(IsValidIndex)
 	DECLARE_CONTAINER_OPERATOR_FUNCTION(Empty)
 
-protected:
 	
 	FORCEINLINE static int32 AddUninitialized(FScriptArray* ScriptArray, int32 ElementSize, int32 Count)
 	{
@@ -281,6 +292,7 @@ protected:
 #endif
 	}
 	
+protected:
 	static int32 FindIndexInternal(void* Container, const std::vector<void*>& InputParams);
 };
 

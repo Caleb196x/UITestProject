@@ -4,6 +4,7 @@ TMap<FString, FContainerTypeAdapter::OperatorFunction> FContainerTypeAdapter::Ar
 TMap<FString, FContainerTypeAdapter::OperatorFunction> FContainerTypeAdapter::SetOperatorFunctions = {};
 TMap<FString, FContainerTypeAdapter::OperatorFunction> FContainerTypeAdapter::MapOperatorFunctions = {};
 FString FContainerTypeAdapter::CallOperatorErrorMessage = "";
+bool FContainerTypeAdapter::bIsInitialized = false;
 
 void* FContainerTypeAdapter::NewContainer(const FString& TypeName, FProperty* InValueProp, FProperty* InKeyProp)
 {
@@ -68,38 +69,44 @@ bool FContainerTypeAdapter::DestroyContainer(void* Container, const FString& Typ
 
 void FContainerTypeAdapter::Init()
 {
+	if (bIsInitialized)
+	{
+		return;
+	}
+	
+	bIsInitialized = true;
 	// array operators
-	ArrayOperatorFunctions.Add("Num", &FArrayContainerAdapter::Num);
-	ArrayOperatorFunctions.Add("Add", &FArrayContainerAdapter::Add);
-	ArrayOperatorFunctions.Add("Get", &FArrayContainerAdapter::Get);
-	ArrayOperatorFunctions.Add("Set", &FArrayContainerAdapter::Set);
-	ArrayOperatorFunctions.Add("RemoveAt", &FArrayContainerAdapter::RemoveAt);
-	ArrayOperatorFunctions.Add("Contains", &FArrayContainerAdapter::Contains);
-	ArrayOperatorFunctions.Add("FindIndex", &FArrayContainerAdapter::FindIndex);
-	ArrayOperatorFunctions.Add("IsValidIndex", &FArrayContainerAdapter::IsValidIndex);
-	ArrayOperatorFunctions.Add("Empty", &FArrayContainerAdapter::Empty);
+	ArrayOperatorFunctions.Add("Num", FArrayContainerAdapter::Num);
+	ArrayOperatorFunctions.Add("Add", FArrayContainerAdapter::Add);
+	ArrayOperatorFunctions.Add("Get", FArrayContainerAdapter::Get);
+	ArrayOperatorFunctions.Add("Set", FArrayContainerAdapter::Set);
+	ArrayOperatorFunctions.Add("RemoveAt", FArrayContainerAdapter::RemoveAt);
+	ArrayOperatorFunctions.Add("Contains", FArrayContainerAdapter::Contains);
+	ArrayOperatorFunctions.Add("FindIndex", FArrayContainerAdapter::FindIndex);
+	ArrayOperatorFunctions.Add("IsValidIndex", FArrayContainerAdapter::IsValidIndex);
+	ArrayOperatorFunctions.Add("Empty", FArrayContainerAdapter::Empty);
 
 	// set operators
-	SetOperatorFunctions.Add("Num", &FSetContainerTypeAdapter::Num);
-	SetOperatorFunctions.Add("Get", &FSetContainerTypeAdapter::Get);
-	SetOperatorFunctions.Add("Add", &FSetContainerTypeAdapter::Add);
-	SetOperatorFunctions.Add("RemoveAt", &FSetContainerTypeAdapter::RemoveAt);
-	SetOperatorFunctions.Add("FindIndex", &FSetContainerTypeAdapter::FindIndex);
-	SetOperatorFunctions.Add("Contains", &FSetContainerTypeAdapter::Contains);
-	SetOperatorFunctions.Add("GetMaxIndex", &FSetContainerTypeAdapter::GetMaxIndex);
-	SetOperatorFunctions.Add("IsValidIndex", &FSetContainerTypeAdapter::IsValidIndex);
-	SetOperatorFunctions.Add("Empty", &FSetContainerTypeAdapter::Empty);
+	SetOperatorFunctions.Add("Num", FSetContainerTypeAdapter::Num);
+	SetOperatorFunctions.Add("Get", FSetContainerTypeAdapter::Get);
+	SetOperatorFunctions.Add("Add", FSetContainerTypeAdapter::Add);
+	SetOperatorFunctions.Add("RemoveAt", FSetContainerTypeAdapter::RemoveAt);
+	SetOperatorFunctions.Add("FindIndex", FSetContainerTypeAdapter::FindIndex);
+	SetOperatorFunctions.Add("Contains", FSetContainerTypeAdapter::Contains);
+	SetOperatorFunctions.Add("GetMaxIndex", FSetContainerTypeAdapter::GetMaxIndex);
+	SetOperatorFunctions.Add("IsValidIndex", FSetContainerTypeAdapter::IsValidIndex);
+	SetOperatorFunctions.Add("Empty", FSetContainerTypeAdapter::Empty);
 
 	// map operators
-	MapOperatorFunctions.Add("Num", &FMapContainerTypeAdapter::Num);
-	MapOperatorFunctions.Add("Get", &FMapContainerTypeAdapter::Get);
-	MapOperatorFunctions.Add("Add", &FMapContainerTypeAdapter::Add);
-	MapOperatorFunctions.Add("Set", &FMapContainerTypeAdapter::Set);
-	MapOperatorFunctions.Add("Remove", &FMapContainerTypeAdapter::Remove);
-	MapOperatorFunctions.Add("GetMaxIndex", &FMapContainerTypeAdapter::GetMaxIndex);
-	MapOperatorFunctions.Add("IsValidIndex", &FMapContainerTypeAdapter::IsValidIndex);
-	MapOperatorFunctions.Add("GetKey", &FMapContainerTypeAdapter::GetKey);
-	MapOperatorFunctions.Add("Empty", &FMapContainerTypeAdapter::Empty);
+	MapOperatorFunctions.Add("Num", FMapContainerTypeAdapter::Num);
+	MapOperatorFunctions.Add("Get", FMapContainerTypeAdapter::Get);
+	MapOperatorFunctions.Add("Add", FMapContainerTypeAdapter::Add);
+	MapOperatorFunctions.Add("Set", FMapContainerTypeAdapter::Set);
+	MapOperatorFunctions.Add("Remove", FMapContainerTypeAdapter::Remove);
+	MapOperatorFunctions.Add("GetMaxIndex", FMapContainerTypeAdapter::GetMaxIndex);
+	MapOperatorFunctions.Add("IsValidIndex", FMapContainerTypeAdapter::IsValidIndex);
+	MapOperatorFunctions.Add("GetKey", FMapContainerTypeAdapter::GetKey);
+	MapOperatorFunctions.Add("Empty", FMapContainerTypeAdapter::Empty);
 	
 }
 
@@ -107,6 +114,8 @@ bool FContainerTypeAdapter::CallOperator(void* Container, const FString& TypeNam
 	const FString& OperatorName, const std::vector<void*>& Params,
 	std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>& Outputs, FString& OutErrMsg)
 {
+	Init();
+	
 	bool CallResult = false;
 	CallOperatorErrorMessage = "";
 	if (TypeName.Equals("Array"))
@@ -117,6 +126,9 @@ bool FContainerTypeAdapter::CallOperator(void* Container, const FString& TypeNam
 			UE_LOG(LogUnrealPython, Error, TEXT("%s"), *OutErrMsg)
 			return false;
 		}
+
+		auto func = ArrayOperatorFunctions[OperatorName];
+		CallResult = func(Container, Params, Outputs);
 			
 		CallResult = ArrayOperatorFunctions[OperatorName](Container, Params, Outputs);
 		OutErrMsg = CallOperatorErrorMessage;
@@ -291,6 +303,8 @@ bool FArrayContainerAdapter::Add(void* Container, const std::vector<void*>& Inpu
 		InnerProp->CopyToUeValueInContainer(InputParams[i], Data);
 	}
 
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 
@@ -321,7 +335,8 @@ bool FArrayContainerAdapter::Empty(void* Container, const std::vector<void*>& In
 	SET_ARRAY_CONTAINER_INNER_PROPERTY(InnerProp, ArrayContainer)
 
 	ArrayContainer->Empty();
-	
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 
@@ -400,7 +415,8 @@ bool FArrayContainerAdapter::Set(void* Container, const std::vector<void*>& Inpu
 
 	InnerProp->GetProperty()->InitializeValue(DataPtr);
 	InnerProp->CopyToUeValueInContainer(InputParams[1], DataPtr);
-	
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 
@@ -476,7 +492,8 @@ bool FArrayContainerAdapter::RemoveAt(void* Container, const std::vector<void*>&
 #else
 	ArrayContainer->InnerArray.Remove(Index, 1, GetSizeWithAlignment(InnerProp->GetProperty()));
 #endif
-	
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 
@@ -534,7 +551,8 @@ bool FSetContainerTypeAdapter::Add(void* Container, const std::vector<void*>& In
 	);
 
 	Property->DestroyValue(Dest);
-	
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 
@@ -544,7 +562,8 @@ bool FSetContainerTypeAdapter::Empty(void* Container, const std::vector<void*>& 
 	SET_SET_CONTAINER_INNER_PROPERTY(InnerProp, SetContainer)
 
 	SetContainer->Empty();
-	
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 
@@ -683,7 +702,8 @@ bool FSetContainerTypeAdapter::RemoveAt(void* Container, const std::vector<void*
 	auto ScriptSetLayout = SetContainer->GetScriptSetLayout();
 	SetContainer->Destruct(Index);
 	SetContainer->InnerSet.RemoveAt(Index, ScriptSetLayout);
-	
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 
@@ -773,7 +793,8 @@ bool FMapContainerTypeAdapter::Add(void* Container, const std::vector<void*>& In
 
 	KeyProperty->DestroyValue(KeyPtr);
 	ValProperty->DestroyValue(ValPtr);
-	
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 
@@ -827,7 +848,8 @@ bool FMapContainerTypeAdapter::Empty(void* Container, const std::vector<void*>& 
 	SET_MAP_CONTAINER_INNER_PROPERTY(KeyProp, ValueProp, MapContainer)
 
 	MapContainer->Empty();
-	
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 
@@ -847,12 +869,16 @@ bool FMapContainerTypeAdapter::Set(void* Container, const std::vector<void*>& In
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
 	Add(Container, InputParams, Outs);
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 
 bool FMapContainerTypeAdapter::GetKey(void* Container, const std::vector<void*>& InputParams,
 			std::vector<std::pair<std::string, std::pair<std::string, void*>>>& Outs)
 {
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 
@@ -890,7 +916,8 @@ bool FMapContainerTypeAdapter::Remove(void* Container, const std::vector<void*>&
 	MapContainer->InnerMap.RemoveAt(Index, SetLayout);
 
 	KeyProperty->DestroyValue(KeyPtr);
-	
+	Outs.push_back(std::make_pair("void", std::make_pair("void", nullptr)));
+
 	return true;
 }
 

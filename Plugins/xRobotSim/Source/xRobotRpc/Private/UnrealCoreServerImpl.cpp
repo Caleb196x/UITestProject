@@ -947,14 +947,14 @@ ErrorInfo FUnrealCoreServerImpl::DestroyContainerInternal(DestroyContainerContex
 	void* const ClientObject = reinterpret_cast<void* const>(Own.getAddress());
 
 	// 从内存管理器中查找容器对象指针
-	void* ContainerPtr = FObjectHolder::Get().GetUObject(ClientObject);
+	const void* ContainerPtr = FObjectHolder::Get().GetUObject(ClientObject);
 	if (!ContainerPtr)
 	{
 		return ErrorInfo(__FILE__, __LINE__,
 			FString::Printf(TEXT("Can not find container object from ClientObject %p"), ClientObject));
 	}
 
-	FObjectHolder::Get().RemoveFromRetainer(ContainerPtr);
+	FObjectHolder::Get().RemoveFromRetainer(ClientObject);
 	
 	return true;
 }
