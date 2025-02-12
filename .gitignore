@@ -17,3 +17,6 @@ Plugins/UnrealEnginePython/.git
 Plugins/XmlUITools/Binaries
 Plugins/XmlUITools/Intermediate
 Plugins/XmlUITools/.git
+Plugins/SmartUIWorks/Intermediate
+Plugins/SmartUIWorks/Binaries
+Plugins/SmartUIWorks/Source/Puerts/ThirdParty/v8_10.6.194

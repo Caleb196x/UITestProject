@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "xeRVUoZxAo9yp5lBfRn535kzlOJps8MZN6UhojSNtNatTEcYm3qfQ1ZtGUIT9cHE/s8iG4yEuCoLUWx6sS2J1w==",
+  "success": true,
+  "projectFilePath": "F:\\AI_UI\\UITestProject\\Plugins\\SmartUIWorks\\Source\\Puerts\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\liumi\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512"
+  ],
+  "logs": []
+}

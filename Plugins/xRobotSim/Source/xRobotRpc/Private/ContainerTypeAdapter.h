@@ -196,7 +196,7 @@ struct FScriptMapExtension
 };
 
 USTRUCT(noexport)
-struct FPropertyMetaRoot
+struct FPropertyMetaAllocRoot
 {
 };
 
