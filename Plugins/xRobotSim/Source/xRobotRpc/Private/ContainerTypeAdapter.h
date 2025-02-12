@@ -254,9 +254,9 @@ public:
 
 	FORCEINLINE static void SetErrorMessage(const FString& Message) { CallOperatorErrorMessage = Message; }
 
-	static TMap<FString, OperatorFunction> ArrayOperatorFunctions;
-	static TMap<FString, OperatorFunction> SetOperatorFunctions;
-	static TMap<FString, OperatorFunction> MapOperatorFunctions;
+	static TMap<FString, std::shared_ptr<OperatorFunction>> ArrayOperatorFunctions;
+	static TMap<FString, std::shared_ptr<OperatorFunction>> SetOperatorFunctions;
+	static TMap<FString, std::shared_ptr<OperatorFunction>> MapOperatorFunctions;
 
 	static FString CallOperatorErrorMessage;
 	static bool bIsInitialized;

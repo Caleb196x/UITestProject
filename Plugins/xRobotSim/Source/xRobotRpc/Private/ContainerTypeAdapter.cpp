@@ -1,8 +1,8 @@
 ﻿#include "ContainerTypeAdapter.h"
 
-TMap<FString, FContainerTypeAdapter::OperatorFunction> FContainerTypeAdapter::ArrayOperatorFunctions = {};
-TMap<FString, FContainerTypeAdapter::OperatorFunction> FContainerTypeAdapter::SetOperatorFunctions = {};
-TMap<FString, FContainerTypeAdapter::OperatorFunction> FContainerTypeAdapter::MapOperatorFunctions = {};
+TMap<FString, std::shared_ptr<FContainerTypeAdapter::OperatorFunction>> FContainerTypeAdapter::ArrayOperatorFunctions = {};
+TMap<FString, std::shared_ptr<FContainerTypeAdapter::OperatorFunction>> FContainerTypeAdapter::SetOperatorFunctions = {};
+TMap<FString, std::shared_ptr<FContainerTypeAdapter::OperatorFunction>> FContainerTypeAdapter::MapOperatorFunctions = {};
 FString FContainerTypeAdapter::CallOperatorErrorMessage = "";
 bool FContainerTypeAdapter::bIsInitialized = false;
 
@@ -76,37 +76,37 @@ void FContainerTypeAdapter::Init()
 	
 	bIsInitialized = true;
 	// array operators
-	ArrayOperatorFunctions.Add("Num", FArrayContainerAdapter::Num);
-	ArrayOperatorFunctions.Add("Add", FArrayContainerAdapter::Add);
-	ArrayOperatorFunctions.Add("Get", FArrayContainerAdapter::Get);
-	ArrayOperatorFunctions.Add("Set", FArrayContainerAdapter::Set);
-	ArrayOperatorFunctions.Add("RemoveAt", FArrayContainerAdapter::RemoveAt);
-	ArrayOperatorFunctions.Add("Contains", FArrayContainerAdapter::Contains);
-	ArrayOperatorFunctions.Add("FindIndex", FArrayContainerAdapter::FindIndex);
-	ArrayOperatorFunctions.Add("IsValidIndex", FArrayContainerAdapter::IsValidIndex);
-	ArrayOperatorFunctions.Add("Empty", FArrayContainerAdapter::Empty);
+	ArrayOperatorFunctions.Add("Num", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FArrayContainerAdapter::Num));
+	ArrayOperatorFunctions.Add("Add", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FArrayContainerAdapter::Add));
+	ArrayOperatorFunctions.Add("Get", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FArrayContainerAdapter::Get));
+	ArrayOperatorFunctions.Add("Set", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FArrayContainerAdapter::Set));
+	ArrayOperatorFunctions.Add("RemoveAt", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FArrayContainerAdapter::RemoveAt));
+	ArrayOperatorFunctions.Add("Contains", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FArrayContainerAdapter::Contains));
+	ArrayOperatorFunctions.Add("FindIndex", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FArrayContainerAdapter::FindIndex));
+	ArrayOperatorFunctions.Add("IsValidIndex", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FArrayContainerAdapter::IsValidIndex));
+	ArrayOperatorFunctions.Add("Empty", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FArrayContainerAdapter::Empty));
 
 	// set operators
-	SetOperatorFunctions.Add("Num", FSetContainerTypeAdapter::Num);
-	SetOperatorFunctions.Add("Get", FSetContainerTypeAdapter::Get);
-	SetOperatorFunctions.Add("Add", FSetContainerTypeAdapter::Add);
-	SetOperatorFunctions.Add("RemoveAt", FSetContainerTypeAdapter::RemoveAt);
-	SetOperatorFunctions.Add("FindIndex", FSetContainerTypeAdapter::FindIndex);
-	SetOperatorFunctions.Add("Contains", FSetContainerTypeAdapter::Contains);
-	SetOperatorFunctions.Add("GetMaxIndex", FSetContainerTypeAdapter::GetMaxIndex);
-	SetOperatorFunctions.Add("IsValidIndex", FSetContainerTypeAdapter::IsValidIndex);
-	SetOperatorFunctions.Add("Empty", FSetContainerTypeAdapter::Empty);
+	SetOperatorFunctions.Add("Num", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FSetContainerTypeAdapter::Num));
+	SetOperatorFunctions.Add("Get", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FSetContainerTypeAdapter::Get));
+	SetOperatorFunctions.Add("Add", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FSetContainerTypeAdapter::Add));
+	SetOperatorFunctions.Add("RemoveAt", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FSetContainerTypeAdapter::RemoveAt));
+	SetOperatorFunctions.Add("FindIndex", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FSetContainerTypeAdapter::FindIndex));
+	SetOperatorFunctions.Add("Contains", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FSetContainerTypeAdapter::Contains));
+	SetOperatorFunctions.Add("GetMaxIndex", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FSetContainerTypeAdapter::GetMaxIndex));
+	SetOperatorFunctions.Add("IsValidIndex", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FSetContainerTypeAdapter::IsValidIndex));
+	SetOperatorFunctions.Add("Empty", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FSetContainerTypeAdapter::Empty));
 
 	// map operators
-	MapOperatorFunctions.Add("Num", FMapContainerTypeAdapter::Num);
-	MapOperatorFunctions.Add("Get", FMapContainerTypeAdapter::Get);
-	MapOperatorFunctions.Add("Add", FMapContainerTypeAdapter::Add);
-	MapOperatorFunctions.Add("Set", FMapContainerTypeAdapter::Set);
-	MapOperatorFunctions.Add("Remove", FMapContainerTypeAdapter::Remove);
-	MapOperatorFunctions.Add("GetMaxIndex", FMapContainerTypeAdapter::GetMaxIndex);
-	MapOperatorFunctions.Add("IsValidIndex", FMapContainerTypeAdapter::IsValidIndex);
-	MapOperatorFunctions.Add("GetKey", FMapContainerTypeAdapter::GetKey);
-	MapOperatorFunctions.Add("Empty", FMapContainerTypeAdapter::Empty);
+	MapOperatorFunctions.Add("Num", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FMapContainerTypeAdapter::Num));
+	MapOperatorFunctions.Add("Get", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FMapContainerTypeAdapter::Get));
+	MapOperatorFunctions.Add("Add", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FMapContainerTypeAdapter::Add));
+	MapOperatorFunctions.Add("Set", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FMapContainerTypeAdapter::Set));
+	MapOperatorFunctions.Add("Remove", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FMapContainerTypeAdapter::Remove));
+	MapOperatorFunctions.Add("GetMaxIndex", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FMapContainerTypeAdapter::GetMaxIndex));
+	MapOperatorFunctions.Add("IsValidIndex", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FMapContainerTypeAdapter::IsValidIndex));
+	MapOperatorFunctions.Add("GetKey", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FMapContainerTypeAdapter::GetKey));
+	MapOperatorFunctions.Add("Empty", std::make_shared<FContainerTypeAdapter::OperatorFunction>(FMapContainerTypeAdapter::Empty));
 	
 }
 
@@ -126,11 +126,10 @@ bool FContainerTypeAdapter::CallOperator(void* Container, const FString& TypeNam
 			UE_LOG(LogUnrealPython, Error, TEXT("%s"), *OutErrMsg)
 			return false;
 		}
-
-		auto func = ArrayOperatorFunctions[OperatorName];
-		CallResult = func(Container, Params, Outputs);
-			
-		CallResult = ArrayOperatorFunctions[OperatorName](Container, Params, Outputs);
+		
+		const auto OperatorFunc = ArrayOperatorFunctions[OperatorName];
+		CallResult = OperatorFunc->operator()(Container, Params, Outputs);
+		
 		OutErrMsg = CallOperatorErrorMessage;
 	}
 	else if (TypeName.Equals("Set"))
@@ -142,7 +141,9 @@ bool FContainerTypeAdapter::CallOperator(void* Container, const FString& TypeNam
 			return false;
 		}
 
-		CallResult = SetOperatorFunctions[OperatorName](Container, Params, Outputs);
+		const auto OperatorFunc = SetOperatorFunctions[OperatorName];
+		CallResult = OperatorFunc->operator()(Container, Params, Outputs);
+		
 		OutErrMsg = CallOperatorErrorMessage;
 	}
 	else if (TypeName.Equals("Map"))
@@ -154,7 +155,9 @@ bool FContainerTypeAdapter::CallOperator(void* Container, const FString& TypeNam
 			return false;
 		}
 
-		CallResult = MapOperatorFunctions[OperatorName](Container, Params, Outputs);
+		const auto OperatorFunc = MapOperatorFunctions[OperatorName];
+		CallResult = OperatorFunc->operator()(Container, Params, Outputs);
+		
 		OutErrMsg = CallOperatorErrorMessage;
 	}
 	else
