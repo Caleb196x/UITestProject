@@ -6,7 +6,7 @@ TMap<FString, FContainerTypeAdapter::OperatorFunction> FContainerTypeAdapter::Ma
 FString FContainerTypeAdapter::CallOperatorErrorMessage = "";
 bool FContainerTypeAdapter::bIsInitialized = false;
 
-void* FContainerTypeAdapter::NewContainer(const FString& TypeName, FProperty* InValueProp, FProperty* InKeyProp)
+void* FContainerTypeAdapter::NewContainer(const FString& TypeName, FProperty* InValueProp, FProperty* InKeyProp, int32 ArrayCounts)
 {
 	if (TypeName.Equals("Map"))
 	{
@@ -22,7 +22,7 @@ void* FContainerTypeAdapter::NewContainer(const FString& TypeName, FProperty* In
 	if (TypeName.Equals("Array"))
 	{
 		
-		return new FScriptArrayExtension(InValueProp);
+		return new FScriptArrayExtension(InValueProp, ArrayCounts);
 	}
 
 	if (TypeName.Equals("Set"))

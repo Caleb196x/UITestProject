@@ -66,6 +66,6 @@ interface UnrealCore
 
     registerCreatedPyObject @15 (pyObject :Object, unrealObject :Object, ueClass :Class) -> ();
 
-    newContainer @16 (own :Object, containerType :Class, valueType :Class, keyType :Class) -> (container :Object);
+    newContainer @16 (own :Object, containerType :Class, valueType :Class, keyType :Class, Args :List(Argument)) -> (container :Object);
     destroyContainer @17 (own :Object) -> (result :Bool);
 }

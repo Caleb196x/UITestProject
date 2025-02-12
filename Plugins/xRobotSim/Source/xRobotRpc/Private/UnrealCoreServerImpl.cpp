@@ -923,9 +923,27 @@ ErrorInfo FUnrealCoreServerImpl::NewContainerInternal(NewContainerContext contex
 				FString::Printf(TEXT("Can not load value property %s"), *ValuePropertyTypeName));
 		}
 	}
+
+	int32 ArraySize = 1;
+	auto Args = context.getParams().getArgs();
+	for (auto Arg : Args)
+	{
+		// array size
+		if (Arg.which() == UnrealCore::Argument::INT_VALUE &&
+			strcmp(Arg.getName().cStr(), "size"))
+		{
+			ArraySize = Arg.getIntValue();
+		}
+		else
+		{
+			FString ArgName = UTF8_TO_TCHAR(Arg.getName().cStr());
+			UE_LOG(LogUnrealPython, Error, TEXT("Not supported argument %s"), *ArgName);
+		}
+	}
+	
 	// todo@Caleb196x: consider the property type is container type
 	// 根据type name，区分内置类型，反射类型，容器类型，分别创建不同property
-	void* Container = FContainerTypeAdapter::NewContainer(ContainerType, ValProp, KeyProp);
+	void* Container = FContainerTypeAdapter::NewContainer(ContainerType, ValProp, KeyProp, ArraySize);
 	if (!Container)
 	{
 		return ErrorInfo(__FILE__, __LINE__,

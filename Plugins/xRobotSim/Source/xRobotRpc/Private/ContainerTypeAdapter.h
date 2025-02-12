@@ -243,7 +243,7 @@ public:
 	using OperatorFunction = std::function<bool(void* ,const std::vector<void*>&,
 		std::vector<std::pair<std::string /*rpc type*/, std::pair<std::string/*ue type*/, void*>>>&)>;
 	
-	static void* NewContainer(const FString& TypeName, FProperty* InValueProp, FProperty* InKeyProp = nullptr);
+	static void* NewContainer(const FString& TypeName, FProperty* InValueProp, FProperty* InKeyProp = nullptr, int32 ArrayCounts = 1);
 
 	static bool DestroyContainer(void* Container, const FString& TypeName);
 	

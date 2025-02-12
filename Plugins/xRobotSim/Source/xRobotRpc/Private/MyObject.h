@@ -40,5 +40,5 @@ public:
 	void TestEnum(EMyEnum MyEnum);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TestArray", ScriptName = "MTestArrayParam"), Category="Test")
-	void TestActorArray(TArray<AActor*> Array);
+	void TestActorArray(TArray<int32> Array);
 };
