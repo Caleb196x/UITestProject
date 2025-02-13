@@ -184,7 +184,7 @@ class UEWidgetRoot {
     }
 }
 
-const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UEWidget, any, any, {}, any, any, any, any> = {
+const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UEWidget, any, any, {}, any, any, any, any, any> = {
     getRootHostContext () {
         return {};
     },
@@ -215,7 +215,7 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
         return instance
     },
     now: Date.now,
-    prepareForCommit () {
+    prepareForCommit(containerInfo: UEWidgetRoot): any {
         //log('prepareForCommit');
     },
     resetAfterCommit (container: UEWidgetRoot) {
@@ -282,7 +282,7 @@ export const ReactUMG = {
             throw new Error("init with World first!");
         }
         let root = new UEWidgetRoot(UE.UMGManager.CreateReactWidget(world));
-        const container = reconciler.createContainer(root, false, false);
+        const container = reconciler.createContainer(root, 0, null, false, false, "", null, null);
         reconciler.updateContainer(reactElement, container, null, null);
         return root;
     },
