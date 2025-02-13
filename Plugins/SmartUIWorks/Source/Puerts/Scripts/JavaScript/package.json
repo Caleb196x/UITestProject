@@ -1,0 +1,13 @@
+{
+  "name": "smartuiworks-js",
+  "version": "0.0.1",
+  "description": "smartuiworks javascript project.",
+  "scripts": {},
+  "author": "Caleb196x",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-reconciler": "^0.24.0"
+  },
+  "devDependencies": {}
+}
