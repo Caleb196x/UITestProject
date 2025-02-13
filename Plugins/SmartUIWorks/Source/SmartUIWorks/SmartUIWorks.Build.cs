@@ -11,6 +11,7 @@ public class SmartUIWorks : ModuleRules
 		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
+				"Programs/UnrealHeaderTool/Public",
 			}
 			);
 				
@@ -25,7 +26,7 @@ public class SmartUIWorks : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
+				"Core", "Projects",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -35,9 +36,17 @@ public class SmartUIWorks : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
+				"UMG",
+				"UnrealEd",
+				"LevelEditor",
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"EditorStyle",
+				"InputCore",
+				"Projects",
+				"DeclarationGenerator",
+				"JsEnv"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

@@ -85,7 +85,7 @@ public class JsEnv : ModuleRules
 
         PublicDependencyModuleNames.AddRange(new string[]
         {
-            "Core", "CoreUObject", "Engine", "ParamDefaultValueMetas", "UMG"
+            "Core", "CoreUObject", "Engine", "ParamDefaultValueMetas", "UMG", "Projects"
         });
 
         if (Target.bBuildEditor)
@@ -167,14 +167,15 @@ public class JsEnv : ModuleRules
         
         if (WithFFI) AddFFI(Target);
 
-        /*string coreJSPath = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "..", "Content"));
-        string destDirName = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "..", "..", "..", "Content"));
-        DirectoryCopy(coreJSPath, destDirName, true);*/
+        string coreJSPath = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "Scripts", "JavaScript"));
+        // plugin content directory
+        string destDirName = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "..", "..", "Content", "JavaScript"));
+        DirectoryCopy(coreJSPath, destDirName, true);
 
         // 每次build时拷贝一些手写的.d.ts到Typing目录以同步更新
-        /*string srcDtsDirName  = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "..", "Typing"));
-        string dstDtsDirName = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "..", "..", "..", "Typing"));
-        DirectoryCopy(srcDtsDirName, dstDtsDirName, true);*/
+        string srcDtsDirName  = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "Scripts", "TypeScript"));
+        string dstDtsDirName = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "..", "..", "Content", "TypeScript"));
+        DirectoryCopy(srcDtsDirName, dstDtsDirName, true);
 
     }
 

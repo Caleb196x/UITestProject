@@ -318,9 +318,6 @@ void FFunctionTranslator::FastCall(v8::Isolate* Isolate, v8::Local<v8::Context>&
     for (TFieldIterator<PropertyMacro> It(CallFunction); It && (It->PropertyFlags & CPF_Parm); ++It)
     {
         PropertyMacro* Property = *It;
-
-        UE_LOG(LogTemp, Display, TEXT("Property name %s, cpp name %s, cpp type %s, size %d"), *Property->GetName(),
-            *Property->GetNameCPP(), *Property->GetCPPType(), Property->GetSize());
         
         FOutParmRec* Out = nullptr;
         if (Property->HasAnyPropertyFlags(CPF_OutParm))

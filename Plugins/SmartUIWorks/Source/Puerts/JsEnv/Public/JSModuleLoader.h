@@ -11,6 +11,7 @@
 #include "PuertsNamespaceDef.h"
 
 #include "CoreMinimal.h"
+#include "Interfaces/IPluginManager.h"
 
 namespace PUERTS_NAMESPACE
 {
@@ -46,6 +47,11 @@ public:
     virtual bool SearchModuleInDir(const FString& Dir, const FString& RequiredModule, FString& Path, FString& AbsolutePath);
 
     virtual bool SearchModuleWithExtInDir(const FString& Dir, const FString& RequiredModule, FString& Path, FString& AbsolutePath);
+
+	FORCEINLINE static FString GetPluginContentDir(const FString& PluginName = TEXT("SmartUIWorks"))
+	{
+		return IPluginManager::Get().FindPlugin(PluginName)->GetBaseDir() / TEXT("Content");
+	}
 
     FString ScriptRoot;
 };

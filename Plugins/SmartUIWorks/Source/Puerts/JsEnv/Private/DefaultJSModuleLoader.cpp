@@ -115,9 +115,9 @@ bool DefaultJSModuleLoader::Search(const FString& RequiredDir, const FString& Re
         }
     }
 
-    return SearchModuleInDir(FPaths::ProjectContentDir() / ScriptRoot, RequiredModule, Path, AbsolutePath) ||
+    return SearchModuleInDir(GetPluginContentDir() / ScriptRoot, RequiredModule, Path, AbsolutePath) ||
            (ScriptRoot != TEXT("JavaScript") &&
-               SearchModuleInDir(FPaths::ProjectContentDir() / TEXT("JavaScript"), RequiredModule, Path, AbsolutePath));
+               SearchModuleInDir(GetPluginContentDir() / TEXT("JavaScript"), RequiredModule, Path, AbsolutePath));
 }
 
 bool DefaultJSModuleLoader::Load(const FString& Path, TArray<uint8>& Content)

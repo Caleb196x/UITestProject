@@ -47,6 +47,12 @@
 			"Type": "Runtime",
 			"LoadingPhase": "PostEngineInit",
 			"WhitelistPlatforms": [ "Win64", "Android", "Mac", "IOS", "Linux" ]
+		},
+		{
+			"Name": "PuertsEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PreDefault",
+			"WhitelistPlatforms": [ "Win64", "Android", "Mac", "IOS", "Linux" ]
 		}
 	]
 }

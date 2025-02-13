@@ -49,7 +49,7 @@ const FVector2D Icon40x40(40.0f, 40.0f);
 TSharedRef<FSlateStyleSet> FGenDTSStyle::Create()
 {
     TSharedRef<FSlateStyleSet> Style = MakeShareable(new FSlateStyleSet("GenDTSStyle"));
-    Style->SetContentRoot(IPluginManager::Get().FindPlugin("Puerts")->GetBaseDir() / TEXT("Resources"));
+    Style->SetContentRoot(IPluginManager::Get().FindPlugin("SmartUIWorks")->GetBaseDir() / TEXT("Resources"));
 
     Style->Set("GenDTS.PluginAction", new IMAGE_BRUSH(TEXT("ButtonIcon_40x"), Icon40x40));
 
