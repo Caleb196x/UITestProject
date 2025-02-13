@@ -204,7 +204,7 @@ const hostConfig = {
         return instance;
     },
     now: Date.now,
-    prepareForCommit() {
+    prepareForCommit(containerInfo) {
         //log('prepareForCommit');
     },
     resetAfterCommit(container) {
@@ -248,17 +248,25 @@ const hostConfig = {
     removeChild(parent, child) {
         parent.removeChild(child);
     },
+    clearContainer(container) {
+        console.error("clear Container");
+    },
     //useSyncScheduling: true,
     supportsMutation: true,
     isPrimaryRenderer: true,
     supportsPersistence: false,
     supportsHydration: false,
-    shouldDeprioritizeSubtree: undefined,
-    setTimeout: undefined,
-    clearTimeout: undefined,
-    cancelDeferredCallback: undefined,
+    // shouldDeprioritizeSubtree: undefined,
+    // setTimeout: undefined,
+    // clearTimeout: undefined,
+    // cancelDeferredCallback: undefined,
     noTimeout: undefined,
-    scheduleDeferredCallback: undefined,
+    preparePortalMount() {
+        // Implement if needed
+    },
+    scheduleTimeout: setTimeout,
+    cancelTimeout: clearTimeout,
+    // scheduleDeferredCallback: undefined,
 };
 const reconciler = Reconciler(hostConfig);
 exports.ReactUMG = {
@@ -267,7 +275,7 @@ exports.ReactUMG = {
             throw new Error("init with World first!");
         }
         let root = new UEWidgetRoot(UE.UMGManager.CreateReactWidget(world));
-        const container = reconciler.createContainer(root, false, false);
+        const container = reconciler.createContainer(root, 0, null, false, false, "", null, null);
         reconciler.updateContainer(reactElement, container, null, null);
         return root;
     },

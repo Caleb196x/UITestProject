@@ -259,6 +259,9 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
     removeChild(parent: UEWidget, child: UEWidget) {
         parent.removeChild(child);
     },
+    clearContainer(container: UEWidgetRoot) {
+        console.error("clear Container")
+    },
 
     //useSyncScheduling: true,
     supportsMutation: true,
@@ -266,12 +269,17 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
     supportsPersistence: false,
     supportsHydration: false,
 
-    shouldDeprioritizeSubtree: undefined,
-    setTimeout: undefined,
-    clearTimeout: undefined,
-    cancelDeferredCallback: undefined,
+    // shouldDeprioritizeSubtree: undefined,
+    // setTimeout: undefined,
+    // clearTimeout: undefined,
+    // cancelDeferredCallback: undefined,
     noTimeout: undefined,
-    scheduleDeferredCallback: undefined,
+    preparePortalMount() {
+        // Implement if needed
+    },
+    scheduleTimeout: setTimeout,
+    cancelTimeout: clearTimeout,
+    // scheduleDeferredCallback: undefined,
 }
 
 const reconciler = Reconciler(hostConfig)

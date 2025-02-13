@@ -184,7 +184,7 @@ class UEWidgetRoot {
     }
 }
 
-const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UEWidget, any, any, {}, any, any, any, any> = {
+const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UEWidget, any, any, {}, any, any, any, any, any> = {
     getRootHostContext () {
         return {};
     },
@@ -215,7 +215,7 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
         return instance
     },
     now: Date.now,
-    prepareForCommit () {
+    prepareForCommit(containerInfo: UEWidgetRoot): any {
         //log('prepareForCommit');
     },
     resetAfterCommit (container: UEWidgetRoot) {
@@ -259,6 +259,9 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
     removeChild(parent: UEWidget, child: UEWidget) {
         parent.removeChild(child);
     },
+    clearContainer(container: UEWidgetRoot) {
+        console.error("clear Container")
+    },
 
     //useSyncScheduling: true,
     supportsMutation: true,
@@ -266,12 +269,17 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
     supportsPersistence: false,
     supportsHydration: false,
 
-    shouldDeprioritizeSubtree: undefined,
-    setTimeout: undefined,
-    clearTimeout: undefined,
-    cancelDeferredCallback: undefined,
+    // shouldDeprioritizeSubtree: undefined,
+    // setTimeout: undefined,
+    // clearTimeout: undefined,
+    // cancelDeferredCallback: undefined,
     noTimeout: undefined,
-    scheduleDeferredCallback: undefined,
+    preparePortalMount() {
+        // Implement if needed
+    },
+    scheduleTimeout: setTimeout,
+    cancelTimeout: clearTimeout,
+    // scheduleDeferredCallback: undefined,
 }
 
 const reconciler = Reconciler(hostConfig)
@@ -282,7 +290,7 @@ export const ReactUMG = {
             throw new Error("init with World first!");
         }
         let root = new UEWidgetRoot(UE.UMGManager.CreateReactWidget(world));
-        const container = reconciler.createContainer(root, false, false);
+        const container = reconciler.createContainer(root, 0, null, false, false, "", null, null);
         reconciler.updateContainer(reactElement, container, null, null);
         return root;
     },
