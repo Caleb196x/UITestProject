@@ -25,4 +25,8 @@ class NOESISEDITOR_API UNoesisXamlReimportFactory : public UNoesisXamlFactory, p
 	virtual EReimportResult::Type Reimport(UObject* Obj) override;
 	virtual int32 GetPriority() const override;
 	// End of FReimportHandler interface
+	virtual bool ShouldShowInNewMenu() const override
+	{
+		return false;
+	}
 };

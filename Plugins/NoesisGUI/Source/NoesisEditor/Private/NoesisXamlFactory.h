@@ -19,4 +19,16 @@ class NOESISEDITOR_API UNoesisXamlFactory : public UFactory
 	// UFactory interface
 		virtual UObject* FactoryCreateBinary(UClass* Class, UObject* Parent, FName Name, EObjectFlags Flags, UObject* Context, const TCHAR* Type, const uint8*& Buffer, const uint8* BufferEnd, FFeedbackContext* Warn) override;
 	// End of UFactory interface
+	// UFactory interface
+	/*virtual UObject* FactoryCreateNew(UClass* Class, UObject* Parent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override
+	{
+		UNoesisXaml* ExistingXaml = NewObject<UNoesisXaml>(Parent, *Name.ToString());
+		return ExistingXaml;
+	}*/
+
+	virtual bool ShouldShowInNewMenu() const override
+	{
+		return true;
+	}
+	// End of UFactory interface
 };

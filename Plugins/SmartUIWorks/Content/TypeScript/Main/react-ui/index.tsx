@@ -2,7 +2,8 @@ import * as React from 'react';
 import { useState } from 'react';
 import { VerticalBox, CanvasPanel, ReactUMG, CanvasPanelSlot, Button, HorizontalBox,/*, TextureImage*/ 
 TextBlock,
-EditableText} from 'react-umg';
+EditableText,
+Root} from 'react-umg';
 import {StatusBar} from './ui-components'
 // import './Login.css'; // 你可以创建一个CSS文件来美化界面
 interface Props {
@@ -100,7 +101,7 @@ class Login extends React.Component<Props, StateLogin>{
     }
 }
 
-export function Load(){
+export function Load() : Root{
     return ReactUMG.render(
         <CanvasPanel>
             <Hello names={["Health:", "Energy:"]}/>

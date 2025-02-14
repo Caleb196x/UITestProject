@@ -53,6 +53,9 @@ void FNoesisStyle::Initialize()
 	StyleSet->Set("ClassThumbnail.NoesisXaml", new IMAGE_PLUGIN_BRUSH("Xaml_64x", Icon64x64));
 	StyleSet->Set("NoesisBlueprintEditor.RestartPreview", new IMAGE_PLUGIN_BRUSH("RestartPreview_40x", Icon40x40));
 	StyleSet->Set("NoesisEditor.About", new IMAGE_PLUGIN_BRUSH("About", FVector2D(300.0f, 60.0f)));
+	StyleSet->Set("ClassIcon.TestBlueprint", new IMAGE_PLUGIN_BRUSH("Blueprint_16x", Icon16x16));
+	StyleSet->Set("ClassThumbnail.TestBlueprint", new IMAGE_PLUGIN_BRUSH("Blueprint_64x", Icon64x64));
+
 
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet.Get());
 };
