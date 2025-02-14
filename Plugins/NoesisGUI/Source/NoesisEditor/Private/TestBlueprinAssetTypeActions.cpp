@@ -1,9 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// NoesisGUI - http://www.noesisengine.com
-// Copyright (c) 2013 Noesis Technologies S.L. All Rights Reserved.
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "NoesisBlueprintAssetTypeActions.h"
+﻿#include "TestBlueprinAssetTypeActions.h"
 
 // Core includes
 #include "Misc/MessageDialog.h"
@@ -13,30 +8,31 @@
 
 // NoesisRuntime includes
 #include "NoesisBlueprint.h"
+#include "TestBlueprint.h"
 
 #define LOCTEXT_NAMESPACE "NoesisEditorModule"
 
-FNoesisBlueprintAssetTypeActions::FNoesisBlueprintAssetTypeActions(EAssetTypeCategories::Type InCategories)
+FTestBlueprintAssetTypeActions::FTestBlueprintAssetTypeActions(EAssetTypeCategories::Type InCategories)
 	: Categories(InCategories)
 {
 };
 
-FText FNoesisBlueprintAssetTypeActions::GetName() const
+FText FTestBlueprintAssetTypeActions::GetName() const
 {
-	return LOCTEXT("NoesisBlueprintAssetTypeActions_Name", "Noesis View Test");
+	return LOCTEXT("TestBlueprintAssetTypeActions_Name", "TestBlueprintType");
 }
 
-UClass* FNoesisBlueprintAssetTypeActions::GetSupportedClass() const
+UClass* FTestBlueprintAssetTypeActions::GetSupportedClass() const
 {
-	return UNoesisBlueprint::StaticClass();
+	return UTestBlueprint::StaticClass();
 }
 
-FColor FNoesisBlueprintAssetTypeActions::GetTypeColor() const
+FColor FTestBlueprintAssetTypeActions::GetTypeColor() const
 {
 	return FColor(42, 166, 226);
 }
 
-void FNoesisBlueprintAssetTypeActions::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<IToolkitHost> EditWithinLevelEditor)
+void FTestBlueprintAssetTypeActions::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<IToolkitHost> EditWithinLevelEditor)
 {
 	EToolkitMode::Type Mode = EditWithinLevelEditor.IsValid() ? EToolkitMode::WorldCentric : EToolkitMode::Standalone;
 
@@ -58,7 +54,7 @@ void FNoesisBlueprintAssetTypeActions::OpenAssetEditor(const TArray<UObject*>& I
 	}
 }
 
-uint32 FNoesisBlueprintAssetTypeActions::GetCategories()
+uint32 FTestBlueprintAssetTypeActions::GetCategories()
 {
 	return Categories;
 }

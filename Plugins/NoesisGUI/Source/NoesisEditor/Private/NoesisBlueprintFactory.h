@@ -22,4 +22,9 @@ class NOESISEDITOR_API UNoesisBlueprintFactory : public UFactory
 	// UFactory interface
 	virtual UObject* FactoryCreateNew(UClass* Class, UObject* Parent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
 	// End of UFactory interface
+
+	virtual bool ShouldShowInNewMenu() const override
+	{
+		return true;
+	}
 };

@@ -62,6 +62,7 @@
 #include "Widgets/Images/SImage.h"
 
 // LangServer includes
+#include "TestBlueprinAssetTypeActions.h"
 #include "NsApp/LangServer.h"
 
 #define LOCTEXT_NAMESPACE "NoesisEditorModule"
@@ -294,6 +295,10 @@ public:
 
 		NoesisBlueprintAssetTypeActions = MakeShareable(new FNoesisBlueprintAssetTypeActions(Category));
 		AssetTools.RegisterAssetTypeActions(NoesisBlueprintAssetTypeActions.ToSharedRef());
+
+		TestBlueprintAssetTypeActions = MakeShareable(new FTestBlueprintAssetTypeActions(Category));
+		AssetTools.RegisterAssetTypeActions(TestBlueprintAssetTypeActions.ToSharedRef());
+		
 		NoesisXamlAssetTypeActions = MakeShareable(new FNoesisXamlAssetTypeActions(Category));
 		AssetTools.RegisterAssetTypeActions(NoesisXamlAssetTypeActions.ToSharedRef());
 		NoesisRiveAssetTypeActions = MakeShareable(new FNoesisRiveAssetTypeActions(Category));
@@ -656,6 +661,7 @@ private:
 	TSharedPtr<FNoesisBlueprintAssetTypeActions> NoesisBlueprintAssetTypeActions;
 	TSharedPtr<FNoesisXamlAssetTypeActions> NoesisXamlAssetTypeActions;
 	TSharedPtr<FNoesisRiveAssetTypeActions> NoesisRiveAssetTypeActions;
+	TSharedPtr<FTestBlueprintAssetTypeActions> TestBlueprintAssetTypeActions;
 	TSharedPtr<FNoesisBlueprintCompiler> NoesisBlueprintCompiler;
 	FDelegateHandle AssetImportHandle;
 	FDelegateHandle ObjectPropertyChangedHandle;
