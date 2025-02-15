@@ -5,8 +5,13 @@ const React = require("react");
 const react_umg_1 = require("react-umg");
 let SlotOfProgressBar = {
     Size: {
+        Value: 100,
         SizeRule: 1
-    }
+    },
+    Padding: {
+        Left: 100,
+        Right: 10,
+    },
 };
 class StatusBar extends React.Component {
     constructor(props) {
@@ -26,7 +31,7 @@ class StatusBar extends React.Component {
     render() {
         return (React.createElement(react_umg_1.HorizontalBox, null,
             React.createElement(react_umg_1.TextBlock, { Text: `${this.props.name}(${this.state.percent.toFixed(2)})` }),
-            React.createElement(react_umg_1.ProgressBar, { Percent: this.state.percent, Slot: SlotOfProgressBar, FillColorAndOpacity: this.color }),
+            React.createElement(react_umg_1.ProgressBar, { Percent: this.state.percent, Slot: SlotOfProgressBar, FillColorAndOpacity: this.color, CategoryName: `${this.props.name}` }),
             React.createElement(react_umg_1.Button, { OnClicked: this.onIncrement }, "+"),
             React.createElement(react_umg_1.Button, { OnClicked: this.onDecrement }, "-")));
     }

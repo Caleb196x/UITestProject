@@ -15,6 +15,10 @@ void UTsGameInstance::OnStart()
 	TArray<TPair<FString, UObject*>> Arguments;
 	Arguments.Add(TPair<FString, UObject*>(TEXT("GameInstance"), this));
 	GameScript->Start("Main/UsingReactUMG", Arguments);
+	
+	GameScript2 = MakeShared<puerts::FJsEnv>(std::make_unique<puerts::DefaultJSModuleLoader>(TEXT("JavaScript")), std::make_shared<puerts::FDefaultLogger>(), 7080);
+
+	GameScript2->Start("Main/UsingReactUMG2", Arguments);
 }
 
 void UTsGameInstance::Shutdown()

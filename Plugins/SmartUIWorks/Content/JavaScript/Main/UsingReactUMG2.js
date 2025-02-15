@@ -17,7 +17,7 @@ let gameInstance = puerts_1.argv.getByName("GameInstance");
 let world = gameInstance.GetWorld();
 async function asyncTest() {
     react_umg_1.ReactUMG.init(world);
-    let root = UI.Load();
+    let root = UI.HelloLoad();
     let latentActionState = new UE.LatentActionState();
     UE.KismetSystemLibrary.Delay(world, 5, latentActionState.GetLatentActionInfo());
     await WaitLatentActionState(latentActionState);
@@ -25,4 +25,4 @@ async function asyncTest() {
     // root.removeFromViewport();
 }
 asyncTest().catch((reason) => console.log("catch " + reason));
-//# sourceMappingURL=UsingReactUMG.js.map
+//# sourceMappingURL=UsingReactUMG2.js.map
