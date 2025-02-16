@@ -1,4 +1,5 @@
 #pragma once
+#include "SmartUIBlueprintFactory.generated.h"
 
 UCLASS(BlueprintType)
 class USmartUIBlueprintFactory : public UFactory

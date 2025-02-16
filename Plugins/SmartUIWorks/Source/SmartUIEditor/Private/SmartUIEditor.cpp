@@ -1,19 +1,9 @@
 ﻿#include "SmartUIEditor.h"
-
 #include "AssetToolsModule.h"
 #include "LogSmartUI.h"
 #include "SmartUIBlueprintAssetTypeActions.h"
 
 #define LOCTEXT_NAMESPACE "FSmartUIEditorModule"
-
-class FSmartUIEditorModule : public ISmartUIEditorModuleInterface
-{
-public:
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
-
-	TSharedPtr<FSmartUIBlueprintAssetTypeActions> TestBlueprintAssetTypeActions;
-};
 
 void FSmartUIEditorModule::StartupModule()
 {
@@ -23,11 +13,12 @@ void FSmartUIEditorModule::StartupModule()
 		LOCTEXT("SmartUIWorksCategory", "SmartUIWorks"));
 	TestBlueprintAssetTypeActions = MakeShareable(new FSmartUIBlueprintAssetTypeActions(Category));
 	AssetTools.RegisterAssetTypeActions(TestBlueprintAssetTypeActions.ToSharedRef());
+	
 }
 
 void FSmartUIEditorModule::ShutdownModule()
 {
-    
+	
 }
 
 #undef LOCTEXT_NAMESPACE

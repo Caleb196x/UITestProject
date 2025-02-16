@@ -4,7 +4,6 @@ exports.ReactUMG = void 0;
 const Reconciler = require("react-reconciler");
 const puerts = require("puerts");
 const UE = require("ue");
-let world;
 function deepEquals(x, y) {
     if (x === y)
         return true;
@@ -208,7 +207,7 @@ const hostConfig = {
         //log('prepareForCommit');
     },
     resetAfterCommit(container) {
-        container.addToViewport(0);
+        // container.addToViewport(0);
     },
     resetTextContent() {
         console.error('resetTextContent not implemented!');
@@ -241,9 +240,7 @@ const hostConfig = {
     },
     removeChildFromContainer(container, child) {
         console.error('removeChildFromContainer');
-        //container.removeChild(child).catch(e => {
-        //    console.error('removeChildFromContainer , e:' + e.message);
-        //});
+        container.removeChild(child);
     },
     removeChild(parent, child) {
         parent.removeChild(child);
@@ -269,18 +266,22 @@ const hostConfig = {
     // scheduleDeferredCallback: undefined,
 };
 const reconciler = Reconciler(hostConfig);
+let coreWidget;
 exports.ReactUMG = {
     render: function (reactElement) {
-        if (world == undefined) {
-            throw new Error("init with World first!");
+        if (coreWidget == undefined) {
+            throw new Error("init with SmartUICoreWidget first!");
         }
-        let root = new UEWidgetRoot(UE.UMGManager.CreateReactWidget(world));
+        let root = new UEWidgetRoot(coreWidget);
         const container = reconciler.createContainer(root, 0, null, false, false, "", null, null);
         reconciler.updateContainer(reactElement, container, null, null);
         return root;
     },
-    init: function (inWorld) {
-        world = inWorld;
+    init: function (inCoreWidget) {
+        coreWidget = inCoreWidget;
+    },
+    release: function () {
+        coreWidget.ReleaseJsEnv();
     }
 };
 //# sourceMappingURL=react-umg.js.map

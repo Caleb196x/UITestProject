@@ -10,6 +10,7 @@ public class SmartUIEditor : ModuleRules
             new string[]
             {
                 "Core",
+                "UnrealEd",
             }
         );
 
@@ -20,7 +21,12 @@ public class SmartUIEditor : ModuleRules
                 "Engine",
                 "Slate",
                 "SlateCore", 
-                "SmartUIWorks"
+                "SmartUIWorks",
+                "JsEnv",
+                "AssetRegistry",
+                "KismetCompiler",
+                "Kismet",
+                "UMG"
             }
         );
     }

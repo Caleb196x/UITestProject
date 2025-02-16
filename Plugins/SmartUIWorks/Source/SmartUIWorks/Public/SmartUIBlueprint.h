@@ -1,12 +1,18 @@
 #pragma once
 #include "Interfaces/IPluginManager.h"
+#include "SmartUIBlueprint.generated.h"
 
-UCLASS(BlueprintType)
-class USmartUIBlueprint : public UBlueprint
+UCLASS()
+class SMARTUIWORKS_API USmartUIBlueprint : public UBlueprint
 {
 	GENERATED_UCLASS_BODY()
 public:
-
+	
+#if WITH_EDITOR
+	UClass* GetBlueprintClass() const;
+	bool SupportedByDefaultBlueprintFactory() const;
+#endif
+	
 	UPROPERTY(BlueprintType, EditAnywhere, Category = "SmartUIWorks")
 	FString JsScriptHomeDir;
 

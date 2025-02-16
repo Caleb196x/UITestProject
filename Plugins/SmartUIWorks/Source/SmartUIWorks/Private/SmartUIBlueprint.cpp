@@ -36,3 +36,15 @@ void USmartUIBlueprint::CopyTemplateScriptFileToHomeDir()
 		UE_LOG(LogSmartUI, Error, TEXT("Copy template script files %s to %s failed."), *TemplateFileDirFullPath, *JsScriptHomeDirFullPath);
 	}
 }
+
+#if WITH_EDITOR
+UClass* USmartUIBlueprint::GetBlueprintClass() const
+{
+	return UBlueprintGeneratedClass::StaticClass();
+}
+
+bool USmartUIBlueprint::SupportedByDefaultBlueprintFactory() const
+{
+	return false;
+}
+#endif

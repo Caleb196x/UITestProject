@@ -3,9 +3,11 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class SMARTUIWORKS_API ISmartUIEditorModuleInterface : public IModuleInterface
+class FSmartUIEditorModule : public IModuleInterface
 {
 public:
+    virtual void StartupModule() override;
+    virtual void ShutdownModule() override;
 
-    static ISmartUIEditorModuleInterface* Get();
+    TSharedPtr<class FSmartUIBlueprintAssetTypeActions> TestBlueprintAssetTypeActions;
 };

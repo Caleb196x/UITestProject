@@ -13,17 +13,19 @@ function WaitLatentActionState(state: UE.LatentActionState) : Promise<void> {
 }
 
 //用React来写UI
-let gameInstance = (argv.getByName("GameInstance") as UE.GameInstance);
-let world = gameInstance.GetWorld();
+let coreWidget = (argv.getByName("CoreWidget") as UE.SmartUICoreWidget);
+// let world = gameInstance.GetWorld();
 
 async function asyncTest() {
-    ReactUMG.init(world);
-    let root = UI.Load();
+
     let latentActionState = new UE.LatentActionState();
-    UE.KismetSystemLibrary.Delay(world, 5, latentActionState.GetLatentActionInfo());
-    await WaitLatentActionState(latentActionState);
+    // UE.KismetSystemLibrary.Delay(world, 5, latentActionState.GetLatentActionInfo());
+    // await WaitLatentActionState(latentActionState);
     console.log("remove from viewport after 5s.")
     // root.removeFromViewport();
 }
 
-asyncTest().catch((reason) => console.log("catch " + reason));
+// asyncTest().catch((reason) => console.log("catch " + reason));
+console.warn("start js")
+ReactUMG.init(coreWidget);
+let root = UI.Load();

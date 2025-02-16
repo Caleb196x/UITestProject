@@ -8,7 +8,7 @@ FJsEnvRuntime::FJsEnvRuntime(int32 EnvPoolSize, int32 DebugPort)
 	{
 		TSharedPtr<puerts::FJsEnv> JsEnv = MakeShared<puerts::FJsEnv>(
 		std::make_unique<puerts::DefaultJSModuleLoader>(TEXT("JavaScript")),
-		std::make_shared<puerts::FDefaultLogger>(), DebugPort);
+		std::make_shared<puerts::FDefaultLogger>(), DebugPort + i);
 		JsRuntimeEnvPool.Add(JsEnv, 0);
 	}
 }
@@ -59,11 +59,11 @@ bool FJsEnvRuntime::StartJavaScript(const TSharedPtr<puerts::FJsEnv>& JsEnv, con
 
 bool FJsEnvRuntime::CheckScriptLegal(const FString& Script) const
 {
-	if (!FPaths::FileExists(Script))
+	/*if (!FPaths::FileExists(Script))
 	{
 		UE_LOG(LogSmartUI, Error, TEXT("can't find script: %s"), *Script);
 		return false;
-	}
+	}*/
 	
 	return true;
 }

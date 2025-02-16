@@ -15,7 +15,7 @@ USmartUIBlueprintFactory::USmartUIBlueprintFactory(const FObjectInitializer& Obj
 
 UObject* USmartUIBlueprintFactory::FactoryCreateNew(UClass* Class, UObject* Parent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
 {
-	return CastChecked<USmartUIBlueprintFactory>(FKismetEditorUtilities::CreateBlueprint(ParentClass, Parent, Name, BPTYPE_Normal,
+	return CastChecked<USmartUIBlueprint>(FKismetEditorUtilities::CreateBlueprint(ParentClass, Parent, Name, BPTYPE_Normal,
 		USmartUIBlueprint::StaticClass(), UBlueprintGeneratedClass::StaticClass(),
 		"UNoesisBlueprintFactory"));
 }
