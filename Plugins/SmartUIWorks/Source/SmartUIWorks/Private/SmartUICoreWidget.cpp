@@ -1,4 +1,7 @@
 ﻿#include "SmartUICoreWidget.h"
+
+#include "JsEnvRuntime.h"
+#include "LogSmartUI.h"
 #include "ReactUMG/ReactWidget.h"
 #include "Blueprint/WidgetTree.h"
 
@@ -8,11 +11,27 @@ USmartUICoreWidget::USmartUICoreWidget(const FObjectInitializer& ObjectInitializ
 	init();
 }
 
+void USmartUICoreWidget::BeginDestroy()
+{
+	ReleaseJsEnv();
+}
+
 void USmartUICoreWidget::init()
 {
 	// 1. 准备参数
+	TArray<TPair<FString, UObject*>> Arguments;
+	Arguments.Add(TPair<FString, UObject*>(TEXT("CoreWidget"), this));
 	
 	// 2. 执行js入口脚本，js脚本会根据定义填充RootWidget
+	JsEnv = FJsEnvRuntime::GetInstance().GetFreeJsEnv();
+	if (JsEnv)
+	{
+		bool Result = FJsEnvRuntime::GetInstance().StartJavaScript(JsEnv, MainReactJsScriptPath, Arguments);
+		if (!Result)
+		{
+			UE_LOG(LogSmartUI, Warning, TEXT("Start ui javascript file %s failed"), *MainReactJsScriptPath);
+		}
+	}
 }
 
 UPanelSlot* USmartUICoreWidget::AddChild(UWidget* Content)
@@ -73,4 +92,13 @@ bool USmartUICoreWidget::RemoveChild(UWidget* Content)
 	InvalidateLayoutAndVolatility();
 
 	return true;
+}
+
+void USmartUICoreWidget::ReleaseJsEnv()
+{
+	if (JsEnv)
+	{
+		FJsEnvRuntime::GetInstance().ReleaseJsEnv(JsEnv);
+		JsEnv = nullptr;
+	}
 }

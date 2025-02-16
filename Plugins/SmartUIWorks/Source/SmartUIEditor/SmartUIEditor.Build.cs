@@ -19,7 +19,8 @@ public class SmartUIEditor : ModuleRules
                 "CoreUObject",
                 "Engine",
                 "Slate",
-                "SlateCore"
+                "SlateCore", 
+                "SmartUIWorks"
             }
         );
     }

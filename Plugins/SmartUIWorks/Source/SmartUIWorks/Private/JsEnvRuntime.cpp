@@ -1,5 +1,7 @@
 #include "JsEnvRuntime.h"
 
+#include "LogSmartUI.h"
+
 FJsEnvRuntime::FJsEnvRuntime(int32 EnvPoolSize, int32 DebugPort)
 {
 	for (int32 i = 0; i < EnvPoolSize; i++)
@@ -7,7 +9,7 @@ FJsEnvRuntime::FJsEnvRuntime(int32 EnvPoolSize, int32 DebugPort)
 		TSharedPtr<puerts::FJsEnv> JsEnv = MakeShared<puerts::FJsEnv>(
 		std::make_unique<puerts::DefaultJSModuleLoader>(TEXT("JavaScript")),
 		std::make_shared<puerts::FDefaultLogger>(), DebugPort);
-		JsRuntimeEnvPool.Add(JsEnv, 1);
+		JsRuntimeEnvPool.Add(JsEnv, 0);
 	}
 }
 
@@ -21,7 +23,23 @@ FJsEnvRuntime::~FJsEnvRuntime()
 	JsRuntimeEnvPool.Empty();
 }
 
-bool FJsEnvRuntime::StartJavaScript(const FString& Script, const TArray<TPair<FString, UObject*>>& Arguments) const
+TSharedPtr<puerts::FJsEnv> FJsEnvRuntime::GetFreeJsEnv()
+{
+	TSharedPtr<puerts::FJsEnv> JsEnv = nullptr;
+	for (auto& Pair : JsRuntimeEnvPool)
+	{
+		if (Pair.Value == 0)
+		{
+			JsEnv = Pair.Key;
+			Pair.Value = 1;
+			break;
+		}
+	}
+
+	return JsEnv;
+}
+
+bool FJsEnvRuntime::StartJavaScript(const TSharedPtr<puerts::FJsEnv>& JsEnv, const FString& Script, const TArray<TPair<FString, UObject*>>& Arguments) const
 {
 	// 1. check js script legal
 	if (!CheckScriptLegal(Script))
@@ -29,17 +47,6 @@ bool FJsEnvRuntime::StartJavaScript(const FString& Script, const TArray<TPair<FS
 		return false;
 	}
 	
-	// 2. find a free js env
-	TSharedPtr<puerts::FJsEnv> JsEnv = nullptr;
-	for (auto& Pair : JsRuntimeEnvPool)
-	{
-		if (Pair.Value == 1)
-		{
-			JsEnv = Pair.Key;
-			break;
-		}
-	}
-
 	// 3. start js execute
 	if (JsEnv)
 	{
@@ -52,5 +59,25 @@ bool FJsEnvRuntime::StartJavaScript(const FString& Script, const TArray<TPair<FS
 
 bool FJsEnvRuntime::CheckScriptLegal(const FString& Script) const
 {
+	if (!FPaths::FileExists(Script))
+	{
+		UE_LOG(LogSmartUI, Error, TEXT("can't find script: %s"), *Script);
+		return false;
+	}
+	
 	return true;
+}
+
+void FJsEnvRuntime::ReleaseJsEnv(TSharedPtr<puerts::FJsEnv> JsEnv)
+{
+	for (auto& Pair : JsRuntimeEnvPool)
+	{
+		auto Key = Pair.Key;
+		if (Key.Get() == JsEnv.Get())
+		{
+			JsEnv->Release();
+			Pair.Value = 0;
+			break;
+		}
+	}
 }

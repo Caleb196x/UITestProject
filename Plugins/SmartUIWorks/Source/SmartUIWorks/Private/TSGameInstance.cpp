@@ -25,4 +25,5 @@ void UTsGameInstance::Shutdown()
 {
 	Super::Shutdown();
 	GameScript.Reset();
+	GameScript2.Reset();
 }

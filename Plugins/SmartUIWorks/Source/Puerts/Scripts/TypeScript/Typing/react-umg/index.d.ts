@@ -979,7 +979,8 @@ declare module "react-umg" {
 
     interface TReactUMG {
         render(element: React.ReactElement) : Root;
-        init(world: any) : void;
+        init(coreWidget: any) : void;
+        release() : void
     }
 
     var ReactUMG : TReactUMG;

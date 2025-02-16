@@ -13,6 +13,7 @@
   },
   "include": [
     "react-umg/**/*",
-    "Main/**/*"
+    "Main/**/*",
+    "Template/**/*"
   ],
 }
