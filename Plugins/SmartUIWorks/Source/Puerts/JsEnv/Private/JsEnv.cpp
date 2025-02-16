@@ -91,4 +91,8 @@ void FJsEnv::OnSourceLoaded(std::function<void(const FString&)> Callback)
     GameScript->OnSourceLoaded(Callback);
 }
 
+void FJsEnv::Release()
+{
+    GameScript->Release();
+}
 }    // namespace PUERTS_NAMESPACE

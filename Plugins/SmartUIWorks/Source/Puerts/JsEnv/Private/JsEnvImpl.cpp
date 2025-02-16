@@ -919,6 +919,8 @@ FJsEnvImpl::~FJsEnvImpl()
         }
     }
     StructCache.Empty();
+
+    UE_LOG(Puerts, Warning, TEXT("Running Destruct for FJsEnvImpl"))
 }
 
 void FJsEnvImpl::InitExtensionMethodsMap()

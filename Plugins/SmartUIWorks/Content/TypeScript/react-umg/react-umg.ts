@@ -2,8 +2,6 @@ import * as Reconciler from 'react-reconciler'
 import * as puerts from 'puerts'
 import * as UE from 'ue'
 
-let world: UE.World;
-
 function deepEquals(x: any, y: any) {
     if ( x === y ) return true;
 
@@ -151,10 +149,10 @@ class UEWidget {
 }
 
 class UEWidgetRoot {
-    nativePtr: UE.ReactWidget;
+    nativePtr: UE.SmartUICoreWidget;
     Added: boolean;
 
-    constructor(nativePtr: UE.ReactWidget) {
+    constructor(nativePtr: UE.SmartUICoreWidget) {
         this.nativePtr = nativePtr;
     }
   
@@ -219,7 +217,7 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
         //log('prepareForCommit');
     },
     resetAfterCommit (container: UEWidgetRoot) {
-        container.addToViewport(0);
+        // container.addToViewport(0);
     },
     resetTextContent () {
         console.error('resetTextContent not implemented!');
@@ -252,9 +250,7 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
     },
     removeChildFromContainer (container: UEWidgetRoot, child: UEWidget) {
         console.error('removeChildFromContainer');
-        //container.removeChild(child).catch(e => {
-        //    console.error('removeChildFromContainer , e:' + e.message);
-        //});
+        container.removeChild(child);
     },
     removeChild(parent: UEWidget, child: UEWidget) {
         parent.removeChild(child);
@@ -283,19 +279,24 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
 }
 
 const reconciler = Reconciler(hostConfig)
+let coreWidget: UE.SmartUICoreWidget;
 
 export const ReactUMG = {
     render: function(reactElement: React.ReactNode) {
-        if (world == undefined) {
-            throw new Error("init with World first!");
+        if (coreWidget == undefined) {
+            throw new Error("init with SmartUICoreWidget first!");
         }
-        let root = new UEWidgetRoot(UE.UMGManager.CreateReactWidget(world));
+        let root = new UEWidgetRoot(coreWidget);
         const container = reconciler.createContainer(root, 0, null, false, false, "", null, null);
         reconciler.updateContainer(reactElement, container, null, null);
         return root;
     },
-    init: function(inWorld: UE.World) {
-        world = inWorld;
+    init: function(inCoreWidget: UE.SmartUICoreWidget) {
+        coreWidget = inCoreWidget;
+    },
+    release: function() {
+        coreWidget.ReleaseJsEnv()
     }
+
 }
 

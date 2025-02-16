@@ -135,6 +135,8 @@ public:
 
     virtual void OnSourceLoaded(std::function<void(const FString&)> Callback) override;
 
+    virtual void Release() override { Started = false; }
+
 public:
     bool IsTypeScriptGeneratedClass(UClass* Class);
 

@@ -67471,5 +67471,17 @@ declare module "ue" {
         static StaticStruct(): ScriptStruct;
         private __tid_PointerToUberGraphFrame__: boolean;
     }
+
+    class SmartUICoreWidget extends UE.UserWidget {
+        constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+        AddChild(Content: $Nullable<UE.Widget>) : UE.PanelSlot;
+        RemoveChild(Content: $Nullable<UE.Widget>) : boolean;
+        ReleaseJsEnv() : void;
+        static StaticClass(): Class;
+        static Find(OrigInName: string, Outer?: Object): SmartUICoreWidget;
+        static Load(InName: string): SmartUICoreWidget;
+    
+        __tid_SmartUICoreWidget__: boolean;
+    }
     
 }

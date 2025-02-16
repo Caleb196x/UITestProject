@@ -53,6 +53,8 @@ public:
 
     virtual void InitExtensionMethodsMap() = 0;
 
+    virtual void Release() = 0;
+
     virtual ~IJsEnv()
     {
     }
@@ -95,6 +97,8 @@ public:
     FString CurrentStackTrace();
 
     void InitExtensionMethodsMap();
+
+    void Release();
 
 private:
     std::unique_ptr<IJsEnv> GameScript;

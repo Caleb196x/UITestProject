@@ -13,16 +13,17 @@ function WaitLatentActionState(state) {
     });
 }
 //用React来写UI
-let gameInstance = puerts_1.argv.getByName("GameInstance");
-let world = gameInstance.GetWorld();
+let coreWidget = puerts_1.argv.getByName("CoreWidget");
+// let world = gameInstance.GetWorld();
 async function asyncTest() {
-    react_umg_1.ReactUMG.init(world);
-    let root = UI.Load();
     let latentActionState = new UE.LatentActionState();
-    UE.KismetSystemLibrary.Delay(world, 5, latentActionState.GetLatentActionInfo());
-    await WaitLatentActionState(latentActionState);
-    console.log("remove from viewport.");
-    root.removeFromViewport();
+    // UE.KismetSystemLibrary.Delay(world, 5, latentActionState.GetLatentActionInfo());
+    // await WaitLatentActionState(latentActionState);
+    console.log("remove from viewport after 5s.");
+    // root.removeFromViewport();
 }
-asyncTest().catch((reason) => console.log("catch " + reason));
+// asyncTest().catch((reason) => console.log("catch " + reason));
+console.warn("start js");
+react_umg_1.ReactUMG.init(coreWidget);
+let root = UI.Load();
 //# sourceMappingURL=UsingReactUMG.js.map

@@ -26,4 +26,5 @@ public:
 	
 private:
 	TSharedPtr<puerts::FJsEnv> GameScript;
+	TSharedPtr<puerts::FJsEnv> GameScript2;
 };
