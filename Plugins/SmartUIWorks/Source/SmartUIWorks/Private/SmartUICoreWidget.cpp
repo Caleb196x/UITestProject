@@ -11,7 +11,7 @@ USmartUICoreWidget::USmartUICoreWidget(const FObjectInitializer& ObjectInitializ
 {
 	TRACE_CPUPROFILER_EVENT_SCOPE(USmartUICoreWidgetInit)
 	uint64 StartCycles = FPlatformTime::Cycles64();
-	
+
 	WidgetTree = CreateDefaultSubobject<UWidgetTree>(TEXT("WidgetTree"));
 	WidgetTree->SetFlags(RF_Transactional);
 	
@@ -43,17 +43,14 @@ void USmartUICoreWidget::init()
 	MainReactJsScriptPath = TEXT("Main/UsingReactUMG");
 	
 	// 2. 执行js入口脚本，js脚本会根据定义填充RootWidget
-	JsEnv = MakeShared<puerts::FJsEnv>(
-		std::make_unique<puerts::DefaultJSModuleLoader>(TEXT("JavaScript")),
-		std::make_shared<puerts::FDefaultLogger>(),8086);
+	JsEnv = FJsEnvRuntime::GetInstance().GetFreeJsEnv();
 	if (JsEnv)
 	{
-		JsEnv->Start(MainReactJsScriptPath, Arguments);
-		/*
+		bool Result = FJsEnvRuntime::GetInstance().StartJavaScript(JsEnv, MainReactJsScriptPath, Arguments);
 		if (!Result)
 		{
 			UE_LOG(LogSmartUI, Warning, TEXT("Start ui javascript file %s failed"), *MainReactJsScriptPath);
-		}*/
+		}
 	}
 }
 
@@ -121,7 +118,7 @@ void USmartUICoreWidget::ReleaseJsEnv()
 {
 	if (JsEnv)
 	{
-		JsEnv.Reset();
+		FJsEnvRuntime::GetInstance().ReleaseJsEnv(JsEnv);
 		JsEnv = nullptr;
 	}
 }
