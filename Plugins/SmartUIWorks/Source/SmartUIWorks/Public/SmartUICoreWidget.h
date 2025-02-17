@@ -18,13 +18,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
 	void ReleaseJsEnv();
 
+	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
+	FString GetWidgetName();
+	
 	virtual void BeginDestroy() override;
 private:
 	void init();
+	
 	// js程序入口
 	FString MainReactJsScriptPath;
 
 	TObjectPtr<UPanelSlot> RootSlot;
 
 	TSharedPtr<puerts::FJsEnv> JsEnv;
+
+	FString WidgetName;
 };

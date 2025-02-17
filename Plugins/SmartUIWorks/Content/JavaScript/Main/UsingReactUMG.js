@@ -2,8 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const UE = require("ue");
 const puerts_1 = require("puerts");
-const react_umg_1 = require("react-umg");
-const UI = require("./react-ui");
 function WaitLatentActionState(state) {
     return new Promise((resolve, reject) => {
         state.LatentActionCallback.Bind(() => {
@@ -23,7 +21,4 @@ async function asyncTest() {
     // root.removeFromViewport();
 }
 // asyncTest().catch((reason) => console.log("catch " + reason));
-console.warn("start js");
-react_umg_1.ReactUMG.init(coreWidget);
-let root = UI.Load();
 //# sourceMappingURL=UsingReactUMG.js.map

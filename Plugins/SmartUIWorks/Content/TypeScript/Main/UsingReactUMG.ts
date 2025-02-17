@@ -26,6 +26,3 @@ async function asyncTest() {
 }
 
 // asyncTest().catch((reason) => console.log("catch " + reason));
-console.warn("start js")
-ReactUMG.init(coreWidget);
-let root = UI.Load();
