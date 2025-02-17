@@ -10,7 +10,7 @@ public:
 		return Instance;
 	}
 
-	FJsEnvRuntime(int32 EnvPoolSize = 3, int32 DebugPort = 8086);
+	FJsEnvRuntime(int32 EnvPoolSize = 1, int32 DebugPort = 8086);
 	~FJsEnvRuntime();
 
 	TSharedPtr<puerts::FJsEnv> GetFreeJsEnv();

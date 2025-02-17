@@ -1,5 +1,6 @@
 ﻿#include "SmartUICoreWidget.h"
 
+#include "JsBridgeCaller.h"
 #include "JsEnvRuntime.h"
 #include "LogSmartUI.h"
 #include "SmartUIBlueprint.h"
@@ -11,9 +12,10 @@ USmartUICoreWidget::USmartUICoreWidget(const FObjectInitializer& ObjectInitializ
 {
 	TRACE_CPUPROFILER_EVENT_SCOPE(USmartUICoreWidgetInit)
 	uint64 StartCycles = FPlatformTime::Cycles64();
-	
+
 	WidgetTree = CreateDefaultSubobject<UWidgetTree>(TEXT("WidgetTree"));
 	WidgetTree->SetFlags(RF_Transactional);
+	WidgetName = TEXT("smart_ui"); // todo: set by blueprint
 	
 	init();
 	
@@ -28,6 +30,7 @@ void USmartUICoreWidget::BeginDestroy()
 {
 	Super::BeginDestroy();
 	ReleaseJsEnv();
+	UE_LOG(LogSmartUI, Warning, TEXT("USmartUICoreWidget::BeginDestroy"))
 }
 
 void USmartUICoreWidget::init()
@@ -36,24 +39,31 @@ void USmartUICoreWidget::init()
 	{
 		return;
 	}
-	
-	// 1. 准备参数
-	TArray<TPair<FString, UObject*>> Arguments;
-	Arguments.Add(TPair<FString, UObject*>(TEXT("CoreWidget"), this));
-	MainReactJsScriptPath = TEXT("Main/UsingReactUMG");
-	
-	// 2. 执行js入口脚本，js脚本会根据定义填充RootWidget
-	JsEnv = MakeShared<puerts::FJsEnv>(
-		std::make_unique<puerts::DefaultJSModuleLoader>(TEXT("JavaScript")),
-		std::make_shared<puerts::FDefaultLogger>(),8086);
-	if (JsEnv)
+
+	if (!UJsBridgeCaller::IsExistBridgeCaller(WidgetName))
 	{
-		JsEnv->Start(MainReactJsScriptPath, Arguments);
-		/*
-		if (!Result)
+		TArray<TPair<FString, UObject*>> Arguments;
+		UJsBridgeCaller* Caller = UJsBridgeCaller::AddNewBridgeCaller(WidgetName);
+		Arguments.Add(TPair<FString, UObject*>(TEXT("BridgeCaller"), Caller));
+		
+		MainReactJsScriptPath = FString::Printf(TEXT("Main/%s/launch"), *WidgetName); // todo: 临时测试设置
+
+		JsEnv = FJsEnvRuntime::GetInstance().GetFreeJsEnv();
+		if (JsEnv)
 		{
-			UE_LOG(LogSmartUI, Warning, TEXT("Start ui javascript file %s failed"), *MainReactJsScriptPath);
-		}*/
+		
+			const bool Result = FJsEnvRuntime::GetInstance().StartJavaScript(JsEnv, MainReactJsScriptPath, Arguments);
+			if (!Result)
+			{
+				UE_LOG(LogSmartUI, Warning, TEXT("Start ui javascript file %s failed"), *MainReactJsScriptPath);
+			}
+		}
+	}
+	
+	const bool DelegateRunResult = UJsBridgeCaller::ExecuteMainCaller(WidgetName, this);
+	if (!DelegateRunResult)
+	{
+		UE_LOG(LogSmartUI, Warning, TEXT("Not bind any bridge caller for %s"), *WidgetName);
 	}
 }
 
@@ -121,7 +131,13 @@ void USmartUICoreWidget::ReleaseJsEnv()
 {
 	if (JsEnv)
 	{
-		JsEnv.Reset();
+		FJsEnvRuntime::GetInstance().ReleaseJsEnv(JsEnv);
 		JsEnv = nullptr;
 	}
 }
+
+FString USmartUICoreWidget::GetWidgetName()
+{
+	return WidgetName;
+}
+

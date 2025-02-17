@@ -67477,6 +67477,19 @@ declare module "ue" {
         AddChild(Content: $Nullable<UE.Widget>) : UE.PanelSlot;
         RemoveChild(Content: $Nullable<UE.Widget>) : boolean;
         ReleaseJsEnv() : void;
+        GetWidgetName() : string;
+        static StaticClass(): Class;
+        static Find(OrigInName: string, Outer?: Object): SmartUICoreWidget;
+        static Load(InName: string): SmartUICoreWidget;
+    
+        __tid_SmartUICoreWidget__: boolean;
+    }
+
+    class JsBridgeCaller extends UE.Object {
+        constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+        MainCaller: $Delegate<(CoreWidget: $Nullable<UE.SmartUICoreWidget>) => void>;
+        static RegisterAllocatedBrideCaller(CallerName: string, Caller: $Nullable<UE.JsBridgeCaller>) : void;
+        static ExecuteMainCaller(CallerName: string, CoreWidget: $Nullable<UE.SmartUICoreWidget>) : boolean;
         static StaticClass(): Class;
         static Find(OrigInName: string, Outer?: Object): SmartUICoreWidget;
         static Load(InName: string): SmartUICoreWidget;
