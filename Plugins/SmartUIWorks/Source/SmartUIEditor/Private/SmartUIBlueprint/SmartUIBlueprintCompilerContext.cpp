@@ -45,6 +45,6 @@ void FSmartUIBlueprintCompilerContext::CopyTermDefaultsToDefaultObject(UObject* 
 	if (USmartUICoreWidget* DefaultInstance = Cast<USmartUICoreWidget>(DefaultObject))
 	{
 		USmartUIBlueprint* SmartUIBlueprint = CastChecked<USmartUIBlueprint>(Blueprint);
-		DefaultInstance->SetWidgetName(SmartUIBlueprint->WidgetName);
+		DefaultInstance->WidgetName = SmartUIBlueprint->WidgetName;
 	}
 }

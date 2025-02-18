@@ -21,8 +21,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
 	FString GetWidgetName();
 
-	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
-	void SetWidgetName(const FString& InWidgetName) { WidgetName = InWidgetName; }
+	UPROPERTY()
+	FString WidgetName;
 	
 	virtual void BeginDestroy() override;
 private:
@@ -34,6 +34,4 @@ private:
 	TObjectPtr<UPanelSlot> RootSlot;
 
 	TSharedPtr<puerts::FJsEnv> JsEnv;
-
-	FString WidgetName;
 };

@@ -1,6 +1,7 @@
 #include "JsEnvRuntime.h"
 
 #include "LogSmartUI.h"
+#include "SmartUIUtils.h"
 
 FJsEnvRuntime::FJsEnvRuntime(int32 EnvPoolSize, int32 DebugPort)
 {
@@ -59,11 +60,13 @@ bool FJsEnvRuntime::StartJavaScript(const TSharedPtr<puerts::FJsEnv>& JsEnv, con
 
 bool FJsEnvRuntime::CheckScriptLegal(const FString& Script) const
 {
-	/*if (!FPaths::FileExists(Script))
+	FString PluginContentDir = FSmartUIUtils::GetPluginContentDir();
+	FString FullPath = FPaths::Combine(PluginContentDir, TEXT("TypeScript"), Script);
+	if (!FPaths::FileExists(FullPath))
 	{
 		UE_LOG(LogSmartUI, Error, TEXT("can't find script: %s"), *Script);
 		return false;
-	}*/
+	}
 	
 	return true;
 }

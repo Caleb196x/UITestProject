@@ -1,7 +1,7 @@
 #include "SmartUIBlueprint.h"
 #include "LogSmartUI.h"
 #include "SmartUIBlueprintGeneratedClass.h"
-#include "Utils.h"
+#include "SmartUIUtils.h"
 
 USmartUIBlueprint::USmartUIBlueprint(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -21,7 +21,7 @@ USmartUIBlueprint::USmartUIBlueprint(const FObjectInitializer& ObjectInitializer
 
 void USmartUIBlueprint::CopyTemplateScriptFileToHomeDir()
 {
-	FString PluginContentDir = GetPluginContentDir();
+	FString PluginContentDir = FSmartUIUtils::GetPluginContentDir();
 
 	const FString JsScriptHomeDirFullPath = FPaths::Combine(PluginContentDir, TEXT("TypeScript"), JsScriptHomeDir);
 	const FString TemplateFileDirFullPath = FPaths::Combine(PluginContentDir, TEXT("TypeScript"), TemplateFileDir);
@@ -37,7 +37,7 @@ void USmartUIBlueprint::CopyTemplateScriptFileToHomeDir()
 		IFileManager::Get().MakeDirectory(*JsScriptHomeDirFullPath);
 	}
 
-	if (!FUtils::CopyDirectoryRecursive(TemplateFileDirFullPath, JsScriptHomeDirFullPath))
+	if (!FSmartUIUtils::CopyDirectoryRecursive(TemplateFileDirFullPath, JsScriptHomeDirFullPath))
 	{
 		UE_LOG(LogSmartUI, Error, TEXT("Copy template script files %s to %s failed."), *TemplateFileDirFullPath, *JsScriptHomeDirFullPath);
 	}

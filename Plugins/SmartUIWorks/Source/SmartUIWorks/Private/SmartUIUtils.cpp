@@ -1,11 +1,11 @@
-﻿#include "Utils.h"
+﻿#include "SmartUIUtils.h"
 
 #include "LogSmartUI.h"
 #include "HAL/PlatformFilemanager.h"
 #include "GenericPlatform/GenericPlatformFile.h"
 #include "Misc/Paths.h"
 
-bool FUtils::CopyDirectoryRecursive(const FString& SrcDir, const FString& DestDir)
+bool FSmartUIUtils::CopyDirectoryRecursive(const FString& SrcDir, const FString& DestDir)
 {
 	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
@@ -42,5 +42,4 @@ bool FUtils::CopyDirectoryRecursive(const FString& SrcDir, const FString& DestDi
 	}
 
 	return true;
-
 }

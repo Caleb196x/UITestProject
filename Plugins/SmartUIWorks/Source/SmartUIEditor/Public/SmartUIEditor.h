@@ -10,4 +10,5 @@ public:
     virtual void ShutdownModule() override;
 
     TSharedPtr<class FSmartUIBlueprintAssetTypeActions> TestBlueprintAssetTypeActions;
+    TSharedPtr<class FSmartUIBlueprintCompiler> SmartUIBlueprintCompiler;
 };

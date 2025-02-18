@@ -28,11 +28,6 @@ public:
 
 	void CopyTemplateScriptFileToHomeDir();
 
-	FORCEINLINE static FString GetPluginContentDir()
-	{
-		return FPaths::ConvertRelativePathToFull(IPluginManager::Get().FindPlugin("SmartUIWorks")->GetContentDir());
-	}
-
 	FORCEINLINE FString GetJsScriptHomeDir()
 	{
 		return JsScriptHomeDir;
