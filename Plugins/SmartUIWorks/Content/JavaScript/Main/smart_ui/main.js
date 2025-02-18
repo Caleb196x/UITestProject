@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Main = Main;
 const React = require("react");
-const Components = require("./components");
+const Components = require("./components/main_components");
 const react_umg_1 = require("react-umg");
 function Main(coreWidget) {
     console.log("running smart ui main");

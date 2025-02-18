@@ -1,7 +1,7 @@
 ﻿#include "SmartUIEditor.h"
 #include "AssetToolsModule.h"
 #include "LogSmartUI.h"
-#include "SmartUIBlueprintAssetTypeActions.h"
+#include "SmartUIBlueprint/SmartUIBlueprintAssetTypeActions.h"
 
 #define LOCTEXT_NAMESPACE "FSmartUIEditorModule"
 
