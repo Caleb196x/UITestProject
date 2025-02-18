@@ -29,24 +29,20 @@ USmartUICoreWidget::USmartUICoreWidget(const FObjectInitializer& ObjectInitializ
 void USmartUICoreWidget::BeginDestroy()
 {
 	Super::BeginDestroy();
-	ReleaseJsEnv();
-	UE_LOG(LogSmartUI, Warning, TEXT("USmartUICoreWidget::BeginDestroy"))
+	ReleaseJsEnv(); // Releasing the environment as a fallback has already been done in the launch script
+	UE_LOG(LogSmartUI, Display, TEXT("Release javascript environment when BeginDestroy of Object"))
 }
 
 void USmartUICoreWidget::init()
 {
-	if (GetName().StartsWith("Default__"))
-	{
-		return;
-	}
-
 	if (!UJsBridgeCaller::IsExistBridgeCaller(WidgetName))
 	{
 		TArray<TPair<FString, UObject*>> Arguments;
 		UJsBridgeCaller* Caller = UJsBridgeCaller::AddNewBridgeCaller(WidgetName);
 		Arguments.Add(TPair<FString, UObject*>(TEXT("BridgeCaller"), Caller));
+		Arguments.Add(TPair<FString, UObject*>(TEXT("CoreWidget"), this));
 		
-		MainReactJsScriptPath = FString::Printf(TEXT("Main/%s/launch"), *WidgetName); // todo: 临时测试设置
+		MainReactJsScriptPath = FString::Printf(TEXT("Main/%s/launch"), *WidgetName);
 
 		JsEnv = FJsEnvRuntime::GetInstance().GetFreeJsEnv();
 		if (JsEnv)
@@ -55,14 +51,22 @@ void USmartUICoreWidget::init()
 			const bool Result = FJsEnvRuntime::GetInstance().StartJavaScript(JsEnv, MainReactJsScriptPath, Arguments);
 			if (!Result)
 			{
+				UJsBridgeCaller::RemoveBridgeCaller(WidgetName);
 				UE_LOG(LogSmartUI, Warning, TEXT("Start ui javascript file %s failed"), *MainReactJsScriptPath);
 			}
+		}
+		else
+		{
+			UJsBridgeCaller::RemoveBridgeCaller(WidgetName);
+			UE_LOG(LogSmartUI, Error, TEXT("Can not obtain any valid javascript runtime environment"))
+			return;
 		}
 	}
 	
 	const bool DelegateRunResult = UJsBridgeCaller::ExecuteMainCaller(WidgetName, this);
 	if (!DelegateRunResult)
 	{
+		UJsBridgeCaller::RemoveBridgeCaller(WidgetName);
 		UE_LOG(LogSmartUI, Warning, TEXT("Not bind any bridge caller for %s"), *WidgetName);
 	}
 }
@@ -131,6 +135,7 @@ void USmartUICoreWidget::ReleaseJsEnv()
 {
 	if (JsEnv)
 	{
+		UE_LOG(LogSmartUI, Display, TEXT("Release javascript env in order to excuting other script"))
 		FJsEnvRuntime::GetInstance().ReleaseJsEnv(JsEnv);
 		JsEnv = nullptr;
 	}

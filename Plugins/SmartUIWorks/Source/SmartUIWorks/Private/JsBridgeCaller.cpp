@@ -38,3 +38,18 @@ UJsBridgeCaller* UJsBridgeCaller::AddNewBridgeCaller(const FString& CallerName)
 
 	return SelfHolder[CallerName];
 }
+
+void UJsBridgeCaller::RemoveBridgeCaller(const FString& CallerName)
+{
+	if (SelfHolder.Contains(CallerName))
+	{
+		UJsBridgeCaller* RemoveCaller = nullptr;
+		SelfHolder.RemoveAndCopyValue(CallerName, RemoveCaller);
+	}
+	
+}
+
+void UJsBridgeCaller::ClearAllBridgeCaller()
+{
+	SelfHolder.Empty();
+}

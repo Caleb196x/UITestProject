@@ -1,1 +1,1 @@
-{"version":3,"file":"launch.js","sourceRoot":"","sources":["../../../TypeScript/Main/smart_ui/launch.ts"],"names":[],"mappings":";;AACA,iCAA8B;AAC9B,mCAA8B;AAE9B,IAAI,YAAY,GAAI,aAAI,CAAC,SAAS,CAAC,cAAc,CAAuB,CAAC;AAEzE,+CAA+C;AAC/C,8CAA8C;AAC9C,YAAY,CAAC,UAAU,CAAC,IAAI,CAAC,WAAI,CAAC,CAAC;AAEnC,4EAA4E"}
+{"version":3,"file":"launch.js","sourceRoot":"","sources":["../../../TypeScript/Main/smart_ui/launch.ts"],"names":[],"mappings":";;AACA,iCAA8B;AAC9B,mCAA8B;AAE9B,IAAI,YAAY,GAAI,aAAI,CAAC,SAAS,CAAC,cAAc,CAAuB,CAAC;AAEzE,YAAY,CAAC,UAAU,CAAC,IAAI,CAAC,WAAI,CAAC,CAAC"}

@@ -1,24 +1,30 @@
 #include "SmartUIBlueprint.h"
-
 #include "LogSmartUI.h"
+#include "SmartUIBlueprintGeneratedClass.h"
+#include "Utils.h"
 
 USmartUIBlueprint::USmartUIBlueprint(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
 {
-	AssetFileName = GetName();
-	JsScriptHomeDir = TEXT("Main") / AssetFileName;
-	TemplateFileDir = FPaths::Combine(TEXT("Template"), TEXT("smart_ui"));
+	WidgetName = GetName();
+	
+	JsScriptHomeDir = TEXT("Main") / WidgetName;
+	TemplateFileDir = FPaths::Combine(TEXT("Template"), TEXT("smart_ui/"));
 	JsScriptMainFileName = TEXT("main");
 
-	CopyTemplateScriptFileToHomeDir();
+	if (!WidgetName.StartsWith("Default__"))
+	{
+		CopyTemplateScriptFileToHomeDir();
+	}
+	
 }
 
 void USmartUIBlueprint::CopyTemplateScriptFileToHomeDir()
 {
 	FString PluginContentDir = GetPluginContentDir();
 
-	const FString JsScriptHomeDirFullPath = FPaths::Combine(PluginContentDir, TEXT("JavaScript"), JsScriptHomeDir);
-	const FString TemplateFileDirFullPath = FPaths::Combine(PluginContentDir, TEXT("JavaScript"), TemplateFileDir);
+	const FString JsScriptHomeDirFullPath = FPaths::Combine(PluginContentDir, TEXT("TypeScript"), JsScriptHomeDir);
+	const FString TemplateFileDirFullPath = FPaths::Combine(PluginContentDir, TEXT("TypeScript"), TemplateFileDir);
 
 	if (!FPaths::DirectoryExists(TemplateFileDirFullPath))
 	{
@@ -31,7 +37,7 @@ void USmartUIBlueprint::CopyTemplateScriptFileToHomeDir()
 		IFileManager::Get().MakeDirectory(*JsScriptHomeDirFullPath);
 	}
 
-	if (!IFileManager::Get().Copy(*TemplateFileDirFullPath, *JsScriptHomeDirFullPath, false))
+	if (!FUtils::CopyDirectoryRecursive(TemplateFileDirFullPath, JsScriptHomeDirFullPath))
 	{
 		UE_LOG(LogSmartUI, Error, TEXT("Copy template script files %s to %s failed."), *TemplateFileDirFullPath, *JsScriptHomeDirFullPath);
 	}
@@ -40,7 +46,7 @@ void USmartUIBlueprint::CopyTemplateScriptFileToHomeDir()
 #if WITH_EDITOR
 UClass* USmartUIBlueprint::GetBlueprintClass() const
 {
-	return UBlueprintGeneratedClass::StaticClass();
+	return USmartUIBlueprintGeneratedClass::StaticClass();
 }
 
 bool USmartUIBlueprint::SupportedByDefaultBlueprintFactory() const

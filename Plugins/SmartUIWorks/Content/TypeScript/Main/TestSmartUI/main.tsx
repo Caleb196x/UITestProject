@@ -1,6 +1,6 @@
 import * as UE from 'ue'
 import * as React from 'react';
-import * as Components from './components';
+import * as Components from './components/main_component';
 import {$Nullable, argv} from 'puerts';
 import {ReactUMG, Root} from 'react-umg'
 

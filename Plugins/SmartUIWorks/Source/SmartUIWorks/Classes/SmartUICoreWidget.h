@@ -20,6 +20,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
 	FString GetWidgetName();
+
+	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
+	void SetWidgetName(const FString& InWidgetName) { WidgetName = InWidgetName; }
 	
 	virtual void BeginDestroy() override;
 private:

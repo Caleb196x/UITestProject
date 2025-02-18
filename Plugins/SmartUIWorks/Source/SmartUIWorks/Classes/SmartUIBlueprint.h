@@ -1,4 +1,5 @@
 #pragma once
+#include "CoreMinimal.h"
 #include "Interfaces/IPluginManager.h"
 #include "SmartUIBlueprint.generated.h"
 
@@ -22,11 +23,14 @@ public:
 	UPROPERTY(BlueprintType, EditAnywhere, Category = "SmartUIWorks")
 	FString JsScriptMainFileName;
 
+	UPROPERTY(BlueprintType, BlueprintReadOnly, Category = "SmartUIWorks")
+	FString WidgetName;
+
 	void CopyTemplateScriptFileToHomeDir();
 
 	FORCEINLINE static FString GetPluginContentDir()
 	{
-		return IPluginManager::Get().FindPlugin("SmartUIWorks")->GetContentDir();
+		return FPaths::ConvertRelativePathToFull(IPluginManager::Get().FindPlugin("SmartUIWorks")->GetContentDir());
 	}
 
 	FORCEINLINE FString GetJsScriptHomeDir()
@@ -38,9 +42,4 @@ public:
 	{
 		return JsScriptHomeDir / JsScriptMainFileName;
 	}
-
-private:
-	FString AssetFileName;
-	
-	
 };

@@ -21,6 +21,10 @@ public:
 	static bool IsExistBridgeCaller(const FString& CallerName);
 
 	static UJsBridgeCaller* AddNewBridgeCaller(const FString& CallerName);
+
+	static void RemoveBridgeCaller(const FString& CallerName);
+
+	static void ClearAllBridgeCaller();
 	
 	UPROPERTY()
 	FJavaScriptMainCaller MainCaller;
