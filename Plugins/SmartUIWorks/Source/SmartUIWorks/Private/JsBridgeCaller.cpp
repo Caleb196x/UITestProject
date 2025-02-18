@@ -31,7 +31,6 @@ UJsBridgeCaller* UJsBridgeCaller::AddNewBridgeCaller(const FString& CallerName)
 	if (!SelfHolder.Contains(CallerName))
 	{
 		UJsBridgeCaller* Caller = NewObject<UJsBridgeCaller>();
-		
 		Caller->SetFlags(RF_Transient);
 		SelfHolder.Add(CallerName, Caller);
 		return Caller;
