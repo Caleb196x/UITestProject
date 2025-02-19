@@ -43,3 +43,17 @@ bool FSmartUIUtils::CopyDirectoryRecursive(const FString& SrcDir, const FString&
 
 	return true;
 }
+
+bool FSmartUIUtils::DeleteDirectoryRecursive(const FString& DirPath)
+{
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	
+	if (PlatformFile.DirectoryExists(*DirPath))
+	{
+		// 删除目录及其内容
+		return PlatformFile.DeleteDirectoryRecursively(*DirPath);
+	}
+	
+	UE_LOG(LogSmartUI, Log, TEXT("Directory does not exist: %s"), *DirPath);
+	return true;
+}

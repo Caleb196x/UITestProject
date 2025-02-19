@@ -15,7 +15,10 @@ USmartUICoreWidget::USmartUICoreWidget(const FObjectInitializer& ObjectInitializ
 
 	WidgetTree = CreateDefaultSubobject<UWidgetTree>(TEXT("WidgetTree"));
 	WidgetTree->SetFlags(RF_Transactional);
-	// WidgetName = TEXT("smart_ui"); // todo: set by blueprint
+	
+	UClass* Class = GetClass();
+	if (USmartUIBlueprint* Blueprint = Cast<USmartUIBlueprint>(Class->ClassGeneratedBy))
+		WidgetName = Blueprint->WidgetName;
 	
 	init();
 	
@@ -43,6 +46,12 @@ void USmartUICoreWidget::init()
 		Arguments.Add(TPair<FString, UObject*>(TEXT("CoreWidget"), this));
 		
 		MainReactJsScriptPath = FString::Printf(TEXT("Main/%s/launch"), *WidgetName);
+
+		if (WidgetName.IsEmpty())
+		{
+			// default object use template
+			MainReactJsScriptPath =TEXT("Template/smart_ui/launch");
+		}
 
 		JsEnv = FJsEnvRuntime::GetInstance().GetFreeJsEnv();
 		if (JsEnv)

@@ -20,8 +20,8 @@ class MainComponent extends React.Component {
     SlotOfVerticalBox = {
         LayoutData: {
             Offsets: {
-                Left: 420,
-                Top: 200,
+                Left: 120,
+                Top: 100,
                 Right: 180,
                 Bottom: 100
             }
@@ -31,10 +31,10 @@ class MainComponent extends React.Component {
         return React.createElement(react_umg_1.CanvasPanel, null,
             React.createElement(react_umg_1.VerticalBox, { Slot: this.SlotOfVerticalBox },
                 React.createElement(react_umg_1.HorizontalBox, null,
-                    React.createElement(react_umg_1.TextBlock, { Text: 'Password: ' }),
+                    React.createElement(react_umg_1.TextBlock, { Text: 'Username: ' }),
                     React.createElement(react_umg_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
                 React.createElement(react_umg_1.HorizontalBox, null,
-                    React.createElement(react_umg_1.Button, { OnClicked: () => this.handleLogin() }, 'Reset'))));
+                    React.createElement(react_umg_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))));
     }
 }
 exports.MainComponent = MainComponent;

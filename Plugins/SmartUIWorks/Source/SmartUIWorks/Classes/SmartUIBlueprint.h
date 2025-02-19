@@ -7,15 +7,9 @@ UCLASS()
 class SMARTUIWORKS_API USmartUIBlueprint : public UBlueprint
 {
 	GENERATED_UCLASS_BODY()
-public:
-	
-#if WITH_EDITOR
-	UClass* GetBlueprintClass() const;
-	bool SupportedByDefaultBlueprintFactory() const;
-#endif
 	
 	UPROPERTY(BlueprintType, EditAnywhere, Category = "SmartUIWorks")
-	FString JsScriptHomeDir;
+	FString TsScriptHomeDir;
 
 	UPROPERTY(BlueprintType, EditAnywhere, Category = "SmartUIWorks")
 	FString TemplateFileDir;
@@ -26,15 +20,27 @@ public:
 	UPROPERTY(BlueprintType, BlueprintReadOnly, Category = "SmartUIWorks")
 	FString WidgetName;
 
+	FORCEINLINE FString GetTsScriptHomeDir()
+	{
+		return TsScriptHomeDir;
+	}
+
+	FORCEINLINE FString GetTsScriptMainFileShortPath()
+	{
+		return TsScriptHomeDir / JsScriptMainFileName;
+	}
+
+protected:
+#if WITH_EDITOR
+	virtual bool Rename(const TCHAR* NewName = nullptr, UObject* NewOuter = nullptr, ERenameFlags Flags = REN_None) override;
+
 	void CopyTemplateScriptFileToHomeDir();
 
-	FORCEINLINE FString GetJsScriptHomeDir()
-	{
-		return JsScriptHomeDir;
-	}
+	void RenameScriptDir(const TCHAR* NewName);
 
-	FORCEINLINE FString GetJsScriptMainFileShortPath()
-	{
-		return JsScriptHomeDir / JsScriptMainFileName;
-	}
+	void RegisterBlueprintDeleteHandle();
+	
+	UClass* GetBlueprintClass() const;
+	bool SupportedByDefaultBlueprintFactory() const;
+#endif
 };

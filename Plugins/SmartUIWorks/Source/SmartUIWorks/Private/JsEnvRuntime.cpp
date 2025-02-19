@@ -61,8 +61,9 @@ bool FJsEnvRuntime::StartJavaScript(const TSharedPtr<puerts::FJsEnv>& JsEnv, con
 bool FJsEnvRuntime::CheckScriptLegal(const FString& Script) const
 {
 	FString PluginContentDir = FSmartUIUtils::GetPluginContentDir();
-	FString FullPath = FPaths::Combine(PluginContentDir, TEXT("TypeScript"), Script);
-	if (!FPaths::FileExists(FullPath))
+	FString FullPath = FPaths::Combine(PluginContentDir, TEXT("JavaScript"), Script);
+	
+	if (!FPaths::FileExists(FullPath + TEXT(".js")))
 	{
 		UE_LOG(LogSmartUI, Error, TEXT("can't find script: %s"), *Script);
 		return false;
