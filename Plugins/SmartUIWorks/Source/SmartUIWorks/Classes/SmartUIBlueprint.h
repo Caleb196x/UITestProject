@@ -7,12 +7,6 @@ UCLASS()
 class SMARTUIWORKS_API USmartUIBlueprint : public UBlueprint
 {
 	GENERATED_UCLASS_BODY()
-public:
-	
-#if WITH_EDITOR
-	UClass* GetBlueprintClass() const;
-	bool SupportedByDefaultBlueprintFactory() const;
-#endif
 	
 	UPROPERTY(BlueprintType, EditAnywhere, Category = "SmartUIWorks")
 	FString TsScriptHomeDir;
@@ -37,6 +31,7 @@ public:
 	}
 
 protected:
+#if WITH_EDITOR
 	virtual bool Rename(const TCHAR* NewName = nullptr, UObject* NewOuter = nullptr, ERenameFlags Flags = REN_None) override;
 
 	void CopyTemplateScriptFileToHomeDir();
@@ -44,4 +39,8 @@ protected:
 	void RenameScriptDir(const TCHAR* NewName);
 
 	void RegisterBlueprintDeleteHandle();
+	
+	UClass* GetBlueprintClass() const;
+	bool SupportedByDefaultBlueprintFactory() const;
+#endif
 };

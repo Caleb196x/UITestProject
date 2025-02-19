@@ -13,14 +13,17 @@ USmartUIBlueprint::USmartUIBlueprint(const FObjectInitializer& ObjectInitializer
 	TemplateFileDir = FPaths::Combine(TEXT("Template"), TEXT("smart_ui/"));
 	JsScriptMainFileName = TEXT("main");
 
+#if WITH_EDITOR
 	if (!WidgetName.StartsWith("Default__"))
 	{
 		CopyTemplateScriptFileToHomeDir();
 	}
 
 	RegisterBlueprintDeleteHandle();
+#endif
 }
 
+#if WITH_EDITOR
 void USmartUIBlueprint::CopyTemplateScriptFileToHomeDir()
 {
 	FString PluginContentDir = FSmartUIUtils::GetPluginContentDir();
@@ -136,7 +139,6 @@ void USmartUIBlueprint::RegisterBlueprintDeleteHandle()
 	});
 }
 
-#if WITH_EDITOR
 UClass* USmartUIBlueprint::GetBlueprintClass() const
 {
 	return USmartUIBlueprintGeneratedClass::StaticClass();
@@ -146,4 +148,5 @@ bool USmartUIBlueprint::SupportedByDefaultBlueprintFactory() const
 {
 	return false;
 }
+
 #endif
