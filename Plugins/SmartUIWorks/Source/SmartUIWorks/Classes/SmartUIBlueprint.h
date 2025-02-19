@@ -15,7 +15,7 @@ public:
 #endif
 	
 	UPROPERTY(BlueprintType, EditAnywhere, Category = "SmartUIWorks")
-	FString JsScriptHomeDir;
+	FString TsScriptHomeDir;
 
 	UPROPERTY(BlueprintType, EditAnywhere, Category = "SmartUIWorks")
 	FString TemplateFileDir;
@@ -26,15 +26,22 @@ public:
 	UPROPERTY(BlueprintType, BlueprintReadOnly, Category = "SmartUIWorks")
 	FString WidgetName;
 
+	FORCEINLINE FString GetTsScriptHomeDir()
+	{
+		return TsScriptHomeDir;
+	}
+
+	FORCEINLINE FString GetTsScriptMainFileShortPath()
+	{
+		return TsScriptHomeDir / JsScriptMainFileName;
+	}
+
+protected:
+	virtual bool Rename(const TCHAR* NewName = nullptr, UObject* NewOuter = nullptr, ERenameFlags Flags = REN_None) override;
+
 	void CopyTemplateScriptFileToHomeDir();
 
-	FORCEINLINE FString GetJsScriptHomeDir()
-	{
-		return JsScriptHomeDir;
-	}
+	void RenameScriptDir(const TCHAR* NewName);
 
-	FORCEINLINE FString GetJsScriptMainFileShortPath()
-	{
-		return JsScriptHomeDir / JsScriptMainFileName;
-	}
+	void RegisterBlueprintDeleteHandle();
 };
