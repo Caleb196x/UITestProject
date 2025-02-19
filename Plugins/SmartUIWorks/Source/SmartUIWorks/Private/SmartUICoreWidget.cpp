@@ -15,7 +15,7 @@ USmartUICoreWidget::USmartUICoreWidget(const FObjectInitializer& ObjectInitializ
 
 	WidgetTree = CreateDefaultSubobject<UWidgetTree>(TEXT("WidgetTree"));
 	WidgetTree->SetFlags(RF_Transactional);
-	WidgetName = TEXT("smart_ui"); // todo: set by blueprint
+	// WidgetName = TEXT("smart_ui"); // todo: set by blueprint
 	
 	init();
 	
@@ -52,6 +52,7 @@ void USmartUICoreWidget::init()
 			if (!Result)
 			{
 				UJsBridgeCaller::RemoveBridgeCaller(WidgetName);
+				ReleaseJsEnv();
 				UE_LOG(LogSmartUI, Warning, TEXT("Start ui javascript file %s failed"), *MainReactJsScriptPath);
 			}
 		}
@@ -67,6 +68,7 @@ void USmartUICoreWidget::init()
 	if (!DelegateRunResult)
 	{
 		UJsBridgeCaller::RemoveBridgeCaller(WidgetName);
+		ReleaseJsEnv();
 		UE_LOG(LogSmartUI, Warning, TEXT("Not bind any bridge caller for %s"), *WidgetName);
 	}
 }

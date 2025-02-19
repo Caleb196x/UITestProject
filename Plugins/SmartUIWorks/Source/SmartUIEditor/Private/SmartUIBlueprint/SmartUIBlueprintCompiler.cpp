@@ -2,6 +2,7 @@
 #include "SmartUIBlueprint.h"
 #include "SmartUIBlueprintGeneratedClass.h"
 #include "SmartUICoreWidget.h"
+#include "SmartUIBlueprintCompilerContext.h"
 
 bool FSmartUIBlueprintCompiler::CanCompile(const UBlueprint* Blueprint)
 {
@@ -23,7 +24,9 @@ void FSmartUIBlueprintCompiler::Compile(UBlueprint* Blueprint, const FKismetComp
 	// todo: convert typescript to javascript: run tsc command
 	if (USmartUIBlueprint* SmartUIBlueprint = Cast<USmartUIBlueprint>(Blueprint))
 	{
-		
+		FSmartUIBlueprintCompilerContext Compiler(SmartUIBlueprint, Results, CompilerOptions);
+		Compiler.Compile();
+		check(Compiler.NewClass);
 	}
 }
 
