@@ -11,8 +11,6 @@ USmartUICoreWidget::USmartUICoreWidget(const FObjectInitializer& ObjectInitializ
 	: Super(ObjectInitializer)
 {
 	TRACE_CPUPROFILER_EVENT_SCOPE(USmartUICoreWidgetInit)
-	uint64 StartCycles = FPlatformTime::Cycles64();
-
 	WidgetTree = CreateDefaultSubobject<UWidgetTree>(TEXT("WidgetTree"));
 	WidgetTree->SetFlags(RF_Transactional);
 	
@@ -21,12 +19,6 @@ USmartUICoreWidget::USmartUICoreWidget(const FObjectInitializer& ObjectInitializ
 		WidgetName = Blueprint->WidgetName;
 	
 	init();
-	
-	uint64 EndCycles = FPlatformTime::Cycles64();
-    
-	double ElapsedMs = FPlatformTime::ToMilliseconds64(EndCycles - StartCycles);
-    
-	UE_LOG(LogTemp, Log, TEXT("Execution Time: %.6f ms"), ElapsedMs);
 }
 
 void USmartUICoreWidget::BeginDestroy()

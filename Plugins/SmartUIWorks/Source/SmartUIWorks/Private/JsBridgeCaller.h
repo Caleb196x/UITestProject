@@ -17,6 +17,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="SmartUIWorks | JsBridgetCaller")
 	static bool ExecuteMainCaller(const FString& CallerName, USmartUICoreWidget* CoreWidget);
+	
+	UPROPERTY()
+	FJavaScriptMainCaller MainCaller;
 
 	static bool IsExistBridgeCaller(const FString& CallerName);
 
@@ -25,9 +28,6 @@ public:
 	static void RemoveBridgeCaller(const FString& CallerName);
 
 	static void ClearAllBridgeCaller();
-	
-	UPROPERTY()
-	FJavaScriptMainCaller MainCaller;
 
 private:
 	static TMap<FString, UJsBridgeCaller*> SelfHolder;
