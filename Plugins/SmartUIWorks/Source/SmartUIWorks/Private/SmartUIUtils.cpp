@@ -5,7 +5,7 @@
 #include "GenericPlatform/GenericPlatformFile.h"
 #include "Misc/Paths.h"
 
-bool FSmartUIUtils::CopyDirectoryRecursive(const FString& SrcDir, const FString& DestDir)
+bool FSmartUIUtils::CopyDirectoryRecursive(const FString& SrcDir, const FString& DestDir, const TArray<FString>& SkipExistFiles)
 {
 	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
@@ -26,6 +26,12 @@ bool FSmartUIUtils::CopyDirectoryRecursive(const FString& SrcDir, const FString&
 		FString RelativePath = SourcePath;
 		FPaths::MakePathRelativeTo(RelativePath, *SrcDir);
 		FString DestPath = FPaths::Combine(*DestDir, *RelativePath);
+
+		if (CheckNameExistInArray(SkipExistFiles, RelativePath)
+			&& FPaths::FileExists(DestPath))
+		{
+			continue;
+		}
 
 		// 创建目标子目录
 		FString DestSubDir = FPaths::GetPath(DestPath);
@@ -56,4 +62,23 @@ bool FSmartUIUtils::DeleteDirectoryRecursive(const FString& DirPath)
 	
 	UE_LOG(LogSmartUI, Log, TEXT("Directory does not exist: %s"), *DirPath);
 	return true;
+}
+
+bool FSmartUIUtils::CheckNameExistInArray(const TArray<FString>& SkipExistFiles, const FString& CheckName)
+{
+	for (const FString& FileName : SkipExistFiles)
+	{
+		if (FileName == CheckName)
+		{
+			return true;
+		}
+
+		FString NameWithoutExt = FPaths::GetCleanFilename(CheckName);
+		if (FileName == NameWithoutExt)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

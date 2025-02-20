@@ -42,7 +42,7 @@ void USmartUIBlueprint::CopyTemplateScriptFileToHomeDir()
 		IFileManager::Get().MakeDirectory(*TsScriptHomeDirFullPath);
 	}
 
-	if (!FSmartUIUtils::CopyDirectoryRecursive(TemplateFileDirFullPath, TsScriptHomeDirFullPath))
+	if (!FSmartUIUtils::CopyDirectoryRecursive(TemplateFileDirFullPath, TsScriptHomeDirFullPath, {"components/main_component.tsx"}))
 	{
 		UE_LOG(LogSmartUI, Error, TEXT("Copy template script files %s to %s failed."), *TemplateFileDirFullPath, *TsScriptHomeDirFullPath);
 	}

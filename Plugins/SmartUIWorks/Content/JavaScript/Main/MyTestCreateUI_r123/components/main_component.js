@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainComponent = void 0;
 const React = require("react");
 const react_umg_1 = require("react-umg");
+const status_bar_compoennt_1 = require("./status_bar_compoennt");
 class MainComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -34,7 +35,8 @@ class MainComponent extends React.Component {
                     React.createElement(react_umg_1.TextBlock, { Text: 'Username: ' }),
                     React.createElement(react_umg_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
                 React.createElement(react_umg_1.HorizontalBox, null,
-                    React.createElement(react_umg_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))));
+                    React.createElement(react_umg_1.Button, { OnClicked: () => this.handleLogin() }, 'Login')),
+                React.createElement(status_bar_compoennt_1.StatusBar, { name: 'Healthy: ', initialPercent: 60 })));
     }
 }
 exports.MainComponent = MainComponent;
