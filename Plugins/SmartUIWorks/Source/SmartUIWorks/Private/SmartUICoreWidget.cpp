@@ -159,5 +159,5 @@ void USmartUICoreWidget::RestartJsScript()
 	Arguments.Add(TPair<FString, UObject*>(TEXT("BridgeCaller"), Caller));
 	Arguments.Add(TPair<FString, UObject*>(TEXT("CoreWidget"), this));
 	
-	FJsEnvRuntime::GetInstance().RestartJsScripts(MainReactJsScriptPath, Arguments);
+	FJsEnvRuntime::GetInstance().RestartJsScripts(ScriptHomeDir, MainReactJsScriptPath, Arguments);
 }

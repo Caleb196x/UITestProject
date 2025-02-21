@@ -23,4 +23,6 @@ public:
 	static bool DeleteDirectoryRecursive(const FString& DirPath);
 
 	static bool CheckNameExistInArray(const TArray<FString>& SkipExistFiles, const FString& CheckName);
+
+	static bool ReadFileContent(const FString& FilePath, FString& OutContent);
 };
