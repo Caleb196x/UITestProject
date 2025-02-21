@@ -23,6 +23,10 @@ public:
 
 	UPROPERTY()
 	FString WidgetName;
+
+	// test
+	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
+	void RestartJsScript();
 	
 	virtual void BeginDestroy() override;
 private:
@@ -30,6 +34,8 @@ private:
 	
 	// js程序入口
 	FString MainReactJsScriptPath;
+
+	FString ScriptHomeDir;
 
 	TObjectPtr<UPanelSlot> RootSlot;
 

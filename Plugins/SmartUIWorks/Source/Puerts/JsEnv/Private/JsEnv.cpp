@@ -95,4 +95,9 @@ void FJsEnv::Release()
 {
     GameScript->Release();
 }
+
+void FJsEnv::ForceReloadJsFile(const FString& ModuleName)
+{
+    GameScript->ForceReloadJsFile(ModuleName);
+}
 }    // namespace PUERTS_NAMESPACE

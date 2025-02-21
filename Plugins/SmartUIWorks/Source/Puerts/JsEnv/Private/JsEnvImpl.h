@@ -137,6 +137,8 @@ public:
 
     virtual void Release() override { Started = false; }
 
+    virtual void ForceReloadJsFile(const FString& ModuleName);
+
 public:
     bool IsTypeScriptGeneratedClass(UClass* Class);
 
@@ -552,6 +554,8 @@ private:
     v8::Global<v8::Context> DefaultContext;
 
     v8::Global<v8::Function> Require;
+
+    v8::Global<v8::Function> ForceReloadJs;
 
     v8::Global<v8::Function> GetESMMain;
 

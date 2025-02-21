@@ -21,6 +21,12 @@ public:
 
 	void ReleaseJsEnv(TSharedPtr<puerts::FJsEnv> JsEnv);
 
+	/**
+	 * reload all javascript files under ScriptHomeDir
+	 * @param ScriptHomeDir Relative path to the plugin content directory
+	 */
+	void RestartJsScripts(const FString& ScriptHomeDir, const TArray<TPair<FString, UObject*>>& Arguments);
+
 private:
 	TMap<TSharedPtr<puerts::FJsEnv>, int32> JsRuntimeEnvPool;
 };

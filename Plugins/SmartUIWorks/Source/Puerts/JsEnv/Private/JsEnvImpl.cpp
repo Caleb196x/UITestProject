@@ -624,6 +624,8 @@ FJsEnvImpl::FJsEnvImpl(std::shared_ptr<IJSModuleLoader> InModuleLoader, std::sha
 
     Require.Reset(Isolate, PuertsObj->Get(Context, FV8Utils::ToV8String(Isolate, "__require")).ToLocalChecked().As<v8::Function>());
 
+    ForceReloadJs.Reset(Isolate, PuertsObj->Get(Context, FV8Utils::ToV8String(Isolate, "forceReload")).ToLocalChecked().As<v8::Function>());
+
     GetESMMain.Reset(
         Isolate, PuertsObj->Get(Context, FV8Utils::ToV8String(Isolate, "getESMMain")).ToLocalChecked().As<v8::Function>());
 
@@ -723,6 +725,7 @@ FJsEnvImpl::~FJsEnvImpl()
     GetESMMain.Reset();
     ReloadJs.Reset();
     JsPromiseRejectCallback.Reset();
+    ForceReloadJs.Reset();
 
     FUETicker::GetCoreTicker().RemoveTicker(DelegateProxiesCheckerHandler);
 
@@ -1539,6 +1542,40 @@ void FJsEnvImpl::ReloadSource(const FString& Path, const PString& JsSource)
 void FJsEnvImpl::OnSourceLoaded(std::function<void(const FString&)> Callback)
 {
     OnSourceLoadedCallback = Callback;
+}
+
+void FJsEnvImpl::ForceReloadJsFile(const FString& ModuleName)
+{
+#ifdef SINGLE_THREAD_VERIFY
+    ensureMsgf(BoundThreadId == FPlatformTLS::GetCurrentThreadId(), TEXT("Access by illegal thread!"));
+#endif
+    auto Isolate = MainIsolate;
+    v8::Isolate::Scope IsolateScope(Isolate);
+    v8::HandleScope HandleScope(Isolate);
+    auto Context = DefaultContext.Get(Isolate);
+    v8::Context::Scope ContextScope(Context);
+    auto ReloadJs = ForceReloadJs.Get(Isolate);
+
+    FString OutPath, OutDebugPath;
+
+    if (ModuleLoader->Search(TEXT(""), ModuleName, OutPath, OutDebugPath))
+    {
+        FString FullPath = FPaths::ConvertRelativePathToFull(OutPath);
+        Logger->Info(FString::Printf(TEXT("force reload js module [%s]"), *FullPath));
+        v8::TryCatch TryCatch(Isolate);
+        v8::Handle<v8::Value> Args[] = {FV8Utils::ToV8String(Isolate, OutPath)};
+
+        (void) (ReloadJs->Call(Context, v8::Undefined(Isolate), 1, Args));
+
+        if (TryCatch.HasCaught())
+        {
+            Logger->Error(FString::Printf(TEXT("reload module exception %s"), *FV8Utils::TryCatchToString(Isolate, &TryCatch)));
+        }
+    }
+    else
+    {
+        Logger->Warn(FString::Printf(TEXT("not find js module [%s]"), *ModuleName));
+    }
 }
 
 #if !defined(ENGINE_INDEPENDENT_JSENV)
