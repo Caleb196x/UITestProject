@@ -16,8 +16,19 @@ USmartUICoreWidget::USmartUICoreWidget(const FObjectInitializer& ObjectInitializ
 	
 	UClass* Class = GetClass();
 	if (USmartUIBlueprint* Blueprint = Cast<USmartUIBlueprint>(Class->ClassGeneratedBy))
+	{
 		WidgetName = Blueprint->WidgetName;
+		ScriptHomeDir = Blueprint->TsScriptHomeDir;
+	}
 	
+	MainReactJsScriptPath = FString::Printf(TEXT("Main/%s/launch"), *WidgetName);
+
+	if (WidgetName.IsEmpty())
+	{
+		// default object use template
+		MainReactJsScriptPath =TEXT("Template/smart_ui/launch");
+	}
+
 	init();
 }
 
@@ -30,20 +41,12 @@ void USmartUICoreWidget::BeginDestroy()
 
 void USmartUICoreWidget::init()
 {
-	if (!UJsBridgeCaller::IsExistBridgeCaller(WidgetName))
+	if (!WidgetName.IsEmpty() && !UJsBridgeCaller::IsExistBridgeCaller(WidgetName))
 	{
 		TArray<TPair<FString, UObject*>> Arguments;
 		UJsBridgeCaller* Caller = UJsBridgeCaller::AddNewBridgeCaller(WidgetName);
 		Arguments.Add(TPair<FString, UObject*>(TEXT("BridgeCaller"), Caller));
 		Arguments.Add(TPair<FString, UObject*>(TEXT("CoreWidget"), this));
-		
-		MainReactJsScriptPath = FString::Printf(TEXT("Main/%s/launch"), *WidgetName);
-
-		if (WidgetName.IsEmpty())
-		{
-			// default object use template
-			MainReactJsScriptPath =TEXT("Template/smart_ui/launch");
-		}
 
 		JsEnv = FJsEnvRuntime::GetInstance().GetFreeJsEnv();
 		if (JsEnv)
@@ -149,3 +152,12 @@ FString USmartUICoreWidget::GetWidgetName()
 	return WidgetName;
 }
 
+void USmartUICoreWidget::RestartJsScript()
+{
+	TArray<TPair<FString, UObject*>> Arguments;
+	UJsBridgeCaller* Caller = UJsBridgeCaller::AddNewBridgeCaller(WidgetName);
+	Arguments.Add(TPair<FString, UObject*>(TEXT("BridgeCaller"), Caller));
+	Arguments.Add(TPair<FString, UObject*>(TEXT("CoreWidget"), this));
+	
+	FJsEnvRuntime::GetInstance().RestartJsScripts(ScriptHomeDir, MainReactJsScriptPath, Arguments);
+}

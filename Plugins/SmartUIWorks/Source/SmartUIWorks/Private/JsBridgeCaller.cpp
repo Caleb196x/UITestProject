@@ -31,7 +31,7 @@ UJsBridgeCaller* UJsBridgeCaller::AddNewBridgeCaller(const FString& CallerName)
 	if (!SelfHolder.Contains(CallerName))
 	{
 		UJsBridgeCaller* Caller = NewObject<UJsBridgeCaller>();
-		Caller->SetFlags(RF_Transient);
+		Caller->AddToRoot();
 		SelfHolder.Add(CallerName, Caller);
 		return Caller;
 	}
@@ -45,11 +45,17 @@ void UJsBridgeCaller::RemoveBridgeCaller(const FString& CallerName)
 	{
 		UJsBridgeCaller* RemoveCaller = nullptr;
 		SelfHolder.RemoveAndCopyValue(CallerName, RemoveCaller);
+		RemoveCaller->RemoveFromRoot();
 	}
 	
 }
 
 void UJsBridgeCaller::ClearAllBridgeCaller()
 {
+	for (auto Self : SelfHolder)
+	{
+		Self.Value->RemoveFromRoot();
+	}
+	
 	SelfHolder.Empty();
 }

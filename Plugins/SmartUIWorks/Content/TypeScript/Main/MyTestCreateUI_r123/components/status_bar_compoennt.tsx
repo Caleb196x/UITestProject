@@ -50,7 +50,7 @@ export class StatusBar extends React.Component<Props, State> {
                 <ProgressBar Percent={this.state.percent} Slot={SlotOfProgressBar} FillColorAndOpacity={this.color} CategoryName={`${this.props.name}`}/>
                 <Button OnClicked={this.onIncrement} >+</Button>
                 <Button OnClicked={this.onDecrement} >-</Button>
-                <button onClick={this.onNativeClick}>原生按钮</button>
+                <TextBlock Text={'热重载测试_叽叽咋咋'}/>
             </HorizontalBox>
         );
     }

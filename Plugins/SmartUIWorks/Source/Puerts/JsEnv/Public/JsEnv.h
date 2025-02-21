@@ -55,6 +55,8 @@ public:
 
     virtual void Release() = 0;
 
+    virtual void ForceReloadJsFile(const FString& ModuleName) = 0;
+
     virtual ~IJsEnv()
     {
     }
@@ -99,6 +101,8 @@ public:
     void InitExtensionMethodsMap();
 
     void Release();
+
+    void ForceReloadJsFile(const FString& ModuleName);
 
 private:
     std::unique_ptr<IJsEnv> GameScript;

@@ -82,3 +82,14 @@ bool FSmartUIUtils::CheckNameExistInArray(const TArray<FString>& SkipExistFiles,
 
 	return false;
 }
+
+bool FSmartUIUtils::ReadFileContent(const FString& FilePath, FString& OutContent)
+{
+	if (FPaths::FileExists(FilePath))
+	{
+		return FFileHelper::LoadFileToString(OutContent, *FilePath);
+	}
+    
+	UE_LOG(LogSmartUI, Error, TEXT("Failed to read file: %s (file not found)"), *FilePath);
+	return false;
+}

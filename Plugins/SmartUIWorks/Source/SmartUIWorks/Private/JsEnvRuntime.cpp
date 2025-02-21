@@ -85,3 +85,62 @@ void FJsEnvRuntime::ReleaseJsEnv(TSharedPtr<puerts::FJsEnv> JsEnv)
 		}
 	}
 }
+
+void FJsEnvRuntime::RestartJsScripts(const FString& ScriptHomeDir, const FString& MainJsScript,  const TArray<TPair<FString, UObject*>>& Arguments)
+{
+	FString PluginContentDir = FSmartUIUtils::GetPluginContentDir();
+	FString JSContentDir = FPaths::Combine(PluginContentDir, TEXT("JavaScript"));
+	FString JsHomeDir = FPaths::Combine(PluginContentDir, TEXT("JavaScript"),ScriptHomeDir);
+
+	if (ScriptHomeDir.IsEmpty() || !FPaths::DirectoryExists(JsHomeDir))
+	{
+		UE_LOG(LogSmartUI, Warning, TEXT("Script home directory not exists."))
+		return;
+	}
+
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	TArray<FString> FileNames;
+	PlatformFile.FindFilesRecursively(FileNames, *JsHomeDir, TEXT(""));
+
+	TMap<FString, FString> ModuleNames;
+	for (FString& SourcePath : FileNames)
+	{
+		if (SourcePath.EndsWith(TEXT(".js.map")))
+		{
+			continue;
+		}
+		
+		FString RelativePath = SourcePath;
+		FPaths::MakePathRelativeTo(RelativePath, *JSContentDir);
+		RelativePath.RemoveFromStart(TEXT("JavaScript/"));
+
+		int32 DotIndex = RelativePath.Find(TEXT("."), ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+		if (DotIndex != INDEX_NONE)
+		{
+			RelativePath.RemoveAt(DotIndex, RelativePath.Len() - DotIndex);
+		}
+
+		ModuleNames.Add(RelativePath, SourcePath);
+	}
+
+	for (const auto& ModulePair : ModuleNames)
+	{
+		FString FileContent;
+		if (FSmartUIUtils::ReadFileContent(ModulePair.Value, FileContent))
+		{
+			for (auto& Pair : JsRuntimeEnvPool)
+			{
+				auto Env = Pair.Key;
+				Env->ReloadModule(FName(*ModulePair.Key), FileContent);
+			}
+		}
+	}
+
+	for (auto& Pair : JsRuntimeEnvPool)
+	{
+		auto Env = Pair.Key;
+		Env->Release();
+		Env->ForceReloadJsFile(MainJsScript);
+		Env->Start(MainJsScript, Arguments);
+	}
+}
