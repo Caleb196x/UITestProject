@@ -1,5 +1,7 @@
 ﻿#include "JsBridgeCaller.h"
 
+#include "LogSmartUI.h"
+
 TMap<FString, UJsBridgeCaller*> UJsBridgeCaller::SelfHolder = {};
 
 void UJsBridgeCaller::RegisterAllocatedBrideCaller(FString CallerName, UJsBridgeCaller* Caller)
@@ -26,13 +28,36 @@ bool UJsBridgeCaller::IsExistBridgeCaller(const FString& CallerName)
 	return SelfHolder.Contains(CallerName);
 }
 
+void PrintSelfHolder(const TMap<FString, UJsBridgeCaller*>& SelfHolder)
+{
+	UE_LOG(LogSmartUI, Log, TEXT("===== TMap Contents map address %p ====="), &SelfHolder);
+    
+	// 使用C++11范围for循环遍历
+	for (const auto& KeyValuePair : SelfHolder)
+	{
+		// 将指针地址转换为十六进制字符串
+		const uint64 PointerAddress = reinterpret_cast<uint64>(KeyValuePair.Value);
+		const FString PointerString = FString::Printf(TEXT("0x%016llX"), PointerAddress);
+
+		UE_LOG(LogSmartUI, Log, TEXT("Key: %-20s | Value Pointer: %s"), 
+			*KeyValuePair.Key, 
+			*PointerString);
+	}
+
+	UE_LOG(LogSmartUI, Log, TEXT("===== Total Entries: %d ====="), SelfHolder.Num());
+}
+
 UJsBridgeCaller* UJsBridgeCaller::AddNewBridgeCaller(const FString& CallerName)
 {
+	UE_LOG(LogSmartUI, Warning, TEXT("Before add "))
+	PrintSelfHolder(SelfHolder);
 	if (!SelfHolder.Contains(CallerName))
 	{
 		UJsBridgeCaller* Caller = NewObject<UJsBridgeCaller>();
 		Caller->AddToRoot();
 		SelfHolder.Add(CallerName, Caller);
+		UE_LOG(LogSmartUI, Warning, TEXT("After add "))
+		PrintSelfHolder(SelfHolder);
 		return Caller;
 	}
 
