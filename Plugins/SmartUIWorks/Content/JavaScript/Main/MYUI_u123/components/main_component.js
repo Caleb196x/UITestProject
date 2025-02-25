@@ -32,11 +32,14 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainComponent = void 0;
 const React = __importStar(require("react"));
 const react_umg_1 = require("react-umg");
-const status_bar_compoennt_1 = require("./status_bar_compoennt");
+const style_module_css_1 = __importDefault(require("./style.module.css"));
 class MainComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -69,7 +72,7 @@ class MainComponent extends React.Component {
                     React.createElement(react_umg_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
                 React.createElement(react_umg_1.HorizontalBox, null,
                     React.createElement(react_umg_1.Button, { OnClicked: () => this.handleLogin() }, 'Login')),
-                React.createElement(status_bar_compoennt_1.StatusBar, { name: 'Healthy: ', initialPercent: 60 })));
+                React.createElement("div", { className: style_module_css_1.default.container })));
     }
 }
 exports.MainComponent = MainComponent;
