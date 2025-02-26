@@ -9,20 +9,17 @@ class SMARTUIWORKS_API USmartUICoreWidget : public UUserWidget
 {
 	GENERATED_UCLASS_BODY()
 public:
-	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
+	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks | CoreWidget")
 	UPanelSlot* AddChild(UWidget* Content);
 
-	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
+	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks | CoreWidget")
 	bool RemoveChild(UWidget* Content);
 
-	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
+	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks | CoreWidget")
 	void ReleaseJsEnv();
 
-	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
+	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks | CoreWidget")
 	FString GetWidgetName();
-
-	UPROPERTY()
-	FString WidgetName;
 
 	// test
 	UFUNCTION(BlueprintCallable, Category = "SmartUIWorks")
@@ -40,4 +37,6 @@ private:
 	TObjectPtr<UPanelSlot> RootSlot;
 
 	TSharedPtr<puerts::FJsEnv> JsEnv;
+
+	FString WidgetName;
 };
