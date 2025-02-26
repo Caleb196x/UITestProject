@@ -17,7 +17,7 @@ class SMARTUIWORKS_API USmartUIBlueprint : public UBlueprint
 	UPROPERTY(BlueprintType, EditAnywhere, Category = "SmartUIWorks")
 	FString JsScriptMainFileName;
 
-	UPROPERTY(BlueprintType, BlueprintReadOnly, Category = "SmartUIWorks")
+	UPROPERTY(BlueprintType, EditAnywhere, BlueprintReadWrite, Category = "SmartUIWorks")
 	FString WidgetName;
 
 	FORCEINLINE FString GetTsScriptHomeDir()
