@@ -154,6 +154,7 @@ FString USmartUICoreWidget::GetWidgetName()
 
 void USmartUICoreWidget::RestartJsScript()
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(RestartJsScript)
 	TArray<TPair<FString, UObject*>> Arguments;
 	UJsBridgeCaller* Caller = UJsBridgeCaller::AddNewBridgeCaller(WidgetName);
 	Arguments.Add(TPair<FString, UObject*>(TEXT("BridgeCaller"), Caller));
