@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Props, CanvasPanel, VerticalBox, HorizontalBox, 
     TextBlock, EditableText, Button, CanvasPanelSlot } 
-from 'react-umg';
+from 'reactUMG';
 
 interface State {
     username: string;

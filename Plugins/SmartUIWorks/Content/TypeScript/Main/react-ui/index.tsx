@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { useState } from 'react';
 import { VerticalBox, CanvasPanel, ReactUMG, CanvasPanelSlot, Button, HorizontalBox,/*, TextureImage*/ 
 TextBlock,
 EditableText,
-Root} from 'react-umg';
+Root} from 'reactUMG';
 import {StatusBar} from './ui-components'
 // import './Login.css'; // 你可以创建一个CSS文件来美化界面
 interface Props {

@@ -1,42 +1,9 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Load = Load;
 exports.HelloLoad = HelloLoad;
-const React = __importStar(require("react"));
-const react_umg_1 = require("react-umg");
+const React = require("react");
+const reactUMG_1 = require("reactUMG");
 const ui_components_1 = require("./ui-components");
 let SlotOfVerticalBox = {
     LayoutData: {
@@ -57,10 +24,10 @@ class Hello extends React.Component {
         };
     }
     render() {
-        return (React.createElement(react_umg_1.CanvasPanel, null,
-            React.createElement(react_umg_1.VerticalBox, { Slot: SlotOfVerticalBox },
-                React.createElement(react_umg_1.HorizontalBox, null,
-                    React.createElement(react_umg_1.Button, { OnHovered: () => this.setState({ buttonTextureIndex: 1 }), OnUnhovered: () => this.setState({ buttonTextureIndex: 0 }) }, this.state.buttonTextureIndex == 0 ? 'normal' : 'hovered')),
+        return (React.createElement(reactUMG_1.CanvasPanel, null,
+            React.createElement(reactUMG_1.VerticalBox, { Slot: SlotOfVerticalBox },
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement(reactUMG_1.Button, { OnHovered: () => this.setState({ buttonTextureIndex: 1 }), OnUnhovered: () => this.setState({ buttonTextureIndex: 0 }) }, this.state.buttonTextureIndex == 0 ? 'normal' : 'hovered')),
                 this.state.names.map((name, idx) => React.createElement(ui_components_1.StatusBar, { name: name, key: idx })))));
     }
 }
@@ -83,10 +50,10 @@ class Hello2 extends React.Component {
         };
     }
     render() {
-        return (React.createElement(react_umg_1.CanvasPanel, null,
-            React.createElement(react_umg_1.VerticalBox, { Slot: SlotOfVerticalBox2 },
-                React.createElement(react_umg_1.HorizontalBox, null,
-                    React.createElement(react_umg_1.Button, { OnHovered: () => this.setState({ buttonTextureIndex: 1 }), OnUnhovered: () => this.setState({ buttonTextureIndex: 0 }) }, this.state.buttonTextureIndex == 0 ? 'normal' : 'hovered')),
+        return (React.createElement(reactUMG_1.CanvasPanel, null,
+            React.createElement(reactUMG_1.VerticalBox, { Slot: SlotOfVerticalBox2 },
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement(reactUMG_1.Button, { OnHovered: () => this.setState({ buttonTextureIndex: 1 }), OnUnhovered: () => this.setState({ buttonTextureIndex: 0 }) }, this.state.buttonTextureIndex == 0 ? 'normal' : 'hovered')),
                 this.state.names.map((name, idx) => React.createElement(ui_components_1.StatusBar, { name: name, key: idx })))));
     }
 }
@@ -115,13 +82,13 @@ class Login extends React.Component {
         console.log(`Welcome, ${this.state.username}!`);
     };
     render() {
-        return React.createElement(react_umg_1.CanvasPanel, null,
-            React.createElement(react_umg_1.VerticalBox, { Slot: SlotOfVerticalBoxOfLogin },
-                React.createElement(react_umg_1.HorizontalBox, null,
-                    React.createElement(react_umg_1.TextBlock, { Text: 'Username: ' }),
-                    React.createElement(react_umg_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
-                React.createElement(react_umg_1.HorizontalBox, null,
-                    React.createElement(react_umg_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))));
+        return React.createElement(reactUMG_1.CanvasPanel, null,
+            React.createElement(reactUMG_1.VerticalBox, { Slot: SlotOfVerticalBoxOfLogin },
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement(reactUMG_1.TextBlock, { Text: 'Username: ' }),
+                    React.createElement(reactUMG_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))));
     }
 }
 let SlotOfVerticalBoxOfLogin2 = {
@@ -149,23 +116,23 @@ class Login2 extends React.Component {
         console.log(`Welcome, ${this.state.username}!`);
     };
     render() {
-        return React.createElement(react_umg_1.CanvasPanel, null,
-            React.createElement(react_umg_1.VerticalBox, { Slot: SlotOfVerticalBoxOfLogin2 },
-                React.createElement(react_umg_1.HorizontalBox, null,
-                    React.createElement(react_umg_1.TextBlock, { Text: 'Username: ' }),
-                    React.createElement(react_umg_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
-                React.createElement(react_umg_1.HorizontalBox, null,
-                    React.createElement(react_umg_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))));
+        return React.createElement(reactUMG_1.CanvasPanel, null,
+            React.createElement(reactUMG_1.VerticalBox, { Slot: SlotOfVerticalBoxOfLogin2 },
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement(reactUMG_1.TextBlock, { Text: 'Username: ' }),
+                    React.createElement(reactUMG_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))));
     }
 }
 function Load() {
-    return react_umg_1.ReactUMG.render(React.createElement(react_umg_1.CanvasPanel, null,
+    return reactUMG_1.ReactUMG.render(React.createElement(reactUMG_1.CanvasPanel, null,
         React.createElement(Hello, { names: ["Health:", "Energy:"] }),
         React.createElement(Login, { names: ["login"] })));
 }
 ;
 function HelloLoad() {
-    return react_umg_1.ReactUMG.render(React.createElement(react_umg_1.CanvasPanel, null,
+    return reactUMG_1.ReactUMG.render(React.createElement(reactUMG_1.CanvasPanel, null,
         React.createElement(Hello2, { names: ["ABC:", "EFG:"] }),
         React.createElement(Login2, { names: ["login"] })));
 }
