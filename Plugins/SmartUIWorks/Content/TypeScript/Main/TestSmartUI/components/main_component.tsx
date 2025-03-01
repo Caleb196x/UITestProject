@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Props, CanvasPanel, VerticalBox, HorizontalBox, 
     TextBlock, EditableText, Button, CanvasPanelSlot } 
-from 'react-umg';
+from 'reactUMG';
+import { StatusBar } from './status_bar_compoennt';
 
 interface State {
     username: string;
@@ -48,6 +49,7 @@ export class MainComponent extends React.Component<Props, State> {
                     {'Login'}
                 </Button>
                 </HorizontalBox>
+                <StatusBar name={'Healthy: '} initialPercent={60}></StatusBar>
             </VerticalBox>
         </CanvasPanel>
     }
