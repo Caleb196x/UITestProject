@@ -44,12 +44,15 @@ export class MainComponent extends React.Component<Props, State> {
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
                 </HorizontalBox>
                 <HorizontalBox>
-                <Button OnClicked={() => this.handleLogin()}>
-                    {'Login'}
-                </Button>
+                    <Button OnClicked={() => this.handleLogin()}>
+                        {'Login'}
+                    </Button>
                 </HorizontalBox>
             </VerticalBox>
-            <div style={{ 
+            <select onChange={(e) => this.handleLogin()} disabled={true}>
+                <option>test1</option>
+            </select>
+            {/* <div style={{ 
                 width: 100, 
                 height: "200px", 
                 backgroundColor: "lightblue",
@@ -57,7 +60,7 @@ export class MainComponent extends React.Component<Props, State> {
                 }}>
                     内联样式示例
             </div>
-            <view className='test.container'></view>
+            <view className='test.container'></view> */}
         </CanvasPanel>
     }
 }

@@ -67,6 +67,7 @@ class UEWidget {
         //console.log(type + ' inited')
     }
     bind(name, callback) {
+        console.log("bind: ", name, callback);
         let nativePtr = this.nativePtr;
         let prop = nativePtr[name];
         if (typeof prop.Add === 'function') {
@@ -86,6 +87,7 @@ class UEWidget {
         }
     }
     update(oldProps, newProps) {
+        console.log("update: ", oldProps, newProps);
         let myProps = {};
         let propChange = false;
         for (var key in newProps) {
@@ -115,6 +117,7 @@ class UEWidget {
         }
     }
     unbind(name) {
+        console.log("unbind: ", name);
         let remover = this.callbackRemovers[name];
         this.callbackRemovers[name] = undefined;
         if (remover) {
@@ -122,17 +125,20 @@ class UEWidget {
         }
     }
     unbindAll() {
+        console.log("unbindAll: ", this.callbackRemovers);
         for (var key in this.callbackRemovers) {
             this.callbackRemovers[key]();
         }
         this.callbackRemovers = {};
     }
     appendChild(child) {
+        console.log("appendChild: ", child.type);
         let nativeSlot = this.nativePtr.AddChild(child.nativePtr);
         //console.log("appendChild", (await this.nativePtr).toJSON(), (await child.nativePtr).toJSON());
         child.nativeSlot = nativeSlot;
     }
     removeChild(child) {
+        console.log("removeChild: ", child.type);
         child.unbindAll();
         this.nativePtr.RemoveChild(child.nativePtr);
         //console.log("removeChild", (await this.nativePtr).toJSON(), (await child.nativePtr).toJSON())

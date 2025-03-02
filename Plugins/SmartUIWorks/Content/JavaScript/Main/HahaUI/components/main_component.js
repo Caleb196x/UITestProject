@@ -34,14 +34,7 @@ class MainComponent extends React.Component {
                     React.createElement(reactUMG_1.TextBlock, { Text: 'Username: ' }),
                     React.createElement(reactUMG_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))),
-            React.createElement("div", { style: {
-                    width: 100,
-                    height: "200px",
-                    backgroundColor: "lightblue",
-                    border: "2px solid darkblue"
-                } }, "\u5185\u8054\u6837\u5F0F\u793A\u4F8B"),
-            React.createElement("view", { className: 'test.container' }));
+                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))));
     }
 }
 exports.MainComponent = MainComponent;
