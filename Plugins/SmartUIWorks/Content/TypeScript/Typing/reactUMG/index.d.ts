@@ -324,6 +324,7 @@ declare module "reactUMG" {
         Font?: RecursivePartial<UE.SlateFontInfo>;
         ForegroundColor?: RecursivePartial<UE.SlateColor>;
         bIsFocusable?: boolean;
+        bIsEnable?: boolean;
         OnSelectionChanged?: (SelectedItem: string, SelectionType: UE.ESelectInfo) => void;
         OnOpening?: () => void;
     }

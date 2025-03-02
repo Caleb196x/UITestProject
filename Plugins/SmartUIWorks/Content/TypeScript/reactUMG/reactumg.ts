@@ -2,6 +2,17 @@ import * as Reconciler from 'react-reconciler'
 import * as puerts from 'puerts'
 import * as UE from 'ue'
 
+/**
+ * Compares two values for deep equality.
+ *
+ * This function checks if two values are strictly equal, and if they are objects,
+ * it recursively checks their properties for equality, excluding the 'children' 
+ * and 'Slot' properties.
+ *
+ * @param x - The first value to compare.
+ * @param y - The second value to compare.
+ * @returns True if the values are deeply equal, false otherwise.
+ */
 function deepEquals(x: any, y: any) {
     if ( x === y ) return true;
 
@@ -67,6 +78,7 @@ class UEWidget {
     }
   
     bind(name: string, callback: Function) {
+        console.log("bind: ", name, callback)
         let nativePtr = this.nativePtr
         let prop = nativePtr[name];
         if (typeof prop.Add === 'function') {
@@ -85,6 +97,8 @@ class UEWidget {
     }
   
     update(oldProps: any, newProps: any) {
+        console.log("update: ", oldProps, newProps)
+
         let myProps = {};
         let propChange = false;
         for(var key in newProps) {
@@ -113,6 +127,7 @@ class UEWidget {
     }
   
     unbind(name: string) {
+        console.log("unbind: ", name)
         let remover = this.callbackRemovers[name];
         this.callbackRemovers[name] = undefined;
         if (remover) {
@@ -121,6 +136,7 @@ class UEWidget {
     }
     
     unbindAll() {
+        console.log("unbindAll: ", this.callbackRemovers)
         for(var key in this.callbackRemovers) {
             this.callbackRemovers[key]();
         }
@@ -128,12 +144,14 @@ class UEWidget {
     }
   
     appendChild(child: UEWidget) {
+        console.log("appendChild: ", child.type)
         let nativeSlot = (this.nativePtr as UE.PanelWidget).AddChild(child.nativePtr);
         //console.log("appendChild", (await this.nativePtr).toJSON(), (await child.nativePtr).toJSON());
         child.nativeSlot = nativeSlot;
     }
     
     removeChild(child: UEWidget) {
+        console.log("removeChild: ", child.type)
         child.unbindAll();
         (this.nativePtr as UE.PanelWidget).RemoveChild(child.nativePtr);
         //console.log("removeChild", (await this.nativePtr).toJSON(), (await child.nativePtr).toJSON())
@@ -219,7 +237,7 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
     resetAfterCommit (container: UEWidgetRoot) {
         // container.addToViewport(0);
     },
-    resetTextContent () {
+    resetTextContent (instance: UEWidget) {
         console.error('resetTextContent not implemented!');
     },
     shouldSetTextContent (type, props) {
@@ -252,11 +270,12 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
         console.error('removeChildFromContainer');
         container.removeChild(child);
     },
+
     removeChild(parent: UEWidget, child: UEWidget) {
         parent.removeChild(child);
     },
+
     clearContainer(container: UEWidgetRoot) {
-        console.error("clear Container")
     },
     getCurrentEventPriority(){
         return 0;
