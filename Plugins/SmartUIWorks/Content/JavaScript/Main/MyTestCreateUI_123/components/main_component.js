@@ -8,7 +8,7 @@ class MainComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: "test.name",
+            username: 'test.name',
             password: '',
         };
     }
@@ -18,6 +18,7 @@ class MainComponent extends React.Component {
         console.log('Password:', this.state.password);
         console.log(`Welcome, ${this.state.username}!`);
         this.textblock_ref.current.nativePtr.SetText('你好啊, ' + this.state.username);
+        // this.css.color = '#0f13';
     };
     SlotOfVerticalBox = {
         LayoutData: {
@@ -30,6 +31,7 @@ class MainComponent extends React.Component {
         }
     };
     textblock_ref = React.createRef();
+    css;
     buttonStyle = {
         backgroundColor: 'green',
         color: 'white',
@@ -42,11 +44,17 @@ class MainComponent extends React.Component {
         return React.createElement(reactUMG_1.CanvasPanel, null,
             React.createElement(reactUMG_1.VerticalBox, { Slot: this.SlotOfVerticalBox },
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement(reactUMG_1.TextBlock, { Text: 'Username: ' }),
+                    React.createElement(reactUMG_1.TextBlock, { ref: this.textblock_ref, Text: 'Username: ' }),
                     React.createElement(reactUMG_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login')),
-                React.createElement(status_bar_compoennt_1.StatusBar, { name: 'Healthy: ', initialPercent: 60 })));
+                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'),
+                    React.createElement(status_bar_compoennt_1.StatusBar, { name: 'Healthy: ', initialPercent: 60 }),
+                    React.createElement("button", { style: this.buttonStyle }, "\u6D4B\u8BD5\u539F\u751F\u6309\u94AE")),
+                React.createElement("select", { defaultValue: "C", onChange: (e) => { console.log("onChange: ", e.target.value); } },
+                    React.createElement("option", { value: "A" }, "a"),
+                    React.createElement("option", { value: "B" }, "b"),
+                    React.createElement("option", { value: "C" }, "c"),
+                    React.createElement("option", { value: "D" }, "d"))));
     }
 }
 exports.MainComponent = MainComponent;

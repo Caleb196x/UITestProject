@@ -1,12 +1,13 @@
 import * as UE from 'ue';
+import * as puerts from 'puerts'
 
-abstract class ComponentWrapper {
+export abstract class ComponentWrapper {
     typeName: string;
     props: any;
 
     abstract convertToWidget(): UE.Widget;
 
-    abstract updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Map<string, any>) : boolean;
+    abstract updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean;
 
     abstract convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function;
 
@@ -40,7 +41,7 @@ class SelectWrapper extends ComponentWrapper {
         if (this.typeName == "option")
         {
             console.log("Do not create anything for option");
-            return undefined;
+            return null;
         }
 
         // combox
@@ -58,19 +59,21 @@ class SelectWrapper extends ComponentWrapper {
         }
 
         // add default options
-        let defaultOptions: UE.TArray<string>;
+        // fixme crash here
+        // let defaultOptions = UE.NewArray<UE.BuiltinString>(children.length);
         for (let i = 0; i < children.length; i++) {
             let child = children[i];
             let option = child['type'];
             if (option == 'option')
             {
-                let actualValue = child['value'];
-                let text = child['children'] as string;
+                let actualValue = child['props']['value'] as string;
+                let text = child['props']['children'] as string;
                 if (actualValue != null)
                 {
                     text = actualValue;
                 }
-                defaultOptions.Add(text);
+                comboBox.DefaultOptions.Add(text);
+                comboBox.AddOption(text);
             }
         }
 
@@ -83,15 +86,20 @@ class SelectWrapper extends ComponentWrapper {
             comboBox.OnSelectionChanged.Add(this.onChangeCallback);
         }
 
-        comboBox.DefaultOptions = defaultOptions;
         comboBox.SelectedOption = defaultValue;
         
         super.convertCSSToWidget(comboBox);
         return comboBox;
     }
 
-    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Map<string, any>) : boolean {
+    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         let propChange = false;
+        let comboBox = widget as UE.ComboBoxString;
+        if (this.typeName == "option")
+        {
+            console.log("Do not update anything for option");
+            return false;
+        }
 
         for(var key in newProps) {
 
@@ -103,7 +111,7 @@ class SelectWrapper extends ComponentWrapper {
                     // change children items
                     let oldChildNum = oldProp.length;
                     let newChildNum = newProp.length;
-                    let comboBox = widget as UE.ComboBoxString;
+                    
                     
                     if (oldChildNum > newChildNum) {
                         let removeItems: string[];
@@ -144,16 +152,14 @@ class SelectWrapper extends ComponentWrapper {
                         for (var item in addItems) {
                             comboBox.AddOption(item);
                         }
-                    } else {
-
                     }
 
                 } else if (typeof newProp === 'function' && key == 'onChange') {
-                    let delegate = widget['OnSelectionChanged'];
-                    delegate.Remove(this.onChangeCallback);
+                    comboBox.OnSelectionChanged.Remove(this.onChangeCallback);
                     this.onChangeCallback = (SelectedItem: string, SelectionType: UE.ESelectInfo): void => {
-                        newProp({'target': SelectedItem});
+                        newProp({'target': {'value': SelectedItem}});
                     };
+                    comboBox.OnSelectionChanged.Add(this.onChangeCallback);
                 } else {
                     updateProps[this.propsReMapping[key]] = newProp;
                 }
@@ -179,7 +185,7 @@ class ButtonWrapper extends ComponentWrapper {
         return undefined;
     }
 
-    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Map<string, any>) : boolean {
+    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         return;
     }
 
@@ -197,7 +203,7 @@ class inputWrapper extends ComponentWrapper {
         return undefined;
     }
 
-    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Map<string, any>) : boolean {
+    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         return;
     }
 
@@ -230,7 +236,7 @@ class ContainerWrapper extends ComponentWrapper {
         console.log("Rendering container with children:", this.children);
     }
 
-    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Map<string, any>) : boolean {
+    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         return;
     }
 
@@ -248,7 +254,7 @@ class ProgressBarWrapper extends ComponentWrapper {
         return undefined;
     }
 
-    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Map<string, any>) : boolean {
+    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         return;
     }
 
@@ -266,7 +272,7 @@ class ImageWrapper extends ComponentWrapper {
         return undefined;
     }
 
-    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Map<string, any>) : boolean {
+    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         return;
     }
 
@@ -284,7 +290,7 @@ class RichTextBlockWrapper extends ComponentWrapper {
         return undefined;
     }
 
-    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Map<string, any>) : boolean {
+    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         return;
     }
 
@@ -302,7 +308,7 @@ class ListViewWrapper extends ComponentWrapper {
         return undefined;
     }
 
-    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Map<string, any>) : boolean {
+    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         return;
     }
 
@@ -320,7 +326,7 @@ class TextBlockWrapper extends ComponentWrapper {
         return undefined;
     }
 
-    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Map<string, any>) : boolean {
+    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         return;
     }
 
@@ -332,7 +338,7 @@ class TextBlockWrapper extends ComponentWrapper {
 const baseComponentsMap: Record<string, any> = {
     // base
     "select": SelectWrapper,
-    "option": "ComboBoxWrapper",
+    "option": SelectWrapper,
     "button": "ButtonWrapper",
     "textarea": "MultiLineEditableTextWrapper",
     "progress": "ProgressBarWrapper",
@@ -362,18 +368,57 @@ const baseComponentsMap: Record<string, any> = {
     "canvas": "CanvasPanelWrapper",
 };
 
-export function createUMGWidgetFromReactComponent(typeName: string, props: Record<string, any>) : UE.Widget {
-    // 这里可以根据传入的 typeName 和 props 做一些逻辑处理
-    // 假设需要将其转换为某种特定的UMG封装组件
+function isKeyOfRecord(key: any, record: Record<string, any>): key is keyof Record<string, any> {
+    return key in record;
+}
 
-    // 这个例子只是将组件名和属性包装在一个对象中
-    let wrapper = new baseComponentsMap[typeName](typeName, props) as ComponentWrapper;
+function isEmpty(record: Record<string, any>): boolean {
+    return Object.keys(record).length === 0;
+}
 
-    return wrapper.convertToWidget();
+export function CreateReactComponentWrapper(typeName: string, props: Record<string, any>) : ComponentWrapper {
+    if (isKeyOfRecord(typeName, baseComponentsMap))
+    {
+        if (typeof baseComponentsMap[typeName] == 'string')
+        {
+            return undefined;
+        }
+
+        let wrapper = new baseComponentsMap[typeName](typeName, props);
+        if (wrapper instanceof ComponentWrapper)
+        {
+            return wrapper;
+        }
+    }
+
+    return undefined;
+}
+
+export function createUMGWidgetFromReactComponent(wrapper: ComponentWrapper) : UE.Widget {
+
+    if (wrapper)
+    {
+        return wrapper.convertToWidget();
+    }
+    return undefined;
 };
 
-export function updateUMGWidgetPropertyUsingReactComponentProperty(widget: UE.Widget, type : string, oldProps : any, newProps: any) : boolean {
-    return false;
+export function updateUMGWidgetPropertyUsingReactComponentProperty(widget: UE.Widget, wrapper: ComponentWrapper, oldProps : any, newProps: any) : boolean {
+    let propsChange = false;
+    let updateProps = {};
+
+    if (wrapper)
+    {
+        propsChange = wrapper.updateWidgetProperty(widget, oldProps, newProps, updateProps);
+    }
+
+    if (propsChange && !isEmpty(updateProps))
+    {
+        puerts.merge(widget, updateProps);
+        UE.UMGManager.SynchronizeWidgetProperties(widget)
+    }
+
+    return propsChange;
 };
 
 export function convertEventToWidgetDelegate(wrapper: ComponentWrapper, reactPropName: string, originCallback: Function) : Function {

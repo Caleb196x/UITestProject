@@ -4,7 +4,6 @@ import { Props, CanvasPanel, VerticalBox, HorizontalBox,
 from 'reactUMG';
 import { StatusBar } from './status_bar_compoennt';
 import { ButtonSlot, ButtonStyle, LinearColor, ESlateColorStylingMode, Margin} from 'ue';
-import test from './test.json';
 
 interface State {
     username: string;
@@ -15,7 +14,7 @@ export class MainComponent extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            username: test.name,
+            username: 'test.name',
             password: '',
         };
     }
@@ -27,7 +26,7 @@ export class MainComponent extends React.Component<Props, State> {
         console.log('Password:', this.state.password);
         console.log(`Welcome, ${this.state.username}!`);
         this.textblock_ref.current.nativePtr.SetText('你好啊, ' + this.state.username);
-        this.css.color = '#0f13';
+        // this.css.color = '#0f13';
     };
 
     SlotOfVerticalBox: CanvasPanelSlot = {
@@ -65,10 +64,15 @@ export class MainComponent extends React.Component<Props, State> {
                 <Button OnClicked={() => this.handleLogin()}>
                     {'Login'}
                 </Button>
-                </HorizontalBox>
                 <StatusBar name={'Healthy: '} initialPercent={60}></StatusBar>
                 <button style={this.buttonStyle}>测试原生按钮</button>
-                <webview />
+                </HorizontalBox>
+                <select defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target.value)}}>
+                    <option value={"A"}>a</option>
+                    <option value={"B"}>b</option>
+                    <option value={"C"}>c</option>
+                    <option value={"D"}>d</option>
+                </select>
             </VerticalBox>
         </CanvasPanel>
     }

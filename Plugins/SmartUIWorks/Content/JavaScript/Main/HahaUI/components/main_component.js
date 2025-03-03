@@ -34,7 +34,9 @@ class MainComponent extends React.Component {
                     React.createElement(reactUMG_1.TextBlock, { Text: 'Username: ' }),
                     React.createElement(reactUMG_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))));
+                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))),
+            React.createElement("select", { onChange: (e) => this.handleLogin(), disabled: true },
+                React.createElement("option", null, "test1")));
     }
 }
 exports.MainComponent = MainComponent;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, HorizontalBox, TextBlock, ProgressBar, HorizontalBoxSlot } from 'reactUMG';
 import {LinearColor} from 'ue'
-import styles from './styles.module.css';
+// import styles from './styles.module.css';
 
 export interface Props {
     name: string;
@@ -52,14 +52,6 @@ export class StatusBar extends React.Component<Props, State> {
                 <Button OnClicked={this.onIncrement} >+</Button>
                 <Button OnClicked={this.onDecrement} >-</Button>
                 <TextBlock Text={'热重载测试_叽叽咋咋'} />
-                <div style={{ 
-                    width: 100, 
-                    height: "200px", 
-                    backgroundColor: "lightblue",
-                    border: "2px solid darkblue"
-                    }} className={styles.host}>
-                    内联样式示例
-                </div>
             </HorizontalBox>
         );
     }
