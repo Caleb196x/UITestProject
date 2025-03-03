@@ -8,7 +8,7 @@ class MainComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: '',
+            username: "test.name",
             password: '',
         };
     }
@@ -17,6 +17,7 @@ class MainComponent extends React.Component {
         console.log('Username:', this.state.username);
         console.log('Password:', this.state.password);
         console.log(`Welcome, ${this.state.username}!`);
+        this.textblock_ref.current.nativePtr.SetText('你好啊, ' + this.state.username);
     };
     SlotOfVerticalBox = {
         LayoutData: {
@@ -28,15 +29,26 @@ class MainComponent extends React.Component {
             }
         }
     };
+    textblock_ref = React.createRef();
+    buttonStyle = {
+        backgroundColor: 'green',
+        color: 'white',
+        padding: '10px 20px',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer'
+    };
     render() {
         return React.createElement(react_umg_1.CanvasPanel, null,
             React.createElement(react_umg_1.VerticalBox, { Slot: this.SlotOfVerticalBox },
                 React.createElement(react_umg_1.HorizontalBox, null,
-                    React.createElement(react_umg_1.TextBlock, { Text: 'Username: ' }),
+                    React.createElement(react_umg_1.TextBlock, { ref: this.textblock_ref, Text: 'Username: ' }),
                     React.createElement(react_umg_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
                 React.createElement(react_umg_1.HorizontalBox, null,
                     React.createElement(react_umg_1.Button, { OnClicked: () => this.handleLogin() }, 'Login')),
-                React.createElement(status_bar_compoennt_1.StatusBar, { name: 'Healthy: ', initialPercent: 60 })));
+                React.createElement(status_bar_compoennt_1.StatusBar, { name: 'Healthy: ', initialPercent: 60 }),
+                React.createElement("button", { style: this.buttonStyle }, "\u6D4B\u8BD5\u539F\u751F\u6309\u94AE"),
+                React.createElement("webview", null)));
     }
 }
 exports.MainComponent = MainComponent;

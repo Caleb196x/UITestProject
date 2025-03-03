@@ -3,6 +3,8 @@ import { Props, CanvasPanel, VerticalBox, HorizontalBox,
     TextBlock, EditableText, Button, CanvasPanelSlot } 
 from 'react-umg';
 import { StatusBar } from './status_bar_compoennt';
+import { ButtonSlot, ButtonStyle, LinearColor, ESlateColorStylingMode, Margin} from 'ue';
+import test from './test.json';
 
 interface State {
     username: string;
@@ -13,7 +15,7 @@ export class MainComponent extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            username: '',
+            username: test.name,
             password: '',
         };
     }
@@ -24,6 +26,8 @@ export class MainComponent extends React.Component<Props, State> {
         console.log('Username:', this.state.username);
         console.log('Password:', this.state.password);
         console.log(`Welcome, ${this.state.username}!`);
+        this.textblock_ref.current.nativePtr.SetText('你好啊, ' + this.state.username);
+        this.css.color = '#0f13';
     };
 
     SlotOfVerticalBox: CanvasPanelSlot = {
@@ -36,12 +40,25 @@ export class MainComponent extends React.Component<Props, State> {
             }
         }
     }
+
+    textblock_ref = React.createRef<TextBlock>();
+    css: React.CSSProperties;
+
+    buttonStyle = {
+        backgroundColor: 'green',
+        color: 'white',
+        padding: '10px 20px',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer'
+      };
+      
     
     render() {
         return <CanvasPanel >
             <VerticalBox Slot={this.SlotOfVerticalBox}>
                 <HorizontalBox>
-                    <TextBlock Text='Username: '/>
+                    <TextBlock ref={this.textblock_ref} Text='Username: '/>
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
                 </HorizontalBox>
                 <HorizontalBox>
@@ -50,6 +67,8 @@ export class MainComponent extends React.Component<Props, State> {
                 </Button>
                 </HorizontalBox>
                 <StatusBar name={'Healthy: '} initialPercent={60}></StatusBar>
+                <button style={this.buttonStyle}>测试原生按钮</button>
+                <webview />
             </VerticalBox>
         </CanvasPanel>
     }
