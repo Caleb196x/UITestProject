@@ -80,7 +80,7 @@ class SelectWrapper extends ComponentWrapper {
         if (typeof onChangeEvent == 'function') {
 
             this.onChangeCallback = (SelectedItem: string, SelectionType: UE.ESelectInfo): void => {
-                onChangeEvent({'target': SelectedItem});
+                onChangeEvent({'target': {'value': SelectedItem}});
             };
 
             comboBox.OnSelectionChanged.Add(this.onChangeCallback);

@@ -50,7 +50,7 @@ class MainComponent extends React.Component {
                     React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'),
                     React.createElement(status_bar_compoennt_1.StatusBar, { name: 'Healthy: ', initialPercent: 60 }),
                     React.createElement("button", { style: this.buttonStyle }, "\u6D4B\u8BD5\u539F\u751F\u6309\u94AE")),
-                React.createElement("select", { defaultValue: "C", onChange: (e) => { console.log("onChange: ", e.target.value); } },
+                React.createElement("select", { defaultValue: "C", onChange: (e) => { console.log("onChange: ", e.target); } },
                     React.createElement("option", { value: "A" }, "a"),
                     React.createElement("option", { value: "B" }, "b"),
                     React.createElement("option", { value: "C" }, "c"),

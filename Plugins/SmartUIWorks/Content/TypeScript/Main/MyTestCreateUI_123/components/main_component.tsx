@@ -67,7 +67,7 @@ export class MainComponent extends React.Component<Props, State> {
                 <StatusBar name={'Healthy: '} initialPercent={60}></StatusBar>
                 <button style={this.buttonStyle}>测试原生按钮</button>
                 </HorizontalBox>
-                <select defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target.value)}}>
+                <select defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
                     <option value={"A"}>a</option>
                     <option value={"B"}>b</option>
                     <option value={"C"}>c</option>
