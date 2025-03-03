@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatusBar = void 0;
 const React = require("react");
-const react_umg_1 = require("react-umg");
+const reactUMG_1 = require("reactUMG");
 let SlotOfProgressBar = {
     Size: {
         Value: 100,
@@ -29,11 +29,11 @@ class StatusBar extends React.Component {
     onIncrement = () => this.setState({ percent: this.state.percent + 0.01 });
     onDecrement = () => this.setState({ percent: this.state.percent - 0.01 });
     render() {
-        return (React.createElement(react_umg_1.HorizontalBox, null,
-            React.createElement(react_umg_1.TextBlock, { Text: `${this.props.name}(${this.state.percent.toFixed(2)})` }),
-            React.createElement(react_umg_1.ProgressBar, { Percent: this.state.percent, Slot: SlotOfProgressBar, FillColorAndOpacity: this.color, CategoryName: `${this.props.name}` }),
-            React.createElement(react_umg_1.Button, { OnClicked: this.onIncrement }, "+"),
-            React.createElement(react_umg_1.Button, { OnClicked: this.onDecrement }, "-")));
+        return (React.createElement(reactUMG_1.HorizontalBox, null,
+            React.createElement(reactUMG_1.TextBlock, { Text: `${this.props.name}(${this.state.percent.toFixed(2)})` }),
+            React.createElement(reactUMG_1.ProgressBar, { Percent: this.state.percent, Slot: SlotOfProgressBar, FillColorAndOpacity: this.color, CategoryName: `${this.props.name}` }),
+            React.createElement(reactUMG_1.Button, { OnClicked: this.onIncrement }, "+"),
+            React.createElement(reactUMG_1.Button, { OnClicked: this.onDecrement }, "-")));
     }
 }
 exports.StatusBar = StatusBar;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Props, CanvasPanel, VerticalBox, HorizontalBox, 
     TextBlock, EditableText, Button, CanvasPanelSlot } 
-from 'react-umg';
+from 'reactUMG';
 import { StatusBar } from './status_bar_compoennt';
 import { ButtonSlot, ButtonStyle, LinearColor, ESlateColorStylingMode, Margin} from 'ue';
 import test from './test.json';

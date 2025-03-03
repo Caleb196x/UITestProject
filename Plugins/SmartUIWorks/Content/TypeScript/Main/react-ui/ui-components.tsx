@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, HorizontalBox, TextBlock, ProgressBar, HorizontalBoxSlot } from 'react-umg';
+import { Button, HorizontalBox, TextBlock, ProgressBar, HorizontalBoxSlot } from 'reactUMG';
 import {LinearColor} from 'ue'
 
 export interface Props {

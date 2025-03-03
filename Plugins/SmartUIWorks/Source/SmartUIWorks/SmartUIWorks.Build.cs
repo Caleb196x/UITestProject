@@ -60,15 +60,15 @@ public class SmartUIWorks : ModuleRules
 			}
 			);
 		
-		string coreJSPath = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "Scripts", "JavaScript"));
-		// plugin content directory
-		string destDirName = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "..", "..", "Content", "JavaScript"));
-		DirectoryCopy(coreJSPath, destDirName, true);
+		// string coreJSPath = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "Scripts", "JavaScript"));
+		// // plugin content directory
+		// string destDirName = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "..", "..", "Content", "JavaScript"));
+		// DirectoryCopy(coreJSPath, destDirName, true);
 
-		// 每次build时拷贝一些手写的.d.ts到Typing目录以同步更新
-		string srcDtsDirName  = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "Scripts", "TypeScript"));
-		string dstDtsDirName = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "..", "Content", "TypeScript"));
-		DirectoryCopy(srcDtsDirName, dstDtsDirName, true);
+		// // 每次build时拷贝一些手写的.d.ts到Typing目录以同步更新
+		// string srcDtsDirName  = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "Scripts", "TypeScript"));
+		// string dstDtsDirName = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", "..", "Content", "TypeScript"));
+		// DirectoryCopy(srcDtsDirName, dstDtsDirName, true);
 	}
 	
 	private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)

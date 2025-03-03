@@ -1,6 +1,6 @@
 import * as UE from 'ue'
 import {argv} from 'puerts';
-import {ReactUMG} from 'react-umg';
+import {ReactUMG} from 'reactUMG';
 
 function WaitLatentActionState(state: UE.LatentActionState) : Promise<void> {
     return new Promise<void>((resolve, reject) => {
