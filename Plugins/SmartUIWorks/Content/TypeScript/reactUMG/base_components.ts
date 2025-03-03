@@ -177,16 +177,153 @@ class SelectWrapper extends ComponentWrapper {
 };
 
 class ButtonWrapper extends ComponentWrapper {
+    private OnClickedCallback: () => void;
+    private OnPressedCallback: () => void;
+    private OnReleasedCallback: () => void;
+    private OnHoveredCallback: () => void;
+    private OnUnHoveredCallback: () => void;
+    private OnFocusCallback: () => void;
+    private OnBlurCallback: () => void;
+
     constructor(type: string, props: any) {
         super();
+        this.typeName = type;
+        this.props = props;
     }
 
     override convertToWidget(): UE.Widget {
-        return undefined;
+        let button = new UE.Button();
+
+        let onClick = this.props['onClick'];
+        if (typeof onClick == 'function') {
+            this.OnClickedCallback = onClick;
+            button.OnClicked.Add(onClick);
+        }
+
+        let onMouseDown = this.props['onMouseDown'];
+        if (typeof onMouseDown == 'function') {
+            this.OnPressedCallback = onMouseDown;
+            button.OnPressed.Add(onMouseDown);
+        }
+
+        let onMouseUp = this.props['onMouseUp'];
+        if (typeof onMouseUp == 'function') {
+            this.OnReleasedCallback = onMouseUp;
+            button.OnReleased.Add(onMouseUp);
+        }
+
+        let onMouseEnter = this.props['onMouseEnter'];
+        if (typeof onMouseEnter == 'function') {
+            this.OnHoveredCallback = onMouseEnter;
+            button.OnHovered.Add(onMouseEnter);
+        }
+
+        let onMouseLeave = this.props['onMouseLeave'];
+        if (typeof onMouseLeave == 'function') {
+            this.OnUnHoveredCallback = onMouseLeave;
+            button.OnUnhovered.Add(onMouseLeave);
+        }
+
+        let onFocus = this.props['onFocus'];
+        if (typeof onFocus == 'function') {
+            this.OnFocusCallback = onFocus;
+            button.OnHovered.Add(onFocus);
+        }
+
+        let onBlur = this.props['onBlur'];
+        if (typeof onBlur == 'function') {
+            this.OnBlurCallback = onBlur;
+            button.OnUnhovered.Add(onBlur);
+        }
+
+        let disabled = this.props['disabled'];
+        if (disabled) {
+            button.bIsEnabled = false;
+        }
+
+        super.convertCSSToWidget(button);
+
+        return button;
     }
 
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
-        return;
+        let propsChange = false;
+        let button = widget as UE.Button;
+        for(var key in newProps) { 
+            
+            let oldProp = oldProps[key];
+            let newProp = newProps[key];
+
+            if (oldProp != newProp) {
+                switch (key) {
+                    case 'onClick':
+                        if (typeof newProp === 'function') {
+                            button.OnClicked.Remove(this.OnClickedCallback);
+                            this.OnClickedCallback = newProp;
+                            button.OnClicked.Add(this.OnClickedCallback);
+                        }
+                        break;
+                    
+                    case 'onMouseDown':
+                        if (typeof newProp === 'function') {
+                            button.OnPressed.Remove(this.OnPressedCallback);
+                            this.OnPressedCallback = newProp;
+                            button.OnPressed.Add(this.OnPressedCallback);
+                        }
+                        break;
+
+                    case 'onMouseUp':
+                        if (typeof newProp === 'function') {
+                            button.OnReleased.Remove(this.OnReleasedCallback);
+                            this.OnReleasedCallback = newProp;
+                            button.OnReleased.Add(this.OnReleasedCallback);
+                        }
+                        break;
+
+                    case 'onMouseEnter':
+                        if (typeof newProp === 'function') {
+                            button.OnHovered.Remove(this.OnHoveredCallback);
+                            this.OnHoveredCallback = newProp;
+                            button.OnHovered.Add(this.OnHoveredCallback);
+                        }
+                        break;
+
+                    case 'onMouseLeave':
+                        if (typeof newProp === 'function') {
+                            button.OnUnhovered.Remove(this.OnUnHoveredCallback);
+                            this.OnUnHoveredCallback = newProp;
+                            button.OnUnhovered.Add(this.OnUnHoveredCallback);
+                        }
+                        break;
+
+                    case 'onFocus':
+                        if (typeof newProp === 'function') {
+                            button.OnHovered.Remove(this.OnFocusCallback);
+                            this.OnFocusCallback = newProp;
+                            button.OnHovered.Add(this.OnFocusCallback);
+                        }
+                        break;
+
+                    case 'onBlur':
+                        if (typeof newProp === 'function') {
+                            button.OnUnhovered.Remove(this.OnBlurCallback);
+                            this.OnBlurCallback = newProp;
+                            button.OnUnhovered.Add(this.OnBlurCallback);
+                        }
+                        break;
+
+                    case 'disabled':
+                        button.bIsEnabled = !newProp;
+                        break;
+
+                    // Add other properties to update if needed
+                    default:
+                        break;
+                }
+            }
+        }
+
+        return propsChange;
     }
 
     override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {
@@ -339,7 +476,7 @@ const baseComponentsMap: Record<string, any> = {
     // base
     "select": SelectWrapper,
     "option": SelectWrapper,
-    "button": "ButtonWrapper",
+    "button": ButtonWrapper,
     "textarea": "MultiLineEditableTextWrapper",
     "progress": "ProgressBarWrapper",
     "img": "ImageWrapper",
