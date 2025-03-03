@@ -94,7 +94,7 @@ class UEWidget {
                 myProps[key] = val;
             }
         }
-        //console.log("UEWidget", type, JSON.stringify(myProps))
+        console.log("UEWidget", type, myProps);
         puerts.merge(this.nativePtr, myProps);
         //console.log(type + ' inited')
     }

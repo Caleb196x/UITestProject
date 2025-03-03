@@ -4,6 +4,18 @@ exports.ReactUMG = void 0;
 const Reconciler = require("react-reconciler");
 const puerts = require("puerts");
 const UE = require("ue");
+const base_components_1 = require("./base_components");
+/**
+ * Compares two values for deep equality.
+ *
+ * This function checks if two values are strictly equal, and if they are objects,
+ * it recursively checks their properties for equality, excluding the 'children'
+ * and 'Slot' properties.
+ *
+ * @param x - The first value to compare.
+ * @param y - The second value to compare.
+ * @returns True if the values are deeply equal, false otherwise.
+ */
 function deepEquals(x, y) {
     if (x === y)
         return true;
@@ -29,6 +41,7 @@ class UEWidget {
     nativePtr;
     slot;
     nativeSlotPtr;
+    reactWrapper;
     constructor(type, props) {
         this.type = type;
         this.callbackRemovers = {};
@@ -41,6 +54,12 @@ class UEWidget {
     }
     init(type, props) {
         console.log("UEWidget: ", type, props);
+        // create react
+        this.reactWrapper = (0, base_components_1.CreateReactComponentWrapper)(type, props);
+        if (this.reactWrapper) {
+            this.nativePtr = (0, base_components_1.createUMGWidgetFromReactComponent)(this.reactWrapper);
+            return;
+        }
         let classPath = exports.lazyloadComponents[type];
         if (classPath) {
             //this.nativePtr = asyncUIManager.CreateComponentByClassPathName(classPath);
@@ -88,6 +107,10 @@ class UEWidget {
     }
     update(oldProps, newProps) {
         console.log("update: ", oldProps, newProps);
+        if (this.reactWrapper) {
+            (0, base_components_1.updateUMGWidgetPropertyUsingReactComponentProperty)(this.nativePtr, this.reactWrapper, oldProps, newProps);
+            return;
+        }
         let myProps = {};
         let propChange = false;
         for (var key in newProps) {
@@ -133,9 +156,14 @@ class UEWidget {
     }
     appendChild(child) {
         console.log("appendChild: ", child.type);
-        let nativeSlot = this.nativePtr.AddChild(child.nativePtr);
-        //console.log("appendChild", (await this.nativePtr).toJSON(), (await child.nativePtr).toJSON());
-        child.nativeSlot = nativeSlot;
+        if (!this.nativePtr && this.reactWrapper) {
+            return;
+        }
+        if (this.nativePtr instanceof UE.PanelWidget) {
+            let nativeSlot = this.nativePtr.AddChild(child.nativePtr);
+            //console.log("appendChild", (await this.nativePtr).toJSON(), (await child.nativePtr).toJSON());
+            child.nativeSlot = nativeSlot;
+        }
     }
     removeChild(child) {
         console.log("removeChild: ", child.type);
@@ -215,7 +243,7 @@ const hostConfig = {
     resetAfterCommit(container) {
         // container.addToViewport(0);
     },
-    resetTextContent() {
+    resetTextContent(instance) {
         console.error('resetTextContent not implemented!');
     },
     shouldSetTextContent(type, props) {
@@ -252,7 +280,6 @@ const hostConfig = {
         parent.removeChild(child);
     },
     clearContainer(container) {
-        console.error("clear Container");
     },
     getCurrentEventPriority() {
         return 0;

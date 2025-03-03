@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatusBar = void 0;
 const React = require("react");
 const reactUMG_1 = require("reactUMG");
-const styles_module_css_1 = require("./styles.module.css");
 let SlotOfProgressBar = {
     Size: {
         Value: 100,
@@ -36,13 +35,7 @@ class StatusBar extends React.Component {
             React.createElement(reactUMG_1.ProgressBar, { Percent: this.state.percent, Slot: SlotOfProgressBar, FillColorAndOpacity: this.color, CategoryName: `${this.props.name}` }),
             React.createElement(reactUMG_1.Button, { OnClicked: this.onIncrement }, "+"),
             React.createElement(reactUMG_1.Button, { OnClicked: this.onDecrement }, "-"),
-            React.createElement(reactUMG_1.TextBlock, { Text: '热重载测试_叽叽咋咋' }),
-            React.createElement("div", { style: {
-                    width: 100,
-                    height: "200px",
-                    backgroundColor: "lightblue",
-                    border: "2px solid darkblue"
-                }, className: styles_module_css_1.default.host }, "\u5185\u8054\u6837\u5F0F\u793A\u4F8B")));
+            React.createElement(reactUMG_1.TextBlock, { Text: '热重载测试_叽叽咋咋' })));
     }
 }
 exports.StatusBar = StatusBar;

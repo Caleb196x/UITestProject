@@ -1,6 +1,7 @@
 import * as Reconciler from 'react-reconciler'
 import * as puerts from 'puerts'
 import * as UE from 'ue'
+import { CreateReactComponentWrapper, createUMGWidgetFromReactComponent, updateUMGWidgetPropertyUsingReactComponentProperty, ComponentWrapper } from './base_components';
 
 /**
  * Compares two values for deep equality.
@@ -39,6 +40,7 @@ class UEWidget {
     nativePtr: UE.Widget;
     slot: any;
     nativeSlotPtr: UE.PanelSlot;
+    reactWrapper: ComponentWrapper;
 
     constructor (type: string, props: any) {
         this.type = type;
@@ -53,6 +55,14 @@ class UEWidget {
 
     init(type: string, props: any) {
         console.log("UEWidget: ", type, props)
+        // create react
+        this.reactWrapper = CreateReactComponentWrapper(type, props);
+        if (this.reactWrapper)
+        {
+            this.nativePtr = createUMGWidgetFromReactComponent(this.reactWrapper);
+            return;
+        } 
+
         let classPath = exports.lazyloadComponents[type];
         if (classPath) {
             //this.nativePtr = asyncUIManager.CreateComponentByClassPathName(classPath);
@@ -98,6 +108,12 @@ class UEWidget {
   
     update(oldProps: any, newProps: any) {
         console.log("update: ", oldProps, newProps)
+
+        if (this.reactWrapper)
+        {
+            updateUMGWidgetPropertyUsingReactComponentProperty(this.nativePtr, this.reactWrapper, oldProps, newProps);
+            return;
+        }
 
         let myProps = {};
         let propChange = false;
@@ -145,9 +161,17 @@ class UEWidget {
   
     appendChild(child: UEWidget) {
         console.log("appendChild: ", child.type)
-        let nativeSlot = (this.nativePtr as UE.PanelWidget).AddChild(child.nativePtr);
-        //console.log("appendChild", (await this.nativePtr).toJSON(), (await child.nativePtr).toJSON());
-        child.nativeSlot = nativeSlot;
+        if (!this.nativePtr && this.reactWrapper)
+        {
+            return;
+        }
+
+        if (this.nativePtr instanceof UE.PanelWidget)
+        {
+            let nativeSlot = (this.nativePtr as UE.PanelWidget).AddChild(child.nativePtr);
+            //console.log("appendChild", (await this.nativePtr).toJSON(), (await child.nativePtr).toJSON());
+            child.nativeSlot = nativeSlot;
+        }
     }
     
     removeChild(child: UEWidget) {
