@@ -11,7 +11,7 @@ export abstract class ComponentWrapper {
 
     abstract convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function;
 
-    convertCSSToWidget(widget: UE.Widget){
+    parseStyleToWidget(widget: UE.Widget){
         if (this.props.hasOwnProperty('style') || this.props.hasOwnProperty('className')) {
             // Handle the style property as needed
             const style = this.props.style;
@@ -19,6 +19,13 @@ export abstract class ComponentWrapper {
         }
 
         return undefined;
+    }
+
+    commonPropertyInitialized(widget: UE.Widget) {
+        if (this.props.hasOwnProperty('title')) {
+            let title = this.props['title'] as string;
+            widget.SetToolTipText(title);
+        }
     }
 };
 
@@ -88,7 +95,8 @@ class SelectWrapper extends ComponentWrapper {
 
         comboBox.SelectedOption = defaultValue;
         
-        super.convertCSSToWidget(comboBox);
+        super.parseStyleToWidget(comboBox);
+        this.commonPropertyInitialized(comboBox);
         return comboBox;
     }
 
@@ -170,6 +178,7 @@ class SelectWrapper extends ComponentWrapper {
             }
         }
 
+        this.commonPropertyInitialized(widget);
         return propChange;
     }
 
@@ -243,7 +252,8 @@ class ButtonWrapper extends ComponentWrapper {
             button.bIsEnabled = false;
         }
 
-        super.convertCSSToWidget(button);
+        super.parseStyleToWidget(button);
+        this.commonPropertyInitialized(button);
 
         return button;
     }
@@ -327,6 +337,8 @@ class ButtonWrapper extends ComponentWrapper {
                 }
             }
         }
+
+        this.commonPropertyInitialized(widget);
 
         return propsChange;
     }
@@ -459,6 +471,8 @@ class inputWrapper extends ComponentWrapper {
             returnWidget = passwordInput;
         }
 
+        this.commonPropertyInitialized(returnWidget);
+
         return returnWidget;
     }
 
@@ -493,6 +507,8 @@ class inputWrapper extends ComponentWrapper {
             }
         }
 
+        this.commonPropertyInitialized(widget);
+
         return propsChange;
     }
 
@@ -515,6 +531,7 @@ class ProgressBarWrapper extends ComponentWrapper {
         let precent: number = progressVal / maxVal;
 
         progressBar.SetPercent(precent);
+        this.commonPropertyInitialized(progressBar);
         return progressBar;
     }
 
@@ -532,6 +549,8 @@ class ProgressBarWrapper extends ComponentWrapper {
             progressBar.SetPercent(precent);
             propsChange = true;
         }
+
+        this.commonPropertyInitialized(widget);
 
         // todo@Caleb196x: update style
 
@@ -582,9 +601,20 @@ class RichTextBlockWrapper extends ComponentWrapper {
 class ListViewWrapper extends ComponentWrapper {
     constructor(type: string, props: any) {
         super();
+        this.typeName = type;
+        this.props = props;
     }
 
     convertToWidget(): UE.Widget {
+        if (this.typeName == 'li') {
+            return null;
+        }
+
+        let list = new UE.ListView();
+
+        let listItems = this.props['children'];
+        
+
         return undefined;
     }
 
@@ -677,7 +707,7 @@ const baseComponentsMap: Record<string, any> = {
 
     // 列表
     "ul": "ListViewWrapper",
-    "li": "ListViewItemWrapper",
+    "li": "ListViewWrapper",
 
     // 富文本
     "article": "RichTextBlockWrapper",
