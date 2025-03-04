@@ -60,7 +60,8 @@ export class MainComponent extends React.Component<Props, State> {
                             onMouseDown={()=>{console.log("mouse down and press")}} 
                             onMouseUp={()=>{console.log("mouse up and release")}}
                             onMouseEnter={()=>{console.log("mouse enter")}}
-                            onMouseLeave={()=>{console.log("mouse leave")}}>
+                            onMouseLeave={()=>{console.log("mouse leave")}}
+                            title='hello'>
                                 {'原生按钮'}
                     </button>
                 </HorizontalBox>
