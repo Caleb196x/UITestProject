@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainComponent = void 0;
 const React = require("react");
 const reactUMG_1 = require("reactUMG");
+const ue_1 = require("ue");
 class MainComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -31,12 +32,16 @@ class MainComponent extends React.Component {
         return React.createElement(reactUMG_1.CanvasPanel, null,
             React.createElement(reactUMG_1.VerticalBox, { Slot: this.SlotOfVerticalBox },
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement(reactUMG_1.TextBlock, { Text: 'Username: ' }),
+                    React.createElement(reactUMG_1.TextBlock, { Text: '\u7528\u6237\u540D: ' }),
                     React.createElement(reactUMG_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))),
-            React.createElement("select", { onChange: (e) => this.handleLogin(), disabled: true },
-                React.createElement("option", null, "test1")));
+                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin(), ClickMethod: ue_1.EButtonClickMethod.MouseDown }, '登录')),
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement("select", { onChange: (e) => this.handleLogin(), defaultValue: 'test1' },
+                        React.createElement("option", null, "test1"),
+                        React.createElement("option", null, "test2"))),
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement("button", { onClick: () => { console.log("hello"); }, onMouseDown: () => { console.log("mouse down and press"); }, onMouseUp: () => { console.log("mouse up and release"); }, onMouseEnter: () => { console.log("mouse enter"); }, onMouseLeave: () => { console.log("mouse leave"); } }, '原生按钮'))));
     }
 }
 exports.MainComponent = MainComponent;

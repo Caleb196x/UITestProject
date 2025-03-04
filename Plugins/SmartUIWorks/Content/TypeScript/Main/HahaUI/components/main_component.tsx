@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Props, CanvasPanel, VerticalBox, HorizontalBox, 
     TextBlock, EditableText, Button, CanvasPanelSlot } 
 from 'reactUMG';
+import {EButtonClickMethod} from 'ue';
 
 interface State {
     username: string;
@@ -40,18 +41,32 @@ export class MainComponent extends React.Component<Props, State> {
         return <CanvasPanel >
             <VerticalBox Slot={this.SlotOfVerticalBox}>
                 <HorizontalBox>
-                    <TextBlock Text='Username: '/>
+                    <TextBlock Text='用户名: '/>
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
                 </HorizontalBox>
                 <HorizontalBox>
-                    <Button OnClicked={() => this.handleLogin()}>
-                        {'Login'}
+                    <Button OnClicked={() => this.handleLogin()} ClickMethod={EButtonClickMethod.MouseDown}>
+                        {'登录'}
                     </Button>
                 </HorizontalBox>
+                <HorizontalBox>
+                    <select onChange={(e) => this.handleLogin()} defaultValue={'test1'}>
+                        <option>test1</option>
+                        <option>test2</option>
+                    </select>
+                </HorizontalBox>
+                <HorizontalBox>
+                    <button onClick={()=>{console.log("hello")}} 
+                            onMouseDown={()=>{console.log("mouse down and press")}} 
+                            onMouseUp={()=>{console.log("mouse up and release")}}
+                            onMouseEnter={()=>{console.log("mouse enter")}}
+                            onMouseLeave={()=>{console.log("mouse leave")}}>
+                                {'原生按钮'}
+                    </button>
+                </HorizontalBox>
+
             </VerticalBox>
-            <select onChange={(e) => this.handleLogin()} disabled={true}>
-                <option>test1</option>
-            </select>
+
             {/* <div style={{ 
                 width: 100, 
                 height: "200px", 
