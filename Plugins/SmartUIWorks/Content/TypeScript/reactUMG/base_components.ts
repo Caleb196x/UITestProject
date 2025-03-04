@@ -101,6 +101,8 @@ class SelectWrapper extends ComponentWrapper {
             return false;
         }
 
+        // todo@Caleb196x: update style
+
         for(var key in newProps) {
 
             let oldProp = oldProps[key];
@@ -249,6 +251,9 @@ class ButtonWrapper extends ComponentWrapper {
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         let propsChange = false;
         let button = widget as UE.Button;
+
+        // todo@Caleb196x: update style
+
         for(var key in newProps) { 
             
             let oldProp = oldProps[key];
@@ -332,49 +337,163 @@ class ButtonWrapper extends ComponentWrapper {
 };
 
 class inputWrapper extends ComponentWrapper {
-    constructor(type: string, props: any) {
-        super();
-    }
 
-    override convertToWidget(): UE.Widget {
-        return undefined;
-    }
+    private textChangeCallback: (text: string) => void
+    private checkboxChangeCallback: (isChecked: boolean) => void;
 
-    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
-        return;
-    }
-
-    override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {
-        return undefined;
-    }
-};
-
-class ContainerWrapper extends ComponentWrapper {
-    private children: any[];
+    private propertySetters: Record<string, (widget: UE.Widget, props: any) => void>;
+    private eventSetters: Record<string, (widget: UE.Widget, props: any, update: boolean) => void>;
 
     constructor(type: string, props: any) {
         super();
-        this.children = [];
+        this.typeName = type;
+        this.props = props;
+        this.setupPropertySetters();
+        this.setupEventSetters();
+    }
+
+    setupPropertySetters() {
+        this.propertySetters = {
+            'placeholder': (widget: UE.Widget, props: any) => {
+                let textInput = widget as UE.EditableText;
+                let placeHolder = props['placeholder'];
+                if (placeHolder) {
+                    textInput.SetHintText(placeHolder as string);
+                }
+            },
+            'defaultValue': (widget: UE.Widget, props: any) => {
+                let textInput = widget as UE.EditableText;
+                let defaultValue = props['defaultValue'];
+                if (defaultValue) {
+                    textInput.SetText(defaultValue as string);
+                }
+            },
+            'disabled': (widget: UE.Widget, props: any) => {
+                let textInput = widget as UE.EditableText;
+                let disabled = props['disabled'];
+                if (disabled) {
+                    textInput.SetIsEnabled(false);
+                }
+            },
+            'readOnly': (widget: UE.Widget, props: any) => {
+                let textInput = widget as UE.EditableText;
+                let readOnly = props['readOnly'];
+                if (readOnly) {
+                    textInput.SetIsReadOnly(true);
+                }
+            },
+            'checked': (widget: UE.Widget, props: any) => {
+                let checkbox = widget as UE.CheckBox;
+                let checked = props['checked'];
+                if (checked) {
+                    checkbox.SetIsChecked(true);
+                }
+            }
+        };
+    }
+
+    setupEventSetters() {
+        this.eventSetters = {
+            'onChange': (widget: UE.Widget, props: any, update: boolean) => {
+                if (widget instanceof UE.EditableText) {
+                    let textInput = widget as UE.EditableText;
+                    let onChange = props['onChange'];
+                    if (typeof onChange === 'function') {
+                        if (update) {
+                            textInput.OnTextChanged.Remove(this.textChangeCallback);
+                        }
+                        this.textChangeCallback = (text: string) => { onChange({'target': {'value': text}}); };
+                        textInput.OnTextChanged.Add(this.textChangeCallback);
+                    }
+                } else if (widget instanceof UE.CheckBox) {
+                    let checkbox = widget as UE.CheckBox;
+                    let onChange = props['onChange'];
+                    if (typeof onChange === 'function') {
+                        if (update) {
+                            checkbox.OnCheckStateChanged.Remove(this.checkboxChangeCallback);
+                        }
+                        this.checkboxChangeCallback = (isChecked: boolean) => { onChange({'target': {'checked': isChecked}}); };
+                        checkbox.OnCheckStateChanged.Add(this.checkboxChangeCallback);
+                    }
+                }
+            }
+        };
+    }
+
+    initOrUpdateWidgetProperties(initPropsName: string[], widget: UE.Widget, propsValue: any, isUpdate: boolean) {
+        for (let propName of initPropsName) {
+            if (propName in this.propertySetters) {
+                this.propertySetters[propName](widget, propsValue);
+            }
+
+            if (propName in this.eventSetters) {
+                this.eventSetters[propName](widget, propsValue, isUpdate);
+            }
+        }
     }
 
     override convertToWidget(): UE.Widget {
-        return undefined;
-    }
+        let inputType = this.props['type'];
+        if (!inputType) {
+            inputType = 'text';
+        }
 
-    addChild(child: any) {
-        this.children.push(child);
-    }
+        let returnWidget: UE.Widget;
 
-    getChildren() {
-        return this.children;
-    }
+        if (inputType == 'text') {
+            let textInput = new UE.EditableText();
+            this.initOrUpdateWidgetProperties(['onChange', 'placeholder', 'defaultValue', 'disabled', 'readOnly'], textInput, this.props, false);
 
-    render() {
-        console.log("Rendering container with children:", this.children);
+            returnWidget = textInput;
+        } else if (inputType == 'checkbox') {
+            let checkbox = new UE.CheckBox();
+
+            this.initOrUpdateWidgetProperties(['onChange', 'checked'], checkbox, this.props, false);
+
+            returnWidget == checkbox;
+        } else if (inputType == 'password') {
+            let passwordInput = new UE.EditableText();
+            passwordInput.SetIsPassword(true);
+            this.initOrUpdateWidgetProperties(['onChange', 'defaultValue', 'readOnly'], passwordInput, this.props, false);
+
+            returnWidget = passwordInput;
+        }
+
+        return returnWidget;
     }
 
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
-        return;
+        let propsChange = false;
+        let oldType = oldProps['type'];
+        let newType = newProps['type'];
+        if (oldType != newType) {
+            console.error('Cannot change input type');
+            return propsChange;
+        }
+
+        // todo@Caleb196x: update style
+
+        for(var key in newProps) {
+            if (key == 'type') continue;
+
+            let oldProp = oldProps[key];
+            let newProp = newProps[key];
+
+            if (oldProp != newProp) {
+
+                if (newType == 'text' && widget instanceof UE.EditableText) {
+                    this.initOrUpdateWidgetProperties(['onChange', 'placeholder', 'defaultValue', 'disabled', 'readOnly'], widget, newProps, true);
+                } else if (newType == 'checkbox' && widget instanceof UE.CheckBox) {
+                    this.initOrUpdateWidgetProperties(['onChange', 'checked'], widget, this.props, true);
+                } else if (newType == 'password' && widget instanceof UE.EditableText) {
+                    this.initOrUpdateWidgetProperties(['onChange', 'defaultValue', 'readOnly'], widget, this.props, true);
+                }
+                
+                propsChange = true;
+            }
+        }
+
+        return propsChange;
     }
 
     override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {
@@ -385,14 +504,38 @@ class ContainerWrapper extends ComponentWrapper {
 class ProgressBarWrapper extends ComponentWrapper {
     constructor(type: string, props: any) {
         super();
+        this.typeName = type;
+        this.props = props;
     }
 
-    convertToWidget(): UE.Widget {
-        return undefined;
+    override convertToWidget(): UE.Widget {
+        let progressBar = new UE.ProgressBar();
+        let progressVal = this.props['value'] || 0.0; // Default to 0 if not provided
+        let maxVal = this.props['max'] || 100.0; // Default to false if not provided
+        let precent: number = progressVal / maxVal;
+
+        progressBar.SetPercent(precent);
+        return progressBar;
     }
 
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
-        return;
+        let propsChange = false;
+        let progressBar = widget as UE.ProgressBar;
+
+        let oldVal = oldProps['value'];
+        let newVal = newProps['value'];
+
+        let newMaxVal = newProps['max'];
+
+        if (oldVal != newVal) {
+            let precent: number = newVal / newMaxVal;
+            progressBar.SetPercent(precent);
+            propsChange = true;
+        }
+
+        // todo@Caleb196x: update style
+
+        return propsChange;
     }
 
     override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {
@@ -454,6 +597,24 @@ class ListViewWrapper extends ComponentWrapper {
     }
 };
 
+class TextareaWrapper extends ComponentWrapper {
+    constructor(type: string, props: any) {
+        super();
+    }
+
+    convertToWidget(): UE.Widget {
+        return undefined;
+    }
+
+    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
+        return;
+    }
+
+    override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {
+        return undefined;
+    }
+}
+
 class TextBlockWrapper extends ComponentWrapper {
     constructor(type: string, props: any) {
         super();
@@ -472,13 +633,46 @@ class TextBlockWrapper extends ComponentWrapper {
     }
 };
 
+class ContainerWrapper extends ComponentWrapper {
+    private children: any[];
+
+    constructor(type: string, props: any) {
+        super();
+        this.children = [];
+    }
+
+    override convertToWidget(): UE.Widget {
+        return undefined;
+    }
+
+    addChild(child: any) {
+        this.children.push(child);
+    }
+
+    getChildren() {
+        return this.children;
+    }
+
+    render() {
+        console.log("Rendering container with children:", this.children);
+    }
+
+    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
+        return;
+    }
+
+    override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {
+        return undefined;
+    }
+};
+
 const baseComponentsMap: Record<string, any> = {
     // base
     "select": SelectWrapper,
     "option": SelectWrapper,
     "button": ButtonWrapper,
-    "textarea": "MultiLineEditableTextWrapper",
-    "progress": "ProgressBarWrapper",
+    "textarea": TextareaWrapper,
+    "progress": ProgressBarWrapper,
     "img": "ImageWrapper",
 
     // 列表
@@ -492,7 +686,7 @@ const baseComponentsMap: Record<string, any> = {
     "a": "RichTextBlockWrapper",
 
     // input
-    "input": "inputWrapper",
+    "input": inputWrapper,
     
     // Text
     "span": "TextBlockWrapper",
@@ -552,6 +746,7 @@ export function updateUMGWidgetPropertyUsingReactComponentProperty(widget: UE.Wi
     if (propsChange && !isEmpty(updateProps))
     {
         puerts.merge(widget, updateProps);
+    } else if (propsChange) {
         UE.UMGManager.SynchronizeWidgetProperties(widget)
     }
 

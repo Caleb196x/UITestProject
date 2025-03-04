@@ -83,6 +83,7 @@ class SelectWrapper extends ComponentWrapper {
             console.log("Do not update anything for option");
             return false;
         }
+        // todo@Caleb196x: update style
         for (var key in newProps) {
             let oldProp = oldProps[key];
             let newProp = newProps[key];
@@ -210,6 +211,7 @@ class ButtonWrapper extends ComponentWrapper {
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
         let propsChange = false;
         let button = widget;
+        // todo@Caleb196x: update style
         for (var key in newProps) {
             let oldProp = oldProps[key];
             let newProp = newProps[key];
@@ -281,40 +283,146 @@ class ButtonWrapper extends ComponentWrapper {
 }
 ;
 class inputWrapper extends ComponentWrapper {
+    textChangeCallback;
+    checkboxChangeCallback;
+    propertySetters;
+    eventSetters;
     constructor(type, props) {
         super();
+        this.typeName = type;
+        this.props = props;
+        this.setupPropertySetters();
+        this.setupEventSetters();
+    }
+    setupPropertySetters() {
+        this.propertySetters = {
+            'placeholder': (widget, props) => {
+                let textInput = widget;
+                let placeHolder = props['placeholder'];
+                if (placeHolder) {
+                    textInput.SetHintText(placeHolder);
+                }
+            },
+            'defaultValue': (widget, props) => {
+                let textInput = widget;
+                let defaultValue = props['defaultValue'];
+                if (defaultValue) {
+                    textInput.SetText(defaultValue);
+                }
+            },
+            'disabled': (widget, props) => {
+                let textInput = widget;
+                let disabled = props['disabled'];
+                if (disabled) {
+                    textInput.SetIsEnabled(false);
+                }
+            },
+            'readOnly': (widget, props) => {
+                let textInput = widget;
+                let readOnly = props['readOnly'];
+                if (readOnly) {
+                    textInput.SetIsReadOnly(true);
+                }
+            },
+            'checked': (widget, props) => {
+                let checkbox = widget;
+                let checked = props['checked'];
+                if (checked) {
+                    checkbox.SetIsChecked(true);
+                }
+            }
+        };
+    }
+    setupEventSetters() {
+        this.eventSetters = {
+            'onChange': (widget, props, update) => {
+                if (widget instanceof UE.EditableText) {
+                    let textInput = widget;
+                    let onChange = props['onChange'];
+                    if (typeof onChange === 'function') {
+                        if (update) {
+                            textInput.OnTextChanged.Remove(this.textChangeCallback);
+                        }
+                        this.textChangeCallback = (text) => { onChange({ 'target': { 'value': text } }); };
+                        textInput.OnTextChanged.Add(this.textChangeCallback);
+                    }
+                }
+                else if (widget instanceof UE.CheckBox) {
+                    let checkbox = widget;
+                    let onChange = props['onChange'];
+                    if (typeof onChange === 'function') {
+                        if (update) {
+                            checkbox.OnCheckStateChanged.Remove(this.checkboxChangeCallback);
+                        }
+                        this.checkboxChangeCallback = (isChecked) => { onChange({ 'target': { 'checked': isChecked } }); };
+                        checkbox.OnCheckStateChanged.Add(this.checkboxChangeCallback);
+                    }
+                }
+            }
+        };
+    }
+    initOrUpdateWidgetProperties(initPropsName, widget, propsValue, isUpdate) {
+        for (let propName of initPropsName) {
+            if (propName in this.propertySetters) {
+                this.propertySetters[propName](widget, propsValue);
+            }
+            if (propName in this.eventSetters) {
+                this.eventSetters[propName](widget, propsValue, isUpdate);
+            }
+        }
     }
     convertToWidget() {
-        return undefined;
+        let inputType = this.props['type'];
+        if (!inputType) {
+            inputType = 'text';
+        }
+        let returnWidget;
+        if (inputType == 'text') {
+            let textInput = new UE.EditableText();
+            this.initOrUpdateWidgetProperties(['onChange', 'placeholder', 'defaultValue', 'disabled', 'readOnly'], textInput, this.props, false);
+            returnWidget = textInput;
+        }
+        else if (inputType == 'checkbox') {
+            let checkbox = new UE.CheckBox();
+            this.initOrUpdateWidgetProperties(['onChange', 'checked'], checkbox, this.props, false);
+            returnWidget == checkbox;
+        }
+        else if (inputType == 'password') {
+            let passwordInput = new UE.EditableText();
+            passwordInput.SetIsPassword(true);
+            this.initOrUpdateWidgetProperties(['onChange', 'defaultValue', 'readOnly'], passwordInput, this.props, false);
+            returnWidget = passwordInput;
+        }
+        return returnWidget;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
-        return;
-    }
-    convertReactEventToWidgetEvent(reactProp, originCallback) {
-        return undefined;
-    }
-}
-;
-class ContainerWrapper extends ComponentWrapper {
-    children;
-    constructor(type, props) {
-        super();
-        this.children = [];
-    }
-    convertToWidget() {
-        return undefined;
-    }
-    addChild(child) {
-        this.children.push(child);
-    }
-    getChildren() {
-        return this.children;
-    }
-    render() {
-        console.log("Rendering container with children:", this.children);
-    }
-    updateWidgetProperty(widget, oldProps, newProps, updateProps) {
-        return;
+        let propsChange = false;
+        let oldType = oldProps['type'];
+        let newType = newProps['type'];
+        if (oldType != newType) {
+            console.error('Cannot change input type');
+            return propsChange;
+        }
+        // todo@Caleb196x: update style
+        for (var key in newProps) {
+            if (key == 'type')
+                continue;
+            let oldProp = oldProps[key];
+            let newProp = newProps[key];
+            if (oldProp != newProp) {
+                if (newType == 'text' && widget instanceof UE.EditableText) {
+                    this.initOrUpdateWidgetProperties(['onChange', 'placeholder', 'defaultValue', 'disabled', 'readOnly'], widget, newProps, true);
+                }
+                else if (newType == 'checkbox' && widget instanceof UE.CheckBox) {
+                    this.initOrUpdateWidgetProperties(['onChange', 'checked'], widget, this.props, true);
+                }
+                else if (newType == 'password' && widget instanceof UE.EditableText) {
+                    this.initOrUpdateWidgetProperties(['onChange', 'defaultValue', 'readOnly'], widget, this.props, true);
+                }
+                propsChange = true;
+            }
+        }
+        return propsChange;
     }
     convertReactEventToWidgetEvent(reactProp, originCallback) {
         return undefined;
@@ -324,12 +432,30 @@ class ContainerWrapper extends ComponentWrapper {
 class ProgressBarWrapper extends ComponentWrapper {
     constructor(type, props) {
         super();
+        this.typeName = type;
+        this.props = props;
     }
     convertToWidget() {
-        return undefined;
+        let progressBar = new UE.ProgressBar();
+        let progressVal = this.props['value'] || 0.0; // Default to 0 if not provided
+        let maxVal = this.props['max'] || 100.0; // Default to false if not provided
+        let precent = progressVal / maxVal;
+        progressBar.SetPercent(precent);
+        return progressBar;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
-        return;
+        let propsChange = false;
+        let progressBar = widget;
+        let oldVal = oldProps['value'];
+        let newVal = newProps['value'];
+        let newMaxVal = newProps['max'];
+        if (oldVal != newVal) {
+            let precent = newVal / newMaxVal;
+            progressBar.SetPercent(precent);
+            propsChange = true;
+        }
+        // todo@Caleb196x: update style
+        return propsChange;
     }
     convertReactEventToWidgetEvent(reactProp, originCallback) {
         return undefined;
@@ -381,6 +507,20 @@ class ListViewWrapper extends ComponentWrapper {
     }
 }
 ;
+class TextareaWrapper extends ComponentWrapper {
+    constructor(type, props) {
+        super();
+    }
+    convertToWidget() {
+        return undefined;
+    }
+    updateWidgetProperty(widget, oldProps, newProps, updateProps) {
+        return;
+    }
+    convertReactEventToWidgetEvent(reactProp, originCallback) {
+        return undefined;
+    }
+}
 class TextBlockWrapper extends ComponentWrapper {
     constructor(type, props) {
         super();
@@ -396,13 +536,39 @@ class TextBlockWrapper extends ComponentWrapper {
     }
 }
 ;
+class ContainerWrapper extends ComponentWrapper {
+    children;
+    constructor(type, props) {
+        super();
+        this.children = [];
+    }
+    convertToWidget() {
+        return undefined;
+    }
+    addChild(child) {
+        this.children.push(child);
+    }
+    getChildren() {
+        return this.children;
+    }
+    render() {
+        console.log("Rendering container with children:", this.children);
+    }
+    updateWidgetProperty(widget, oldProps, newProps, updateProps) {
+        return;
+    }
+    convertReactEventToWidgetEvent(reactProp, originCallback) {
+        return undefined;
+    }
+}
+;
 const baseComponentsMap = {
     // base
     "select": SelectWrapper,
     "option": SelectWrapper,
     "button": ButtonWrapper,
-    "textarea": "MultiLineEditableTextWrapper",
-    "progress": "ProgressBarWrapper",
+    "textarea": TextareaWrapper,
+    "progress": ProgressBarWrapper,
     "img": "ImageWrapper",
     // 列表
     "ul": "ListViewWrapper",
@@ -413,7 +579,7 @@ const baseComponentsMap = {
     "mark": "RichTextBlockWrapper",
     "a": "RichTextBlockWrapper",
     // input
-    "input": "inputWrapper",
+    "input": inputWrapper,
     // Text
     "span": "TextBlockWrapper",
     "p": "TextBlockWrapper",
@@ -456,6 +622,8 @@ function updateUMGWidgetPropertyUsingReactComponentProperty(widget, wrapper, old
     }
     if (propsChange && !isEmpty(updateProps)) {
         puerts.merge(widget, updateProps);
+    }
+    else if (propsChange) {
         UE.UMGManager.SynchronizeWidgetProperties(widget);
     }
     return propsChange;

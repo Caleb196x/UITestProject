@@ -10,6 +10,7 @@ class MainComponent extends React.Component {
         this.state = {
             username: 'test.name',
             password: '',
+            progressVal: 0.0,
         };
     }
     handleLogin = () => {
@@ -48,13 +49,19 @@ class MainComponent extends React.Component {
                     React.createElement(reactUMG_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
                 React.createElement(reactUMG_1.HorizontalBox, null,
                     React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'),
-                    React.createElement(status_bar_compoennt_1.StatusBar, { name: 'Healthy: ', initialPercent: 60 }),
-                    React.createElement("button", { style: this.buttonStyle }, "\u6D4B\u8BD5\u539F\u751F\u6309\u94AE")),
-                React.createElement("select", { defaultValue: "C", onChange: (e) => { console.log("onChange: ", e.target); } },
-                    React.createElement("option", { value: "A" }, "a"),
-                    React.createElement("option", { value: "B" }, "b"),
-                    React.createElement("option", { value: "C" }, "c"),
-                    React.createElement("option", { value: "D" }, "d"))));
+                    React.createElement(status_bar_compoennt_1.StatusBar, { name: 'Healthy: ', initialPercent: 60 })),
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement("input", { type: 'text', value: this.state.username, onChange: (e) => this.setState({ username: e.target.value }), placeholder: '\u8F93\u5165\u5185\u5BB9...', "aria-label": '\u7528\u6237\u540D', required: true }),
+                    React.createElement("button", { style: this.buttonStyle, onClick: () => this.handleLogin() }, "\u6D4B\u8BD5\u539F\u751F\u6309\u94AE")),
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement("select", { defaultValue: "C", onChange: (e) => { console.log("onChange: ", e.target); } },
+                        React.createElement("option", { value: "A" }, "a"),
+                        React.createElement("option", { value: "B" }, "b"),
+                        React.createElement("option", { value: "C" }, "c"),
+                        React.createElement("option", { value: "D" }, "d")),
+                    React.createElement("progress", { value: this.state.progressVal, max: 100 }, "\u8FDB\u5EA6\u6761"),
+                    React.createElement("button", { onClick: () => { this.setState({ progressVal: Math.min(this.state.progressVal + 5, 100) }); } }, "\u589E\u52A0\u8FDB\u5EA6"),
+                    React.createElement("button", { onClick: () => { this.setState({ progressVal: Math.max(this.state.progressVal - 5, 0) }); } }, "\u51CF\u5C11\u8FDB\u5EA6"))));
     }
 }
 exports.MainComponent = MainComponent;

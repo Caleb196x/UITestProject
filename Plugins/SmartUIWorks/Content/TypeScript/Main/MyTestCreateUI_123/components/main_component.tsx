@@ -8,6 +8,7 @@ import { ButtonSlot, ButtonStyle, LinearColor, ESlateColorStylingMode, Margin} f
 interface State {
     username: string;
     password: string;
+    progressVal: number;
 }
 
 export class MainComponent extends React.Component<Props, State> {
@@ -16,6 +17,7 @@ export class MainComponent extends React.Component<Props, State> {
         this.state = {
             username: 'test.name',
             password: '',
+            progressVal: 0.0,
         };
     }
 
@@ -65,14 +67,27 @@ export class MainComponent extends React.Component<Props, State> {
                     {'Login'}
                 </Button>
                 <StatusBar name={'Healthy: '} initialPercent={60}></StatusBar>
-                <button style={this.buttonStyle}>测试原生按钮</button>
                 </HorizontalBox>
-                <select defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
-                    <option value={"A"}>a</option>
-                    <option value={"B"}>b</option>
-                    <option value={"C"}>c</option>
-                    <option value={"D"}>d</option>
-                </select>
+                <HorizontalBox>
+                    <input type='text' value={this.state.username} onChange={(e)=>this.setState({username: e.target.value})} 
+                                placeholder='输入内容...' aria-label='用户名' required/>
+                    <button style={this.buttonStyle} onClick={()=>this.handleLogin()}>测试原生按钮</button>
+                </HorizontalBox>
+                <HorizontalBox>
+                    <select defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
+                        <option value={"A"}>a</option>
+                        <option value={"B"}>b</option>
+                        <option value={"C"}>c</option>
+                        <option value={"D"}>d</option>
+                    </select>
+
+                    <progress value={this.state.progressVal} max={100}>
+                        进度条
+                    </progress>
+                    <button onClick={()=>{this.setState({progressVal: Math.min(this.state.progressVal + 5, 100)})}}>增加进度</button>
+                    <button onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>
+                </HorizontalBox>
+
             </VerticalBox>
         </CanvasPanel>
     }
