@@ -75,7 +75,7 @@ var global = global || (function () { return this; }());
                 scriptId = parsedScript.get(win_url)
             }
         }
-        
+         
         if (scriptId) {
             if (typeof source === "string") {
                 let orgSourceInfo = await sendCommand("Debugger.getScriptSource", {scriptId:"" + scriptId});

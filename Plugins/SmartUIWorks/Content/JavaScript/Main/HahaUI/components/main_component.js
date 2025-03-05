@@ -41,7 +41,7 @@ class MainComponent extends React.Component {
                         React.createElement("option", null, "test1"),
                         React.createElement("option", null, "test2"))),
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement("button", { onClick: () => { console.log("hello"); }, onMouseDown: () => { console.log("mouse down and press"); }, onMouseUp: () => { console.log("mouse up and release"); }, onMouseEnter: () => { console.log("mouse enter"); }, onMouseLeave: () => { console.log("mouse leave"); } }, '原生按钮'))));
+                    React.createElement("button", { onClick: () => { console.log("hello"); }, onMouseDown: () => { console.log("mouse down and press"); }, onMouseUp: () => { console.log("mouse up and release"); }, onMouseEnter: () => { console.log("mouse enter"); }, onMouseLeave: () => { console.log("mouse leave"); }, title: 'hello' }, '原生按钮'))));
     }
 }
 exports.MainComponent = MainComponent;

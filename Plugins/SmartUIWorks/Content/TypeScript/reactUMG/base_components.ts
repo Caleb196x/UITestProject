@@ -565,10 +565,35 @@ class ProgressBarWrapper extends ComponentWrapper {
 class ImageWrapper extends ComponentWrapper {
     constructor(type: string, props: any) {
         super();
+        this.typeName = type;
+        this.props = props;
     }
 
     convertToWidget(): UE.Widget {
-        return undefined;
+        // 关键问题：如何解决图片导入的问题
+        // 功能设想
+        // 1. 使用import image from '图片路径'的方式导入一张图片，image在UE中的类型为UTexture， 可以直接设置到img标签的src属性中
+        // 2. 在img标签的src属性中写入图片路径，在创建对应widget时再导入图片
+        // 
+        // 实现思路：
+        // 1. hook ts的import逻辑，实现导入流程
+        // 2. hook js的require逻辑，实现图片的导入；只导入一次，以及通过hash值对比文件是否发生变化，如果发生变化，重新导入
+        // 3. 图片导入时，首先读取图片数据，调用ImportFileAsTexture2D API来创建UTexture（创建后是否能够将UTexture保存为本地uasset资产文件？）（思考如何做异步和批量导入，做性能优化）
+        // 4. 读取img的标签属性，例如src, width, height
+        
+        
+        let imageWidgt = new UE.Image();
+        let srcImage = this.props['src'];
+        if (srcImage) {
+            imageWidgt.SetBrushFromTexture(srcImage, true);
+        }
+
+        // todo@Caleb196x: 在style中去设置width和height
+        // todo@Caleb196x: 
+        let width = this.props['width'];
+        let height = this.props['height'];
+
+        return imageWidgt;
     }
 
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
@@ -703,7 +728,7 @@ const baseComponentsMap: Record<string, any> = {
     "button": ButtonWrapper,
     "textarea": TextareaWrapper,
     "progress": ProgressBarWrapper,
-    "img": "ImageWrapper",
+    "img": ImageWrapper,
 
     // 列表
     "ul": "ListViewWrapper",
