@@ -4,6 +4,7 @@ exports.MainComponent = void 0;
 const React = require("react");
 const reactUMG_1 = require("reactUMG");
 const ue_1 = require("ue");
+const face_png_1 = require("../assets/face.png");
 class MainComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -39,9 +40,13 @@ class MainComponent extends React.Component {
                 React.createElement(reactUMG_1.HorizontalBox, null,
                     React.createElement("select", { onChange: (e) => this.handleLogin(), defaultValue: 'test1' },
                         React.createElement("option", null, "test1"),
-                        React.createElement("option", null, "test2"))),
+                        React.createElement("option", null, "test2")),
+                    React.createElement("textarea", { onSubmit: (e) => { console.log(e.target); } })),
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement("button", { onClick: () => { console.log("hello"); }, onMouseDown: () => { console.log("mouse down and press"); }, onMouseUp: () => { console.log("mouse up and release"); }, onMouseEnter: () => { console.log("mouse enter"); }, onMouseLeave: () => { console.log("mouse leave"); }, title: 'hello' }, '原生按钮'))));
+                    React.createElement("button", { onClick: () => { console.log("hello"); }, onMouseDown: () => { console.log("mouse down and press"); }, onMouseUp: () => { console.log("mouse up and release"); }, onMouseEnter: () => { console.log("mouse enter"); }, onMouseLeave: () => { console.log("mouse leave"); }, title: 'hello' }, '原生按钮')),
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement("img", { src: face_png_1.default, width: 512, height: 512 }),
+                    React.createElement("textarea", { defaultValue: '默认内容', placeholder: '\u8BF7\u8F93\u5165\u591A\u884C\u5185\u5BB9...', onChange: (e) => { console.log("on change: " + e.target.value); }, onSubmit: (e) => { console.log("on submit: " + e.target); }, onBlur: (e) => { console.log("on blue: " + e.target.value); } }))));
     }
 }
 exports.MainComponent = MainComponent;

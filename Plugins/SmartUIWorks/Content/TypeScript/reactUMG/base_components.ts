@@ -411,7 +411,7 @@ class inputWrapper extends ComponentWrapper {
                     let textInput = widget as UE.EditableText;
                     let onChange = props['onChange'];
                     if (typeof onChange === 'function') {
-                        if (update) {
+                        if (update && this.checkboxChangeCallback) {
                             textInput.OnTextChanged.Remove(this.textChangeCallback);
                         }
                         this.textChangeCallback = (text: string) => { onChange({'target': {'value': text}}); };
@@ -421,7 +421,7 @@ class inputWrapper extends ComponentWrapper {
                     let checkbox = widget as UE.CheckBox;
                     let onChange = props['onChange'];
                     if (typeof onChange === 'function') {
-                        if (update) {
+                        if (update && this.checkboxChangeCallback) {
                             checkbox.OnCheckStateChanged.Remove(this.checkboxChangeCallback);
                         }
                         this.checkboxChangeCallback = (isChecked: boolean) => { onChange({'target': {'checked': isChecked}}); };
@@ -569,7 +569,7 @@ class ImageWrapper extends ComponentWrapper {
         this.props = props;
     }
 
-    convertToWidget(): UE.Widget {
+    override convertToWidget(): UE.Widget {
         // 关键问题：如何解决图片导入的问题
         // 功能设想
         // 1. 使用import image from '图片路径'的方式导入一张图片，image在UE中的类型为UTexture， 可以直接设置到img标签的src属性中
@@ -584,7 +584,17 @@ class ImageWrapper extends ComponentWrapper {
         
         let imageWidgt = new UE.Image();
         let srcImage = this.props['src'];
-        if (srcImage) {
+        if (typeof srcImage ==  'string') {
+            // todo@Caleb196x: 如果是网络图片，则需要先下载到本地，同时还要加入缓存，防止每次都下载
+
+            let fullpath = srcImage;
+            // todo@Caleb196x: 获取文件全路径，判断文件是否存在
+            let texture = UE.KismetRenderingLibrary.ImportFileAsTexture2D(null, fullpath);
+            // todo@Caleb196x: 将texture加入全局缓存，如果是相同路径，直接读缓存数据
+            if (texture) {
+                imageWidgt.SetBrushFromTexture(texture, true);
+            }
+        } else if (srcImage) {
             imageWidgt.SetBrushFromTexture(srcImage, true);
         }
 
@@ -653,16 +663,141 @@ class ListViewWrapper extends ComponentWrapper {
 };
 
 class TextareaWrapper extends ComponentWrapper {
+    private propertySetters: Record<string, (widget: UE.MultiLineEditableText) => void>;
+    private eventSetters: Record<string, (widget: UE.MultiLineEditableText, update: boolean) => void>;
+    private onTextChange: (Text: string) => void;
+    private onTextSubmit: (Text: string, CommitMethod: UE.ETextCommit) => void;
+    private onLostFocus: (Text: string, CommitMethod: UE.ETextCommit) => void;
+
     constructor(type: string, props: any) {
         super();
+        this.typeName = type;
+        this.props = props;
+        this.setupPropertySetters();
+        this.setupEventSetters();
     }
 
-    convertToWidget(): UE.Widget {
-        return undefined;
+    setupPropertySetters() {
+        this.propertySetters = {
+            'value': (widget: UE.MultiLineEditableText) => {
+                let textVal = this.props['value'];
+                if (textVal) {
+                    widget.SetText(textVal);
+                }
+            },
+            'defaultValue': (widget: UE.MultiLineEditableText) => {
+                let textVal = this.props['value'];
+                if (textVal) {
+                    widget.SetText(textVal);
+                }
+            },
+            'placeholder':  (widget: UE.MultiLineEditableText) => {
+                let placeholder = this.props['placeholder'];
+                if (placeholder) {
+                    widget.SetHintText(placeholder);
+                }
+            },
+            'readOnly': (widget: UE.MultiLineEditableText) => {
+                let readOnly = this.props['readOnly'];
+                if (readOnly) {
+                    widget.SetIsReadOnly(readOnly);
+                }
+            },
+            'disabled': (widget: UE.MultiLineEditableText) => {
+                let disabled = this.props['disabled'];
+                if (disabled) {
+                    widget.SetIsEnabled(!disabled);
+                }
+            },
+        };
+    }
+
+    setupEventSetters() {
+        this.eventSetters = {
+            'onChange': (widget: UE.MultiLineEditableText, update: boolean) => {
+                let onChange = this.props['onChange'];
+                if (onChange) {
+                    if (update && this.onTextChange) {
+                        widget.OnTextChanged.Remove(this.onTextChange);
+                    }
+                    this.onTextChange = (Text: string) => { onChange({'target': {'value': Text}}); };
+                    widget.OnTextChanged.Add(this.onTextChange);
+                }
+            },
+            'onSubmit': (widget: UE.MultiLineEditableText, update: boolean) => {
+                let onSubmit = this.props['onSubmit'];
+                if (onSubmit) {
+                    if (update && this.onTextSubmit) {
+                        widget.OnTextCommitted.Remove(this.onTextSubmit);
+                    }
+
+                    this.onTextSubmit = (Text: string, commitMethod: UE.ETextCommit) => {
+                        if (commitMethod == UE.ETextCommit.Default) {
+                            onSubmit({'target': Text});
+                        }
+                     };
+                    widget.OnTextCommitted.Add(this.onTextSubmit);
+                }
+            },
+            'onBlur': (widget: UE.MultiLineEditableText, update: boolean) => {
+                let onBlur = this.props['onBlur'];
+                if (onBlur) {
+                    if (update && this.onLostFocus) {
+                        widget.OnTextCommitted.Remove(this.onLostFocus);
+                    }
+
+                    this.onLostFocus = (Text: string, commitMethod: UE.ETextCommit) => {
+                        if (commitMethod == UE.ETextCommit.OnUserMovedFocus) {
+                            onBlur({'target': {'value': Text}});
+                        }
+                     };
+                    widget.OnTextCommitted.Add(this.onLostFocus);
+                }
+            },
+        };
+    }
+
+    override convertToWidget(): UE.Widget {
+        let multiLineText = new UE.MultiLineEditableText();
+
+        this.propertySetters['value'](multiLineText);
+        this.propertySetters['defaultValue'](multiLineText);
+        this.propertySetters['placeholder'](multiLineText);
+        this.propertySetters['readOnly'](multiLineText);
+        this.propertySetters['disabled'](multiLineText);
+
+        this.eventSetters['onChange'](multiLineText, false);
+        this.eventSetters['onSubmit'](multiLineText, false);
+        this.eventSetters['onBlur'](multiLineText, false);
+
+        return multiLineText;
     }
 
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
-        return;
+        let multiLine = widget as UE.MultiLineEditableText;
+        let propsChange = false;
+
+        for (var key in newProps) {
+            if (key in this.propertySetters) {
+                let oldProp = oldProps[key];
+                let newProp = newProps[key];
+                if (oldProp != newProp) {
+                    this.propertySetters[key](multiLine);
+                    propsChange = true;
+                }
+            }
+
+            if (key in this.eventSetters) {
+                let oldProp = oldProps[key];
+                let newProp = newProps[key];
+                if (oldProp != newProp) {
+                    this.eventSetters[key](multiLine, true);
+                    propsChange = true;
+                }
+            }
+        }
+
+        return propsChange;
     }
 
     override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {

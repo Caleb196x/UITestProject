@@ -350,7 +350,7 @@ class inputWrapper extends ComponentWrapper {
                     let textInput = widget;
                     let onChange = props['onChange'];
                     if (typeof onChange === 'function') {
-                        if (update) {
+                        if (update && this.checkboxChangeCallback) {
                             textInput.OnTextChanged.Remove(this.textChangeCallback);
                         }
                         this.textChangeCallback = (text) => { onChange({ 'target': { 'value': text } }); };
@@ -361,7 +361,7 @@ class inputWrapper extends ComponentWrapper {
                     let checkbox = widget;
                     let onChange = props['onChange'];
                     if (typeof onChange === 'function') {
-                        if (update) {
+                        if (update && this.checkboxChangeCallback) {
                             checkbox.OnCheckStateChanged.Remove(this.checkboxChangeCallback);
                         }
                         this.checkboxChangeCallback = (isChecked) => { onChange({ 'target': { 'checked': isChecked } }); };
@@ -495,10 +495,21 @@ class ImageWrapper extends ComponentWrapper {
         // 4. 读取img的标签属性，例如src, width, height
         let imageWidgt = new UE.Image();
         let srcImage = this.props['src'];
-        if (srcImage) {
+        if (typeof srcImage == 'string') {
+            // todo@Caleb196x: 如果是网络图片，则需要先下载到本地，同时还要加入缓存，防止每次都下载
+            let fullpath = srcImage;
+            // todo@Caleb196x: 获取文件全路径，判断文件是否存在
+            let texture = UE.KismetRenderingLibrary.ImportFileAsTexture2D(null, fullpath);
+            // todo@Caleb196x: 将texture加入全局缓存，如果是相同路径，直接读缓存数据
+            if (texture) {
+                imageWidgt.SetBrushFromTexture(texture, true);
+            }
+        }
+        else if (srcImage) {
             imageWidgt.SetBrushFromTexture(srcImage, true);
         }
         // todo@Caleb196x: 在style中去设置width和height
+        // todo@Caleb196x: 
         let width = this.props['width'];
         let height = this.props['height'];
         return imageWidgt;
@@ -549,14 +560,128 @@ class ListViewWrapper extends ComponentWrapper {
 }
 ;
 class TextareaWrapper extends ComponentWrapper {
+    propertySetters;
+    eventSetters;
+    onTextChange;
+    onTextSubmit;
+    onLostFocus;
     constructor(type, props) {
         super();
+        this.typeName = type;
+        this.props = props;
+        this.setupPropertySetters();
+        this.setupEventSetters();
+    }
+    setupPropertySetters() {
+        this.propertySetters = {
+            'value': (widget) => {
+                let textVal = this.props['value'];
+                if (textVal) {
+                    widget.SetText(textVal);
+                }
+            },
+            'defaultValue': (widget) => {
+                let textVal = this.props['value'];
+                if (textVal) {
+                    widget.SetText(textVal);
+                }
+            },
+            'placeholder': (widget) => {
+                let placeholder = this.props['placeholder'];
+                if (placeholder) {
+                    widget.SetHintText(placeholder);
+                }
+            },
+            'readOnly': (widget) => {
+                let readOnly = this.props['readOnly'];
+                if (readOnly) {
+                    widget.SetIsReadOnly(readOnly);
+                }
+            },
+            'disabled': (widget) => {
+                let disabled = this.props['disabled'];
+                if (disabled) {
+                    widget.SetIsEnabled(!disabled);
+                }
+            },
+        };
+    }
+    setupEventSetters() {
+        this.eventSetters = {
+            'onChange': (widget, update) => {
+                let onChange = this.props['onChange'];
+                if (onChange) {
+                    if (update && this.onTextChange) {
+                        widget.OnTextChanged.Remove(this.onTextChange);
+                    }
+                    this.onTextChange = (Text) => { onChange({ 'target': { 'value': Text } }); };
+                    widget.OnTextChanged.Add(this.onTextChange);
+                }
+            },
+            'onSubmit': (widget, update) => {
+                let onSubmit = this.props['onSubmit'];
+                if (onSubmit) {
+                    if (update && this.onTextSubmit) {
+                        widget.OnTextCommitted.Remove(this.onTextSubmit);
+                    }
+                    this.onTextSubmit = (Text, commitMethod) => {
+                        if (commitMethod == UE.ETextCommit.OnEnter) {
+                            onSubmit({ 'target': Text });
+                        }
+                    };
+                    widget.OnTextCommitted.Add(this.onTextSubmit);
+                }
+            },
+            'onBlur': (widget, update) => {
+                let onBlur = this.props['onBlur'];
+                if (onBlur) {
+                    if (update && this.onLostFocus) {
+                        widget.OnTextCommitted.Remove(this.onLostFocus);
+                    }
+                    this.onLostFocus = (Text, commitMethod) => {
+                        if (commitMethod == UE.ETextCommit.OnUserMovedFocus) {
+                            onBlur({ 'target': { 'value': Text } });
+                        }
+                    };
+                    widget.OnTextCommitted.Add(this.onLostFocus);
+                }
+            },
+        };
     }
     convertToWidget() {
-        return undefined;
+        let multiLineText = new UE.MultiLineEditableText();
+        this.propertySetters['value'](multiLineText);
+        this.propertySetters['defaultValue'](multiLineText);
+        this.propertySetters['placeholder'](multiLineText);
+        this.propertySetters['readOnly'](multiLineText);
+        this.propertySetters['disabled'](multiLineText);
+        this.eventSetters['onChange'](multiLineText, false);
+        this.eventSetters['onSubmit'](multiLineText, false);
+        this.eventSetters['onBlur'](multiLineText, false);
+        return multiLineText;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
-        return;
+        let multiLine = widget;
+        let propsChange = false;
+        for (var key in newProps) {
+            if (key in this.propertySetters) {
+                let oldProp = oldProps[key];
+                let newProp = newProps[key];
+                if (oldProp != newProp) {
+                    this.propertySetters[key](multiLine);
+                    propsChange = true;
+                }
+            }
+            if (key in this.eventSetters) {
+                let oldProp = oldProps[key];
+                let newProp = newProps[key];
+                if (oldProp != newProp) {
+                    this.eventSetters[key](multiLine, true);
+                    propsChange = true;
+                }
+            }
+        }
+        return propsChange;
     }
     convertReactEventToWidgetEvent(reactProp, originCallback) {
         return undefined;

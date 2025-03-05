@@ -4,7 +4,6 @@ import { Props, CanvasPanel, VerticalBox, HorizontalBox,
 from 'reactUMG';
 import { StatusBar } from './status_bar_compoennt';
 import { ButtonSlot, ButtonStyle, LinearColor, ESlateColorStylingMode, Margin} from 'ue';
-import face from '../assets/face.png';
 
 interface State {
     username: string;
@@ -16,7 +15,7 @@ export class MainComponent extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            username: 'test.name2',
+            username: 'test.name',
             password: '',
             progressVal: 0.0,
         };
@@ -39,17 +38,6 @@ export class MainComponent extends React.Component<Props, State> {
                 Top: 100,
                 Right: 180,
                 Bottom: 100
-            }
-        }
-    }
-
-    SlotOfVerticalBox2: CanvasPanelSlot = {
-        LayoutData: {
-            Offsets: {
-                Left: 120,
-                Top: 300,
-                Right: 180,
-                Bottom: 50
             }
         }
     }
@@ -93,20 +81,13 @@ export class MainComponent extends React.Component<Props, State> {
                         <option value={"D"}>d</option>
                     </select>
 
-                </HorizontalBox>
-
-            </VerticalBox>
-            <VerticalBox Slot={this.SlotOfVerticalBox2}>
                 <progress value={this.state.progressVal} max={100}>
                     进度条
                 </progress>
                 <button onClick={()=>{this.setState({progressVal: Math.min(this.state.progressVal + 5, 100)})}}>增加进度</button>
                 <button onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>
-                <HorizontalBox>
-                    <img src={face} width={256} height={256} />
                 </HorizontalBox>
             </VerticalBox>
-
         </CanvasPanel>
     }
 }
