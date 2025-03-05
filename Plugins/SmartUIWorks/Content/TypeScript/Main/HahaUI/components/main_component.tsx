@@ -3,6 +3,7 @@ import { Props, CanvasPanel, VerticalBox, HorizontalBox,
     TextBlock, EditableText, Button, CanvasPanelSlot } 
 from 'reactUMG';
 import {EButtonClickMethod} from 'ue';
+import face from '../assets/face.png';
 
 interface State {
     username: string;
@@ -54,6 +55,7 @@ export class MainComponent extends React.Component<Props, State> {
                         <option>test1</option>
                         <option>test2</option>
                     </select>
+                    <textarea onSubmit={(e)=>{console.log(e.target)}}></textarea>
                 </HorizontalBox>
                 <HorizontalBox>
                     <button onClick={()=>{console.log("hello")}} 
@@ -64,6 +66,13 @@ export class MainComponent extends React.Component<Props, State> {
                             title='hello'>
                                 {'原生按钮'}
                     </button>
+                </HorizontalBox>
+                <HorizontalBox>
+                    <img src={face} width={512} height={512}/>
+                    <textarea defaultValue={'默认内容'} placeholder='请输入多行内容...' 
+                            onChange={(e)=>{console.log("on change: " + e.target.value)}} 
+                            onSubmit={(e) => {console.log("on submit: " + e.target)}}
+                            onBlur={(e)=>{console.log("on blur: " + e.target.value)}}></textarea>
                 </HorizontalBox>
 
             </VerticalBox>
