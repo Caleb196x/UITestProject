@@ -33,6 +33,7 @@
 #include "ContainerMeta.h"
 
 #include "V8InspectorImpl.h"
+#include "Kismet/KismetRenderingLibrary.h"
 #if USE_WASM3
 #include "WasmModuleInstance.h"
 #endif
@@ -514,6 +515,8 @@ FJsEnvImpl::FJsEnvImpl(std::shared_ptr<IJSModuleLoader> InModuleLoader, std::sha
     MethodBindingHelper<&FJsEnvImpl::FindModule>::Bind(Isolate, Context, Global, "__tgjsFindModule", This);
 
     MethodBindingHelper<&FJsEnvImpl::SetInspectorCallback>::Bind(Isolate, Context, Global, "__tgjsSetInspectorCallback", This);
+
+    MethodBindingHelper<&FJsEnvImpl::ReadImageFileAsTexture2D>::Bind(Isolate, Context, Global, "__tgjsReadImageFileAsTexture2D", This);
 
     MethodBindingHelper<&FJsEnvImpl::DispatchProtocolMessage>::Bind(
         Isolate, Context, Global, "__tgjsDispatchProtocolMessage", This);
@@ -4576,6 +4579,30 @@ void FJsEnvImpl::DispatchProtocolMessage(const v8::FunctionCallbackInfo<v8::Valu
         InspectorChannel->DispatchProtocolMessage(TCHAR_TO_UTF8(*Message));
     }
 #endif    // !WITH_QUICKJS
+}
+
+void FJsEnvImpl::ReadImageFileAsTexture2D(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+    v8::Isolate* Isolate = Info.GetIsolate();
+    v8::Isolate::Scope Isolatescope(Isolate);
+    v8::HandleScope HandleScope(Isolate);
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    v8::Context::Scope ContextScope(Context);
+
+    CHECK_V8_ARGS(EArgString);
+
+    const FString ImagePath = FV8Utils::ToFString(Isolate, Info[0]);
+    if (FPaths::FileExists(ImagePath))
+    {
+        if (UTexture2D* Texture = UKismetRenderingLibrary::ImportFileAsTexture2D(nullptr, ImagePath))
+        {
+            auto Result = FV8Utils::IsolateData<IObjectMapper>(Isolate)->FindOrAdd(Isolate, Context, Texture->GetClass(), Texture);
+            Info.GetReturnValue().Set(Result);
+            return;
+        }
+    }
+
+    FV8Utils::ThrowException(Isolate, FString::Printf(TEXT("Image path not exist: %s"), *ImagePath));
 }
 
 void FJsEnvImpl::DumpStatisticsLog(const v8::FunctionCallbackInfo<v8::Value>& Info)

@@ -4,11 +4,12 @@ exports.MainComponent = void 0;
 const React = require("react");
 const reactUMG_1 = require("reactUMG");
 const status_bar_compoennt_1 = require("./status_bar_compoennt");
+const face_png_1 = require("../assets/face.png");
 class MainComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: 'test.name',
+            username: 'test.name2',
             password: '',
             progressVal: 0.0,
         };
@@ -28,6 +29,16 @@ class MainComponent extends React.Component {
                 Top: 100,
                 Right: 180,
                 Bottom: 100
+            }
+        }
+    };
+    SlotOfVerticalBox2 = {
+        LayoutData: {
+            Offsets: {
+                Left: 120,
+                Top: 300,
+                Right: 180,
+                Bottom: 50
             }
         }
     };
@@ -58,10 +69,13 @@ class MainComponent extends React.Component {
                         React.createElement("option", { value: "A" }, "a"),
                         React.createElement("option", { value: "B" }, "b"),
                         React.createElement("option", { value: "C" }, "c"),
-                        React.createElement("option", { value: "D" }, "d")),
-                    React.createElement("progress", { value: this.state.progressVal, max: 100 }, "\u8FDB\u5EA6\u6761"),
-                    React.createElement("button", { onClick: () => { this.setState({ progressVal: Math.min(this.state.progressVal + 5, 100) }); } }, "\u589E\u52A0\u8FDB\u5EA6"),
-                    React.createElement("button", { onClick: () => { this.setState({ progressVal: Math.max(this.state.progressVal - 5, 0) }); } }, "\u51CF\u5C11\u8FDB\u5EA6"))));
+                        React.createElement("option", { value: "D" }, "d")))),
+            React.createElement(reactUMG_1.VerticalBox, { Slot: this.SlotOfVerticalBox2 },
+                React.createElement("progress", { value: this.state.progressVal, max: 100 }, "\u8FDB\u5EA6\u6761"),
+                React.createElement("button", { onClick: () => { this.setState({ progressVal: Math.min(this.state.progressVal + 5, 100) }); } }, "\u589E\u52A0\u8FDB\u5EA6"),
+                React.createElement("button", { onClick: () => { this.setState({ progressVal: Math.max(this.state.progressVal - 5, 0) }); } }, "\u51CF\u5C11\u8FDB\u5EA6"),
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement("img", { src: face_png_1.default, width: 256, height: 256 }))));
     }
 }
 exports.MainComponent = MainComponent;

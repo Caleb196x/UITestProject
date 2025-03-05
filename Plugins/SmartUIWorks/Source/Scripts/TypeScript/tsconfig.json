@@ -5,6 +5,9 @@
     "experimentalDecorators": true,
     "jsx": "react",
     "sourceMap": true,
+    "paths": {
+      "@assets/*": ["Main/assets/*"]
+    },
     "typeRoots": [
       "Typing",
       "./node_modules/@types"

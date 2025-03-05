@@ -10,13 +10,19 @@ const puerts = require("puerts");
 class ComponentWrapper {
     typeName;
     props;
-    convertCSSToWidget(widget) {
+    parseStyleToWidget(widget) {
         if (this.props.hasOwnProperty('style') || this.props.hasOwnProperty('className')) {
             // Handle the style property as needed
             const style = this.props.style;
             // Apply the style to the ComboBox or handle it accordingly
         }
         return undefined;
+    }
+    commonPropertyInitialized(widget) {
+        if (this.props.hasOwnProperty('title')) {
+            let title = this.props['title'];
+            widget.SetToolTipText(title);
+        }
     }
 }
 exports.ComponentWrapper = ComponentWrapper;
@@ -73,7 +79,8 @@ class SelectWrapper extends ComponentWrapper {
             comboBox.OnSelectionChanged.Add(this.onChangeCallback);
         }
         comboBox.SelectedOption = defaultValue;
-        super.convertCSSToWidget(comboBox);
+        super.parseStyleToWidget(comboBox);
+        this.commonPropertyInitialized(comboBox);
         return comboBox;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
@@ -144,6 +151,7 @@ class SelectWrapper extends ComponentWrapper {
                 propChange = true;
             }
         }
+        this.commonPropertyInitialized(widget);
         return propChange;
     }
     convertReactEventToWidgetEvent(reactProp, originCallback) {
@@ -205,7 +213,8 @@ class ButtonWrapper extends ComponentWrapper {
         if (disabled) {
             button.bIsEnabled = false;
         }
-        super.convertCSSToWidget(button);
+        super.parseStyleToWidget(button);
+        this.commonPropertyInitialized(button);
         return button;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
@@ -275,6 +284,7 @@ class ButtonWrapper extends ComponentWrapper {
                 }
             }
         }
+        this.commonPropertyInitialized(widget);
         return propsChange;
     }
     convertReactEventToWidgetEvent(reactProp, originCallback) {
@@ -393,6 +403,7 @@ class inputWrapper extends ComponentWrapper {
             this.initOrUpdateWidgetProperties(['onChange', 'defaultValue', 'readOnly'], passwordInput, this.props, false);
             returnWidget = passwordInput;
         }
+        this.commonPropertyInitialized(returnWidget);
         return returnWidget;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
@@ -422,6 +433,7 @@ class inputWrapper extends ComponentWrapper {
                 propsChange = true;
             }
         }
+        this.commonPropertyInitialized(widget);
         return propsChange;
     }
     convertReactEventToWidgetEvent(reactProp, originCallback) {
@@ -441,6 +453,7 @@ class ProgressBarWrapper extends ComponentWrapper {
         let maxVal = this.props['max'] || 100.0; // Default to false if not provided
         let precent = progressVal / maxVal;
         progressBar.SetPercent(precent);
+        this.commonPropertyInitialized(progressBar);
         return progressBar;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
@@ -454,6 +467,7 @@ class ProgressBarWrapper extends ComponentWrapper {
             progressBar.SetPercent(precent);
             propsChange = true;
         }
+        this.commonPropertyInitialized(widget);
         // todo@Caleb196x: update style
         return propsChange;
     }
@@ -465,9 +479,29 @@ class ProgressBarWrapper extends ComponentWrapper {
 class ImageWrapper extends ComponentWrapper {
     constructor(type, props) {
         super();
+        this.typeName = type;
+        this.props = props;
     }
     convertToWidget() {
-        return undefined;
+        // 关键问题：如何解决图片导入的问题
+        // 功能设想
+        // 1. 使用import image from '图片路径'的方式导入一张图片，image在UE中的类型为UTexture， 可以直接设置到img标签的src属性中
+        // 2. 在img标签的src属性中写入图片路径，在创建对应widget时再导入图片
+        // 
+        // 实现思路：
+        // 1. hook ts的import逻辑，实现导入流程
+        // 2. hook js的require逻辑，实现图片的导入；只导入一次，以及通过hash值对比文件是否发生变化，如果发生变化，重新导入
+        // 3. 图片导入时，首先读取图片数据，调用ImportFileAsTexture2D API来创建UTexture（创建后是否能够将UTexture保存为本地uasset资产文件？）（思考如何做异步和批量导入，做性能优化）
+        // 4. 读取img的标签属性，例如src, width, height
+        let imageWidgt = new UE.Image();
+        let srcImage = this.props['src'];
+        if (srcImage) {
+            imageWidgt.SetBrushFromTexture(srcImage, true);
+        }
+        // todo@Caleb196x: 在style中去设置width和height
+        let width = this.props['width'];
+        let height = this.props['height'];
+        return imageWidgt;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
         return;
@@ -495,8 +529,15 @@ class RichTextBlockWrapper extends ComponentWrapper {
 class ListViewWrapper extends ComponentWrapper {
     constructor(type, props) {
         super();
+        this.typeName = type;
+        this.props = props;
     }
     convertToWidget() {
+        if (this.typeName == 'li') {
+            return null;
+        }
+        let list = new UE.ListView();
+        let listItems = this.props['children'];
         return undefined;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
@@ -569,10 +610,10 @@ const baseComponentsMap = {
     "button": ButtonWrapper,
     "textarea": TextareaWrapper,
     "progress": ProgressBarWrapper,
-    "img": "ImageWrapper",
+    "img": ImageWrapper,
     // 列表
     "ul": "ListViewWrapper",
-    "li": "ListViewItemWrapper",
+    "li": "ListViewWrapper",
     // 富文本
     "article": "RichTextBlockWrapper",
     "code": "RichTextBlockWrapper",
