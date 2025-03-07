@@ -615,12 +615,21 @@ class ImageWrapper extends ComponentWrapper {
     }
 };
 
-class RichTextBlockWrapper extends ComponentWrapper {
+class TextBlockWrapper extends ComponentWrapper {
     constructor(type: string, props: any) {
         super();
+        this.typeName = type;
+        this.props = props;
     }
 
-    convertToWidget(): UE.Widget {
+    override convertToWidget(): UE.Widget {
+        // 对所有text类型的组件均有效：
+        // 1. 如果text中child标签中包含或者自身就是<a>, <img>, <code>, ，那么就走rich text block的逻辑
+        // 2. 如果text中只有文本数据，那么就走text block的逻辑。（所以判断的逻辑需要写一个单独的判断函数）
+        // 3. 如果是rich text block 
+
+        
+
         return undefined;
     }
 
@@ -804,24 +813,6 @@ class TextareaWrapper extends ComponentWrapper {
         return undefined;
     }
 }
-
-class TextBlockWrapper extends ComponentWrapper {
-    constructor(type: string, props: any) {
-        super();
-    }
-
-    convertToWidget(): UE.Widget {
-        return undefined;
-    }
-
-    override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
-        return;
-    }
-
-    override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {
-        return undefined;
-    }
-};
 
 class ContainerWrapper extends ComponentWrapper {
     private children: any[];
