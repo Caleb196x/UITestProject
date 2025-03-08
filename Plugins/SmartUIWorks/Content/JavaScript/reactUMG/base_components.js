@@ -562,8 +562,7 @@ class TextBlockWrapper extends ComponentWrapper {
         let childs = this.props['children'];
         if (this.shouldUseRichTextBlock(childs)) {
             let richTextWidget = new UE.RichTextBlock();
-            let styleSetDataTableClass = UE.Class.Load('/Game/NewDataTable.NewDataTable_C');
-            let styleSetDataTable = UE.NewObject(styleSetDataTableClass);
+            let styleSetDataTable = UE.DataTable.Find('/Game/NewDataTable.NewDataTable');
             let richText = '';
             for (var child in childs) {
                 richText += this.stringfyPropsToString(child);
