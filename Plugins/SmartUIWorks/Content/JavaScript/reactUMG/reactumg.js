@@ -224,7 +224,7 @@ const hostConfig = {
     appendChild(parent, child) {
         parent.appendChild(child);
     },
-    createInstance(type, props) {
+    createInstance(type, props, rootContainer, hostContext, internalHandle) {
         return new UEWidget(type, props);
     },
     createTextInstance(text) {

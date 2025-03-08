@@ -1,4 +1,5 @@
 import * as Reconciler from 'react-reconciler'
+import { FunctionComponent, ComponentClass, Component } from 'react';
 import * as puerts from 'puerts'
 import * as UE from 'ue'
 import { CreateReactComponentWrapper, createUMGWidgetFromReactComponent, updateUMGWidgetPropertyUsingReactComponentProperty, ComponentWrapper } from './base_components';
@@ -242,7 +243,7 @@ const hostConfig : Reconciler.HostConfig<string, any, UEWidgetRoot, UEWidget, UE
     appendChild (parent: UEWidget, child: UEWidget) {
         parent.appendChild(child);
     },
-    createInstance (type: string, props: any) {
+    createInstance (type: string, props: any, rootContainer: UEWidgetRoot, hostContext: any, internalHandle: Reconciler.OpaqueHandle) {
         return new UEWidget(type, props);
     },
     createTextInstance (text: string) {
