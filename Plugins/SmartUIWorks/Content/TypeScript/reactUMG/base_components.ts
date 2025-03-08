@@ -616,25 +616,110 @@ class ImageWrapper extends ComponentWrapper {
 };
 
 class TextBlockWrapper extends ComponentWrapper {
+
+    private richTextSupportTag: string[] = ['a', 'code', 'mark', 'article', 'strong', 'em', 'del'];
+
     constructor(type: string, props: any) {
         super();
         this.typeName = type;
         this.props = props;
     }
 
+    shouldUseRichTextBlock(children: any): boolean {
+        if (typeof children == 'string') return false;
+
+        for (var key in children) {
+            let value = children[key];
+            if (typeof value == 'string') {
+                continue;
+            }
+
+            if (this.richTextSupportTag.includes(value['type'] as string)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    stringfyPropsToString(prop: any): string {
+        if (typeof prop === 'string') return prop;
+
+        const children = prop.children
+        .map(child => this.stringfyPropsToString(child))
+        .join('');
+
+        return `<${prop.type}>${children}</>`;
+    }
+
     override convertToWidget(): UE.Widget {
         // 对所有text类型的组件均有效：
-        // 1. 如果text中child标签中包含或者自身就是<a>, <img>, <code>, ，那么就走rich text block的逻辑
+        // 1. 如果text中child标签中包含或者自身就是<a>, <code>, <mark>，<article> 那么就走rich text block的逻辑
         // 2. 如果text中只有文本数据，那么就走text block的逻辑。（所以判断的逻辑需要写一个单独的判断函数）
-        // 3. 如果是rich text block 
+        // 3. 如果是rich text block，需要将孩子标签转换为RichTextStyle支持的标签格式并进行处理；
+        // 4. 提前创建RichTextStyle资产，在ts中load，然后赋给RichTextBlock
+        // 5. todo@Caleb196x: 暂时不处理文本中嵌入img的情况
+        // 6. todo@Caleb196x: 可能涉及到修改某个标签的RichTextStyle的情况
 
-        
+        let childs = this.props['children'];
 
-        return undefined;
+        if (this.shouldUseRichTextBlock(childs)) {
+            let richTextWidget = new UE.RichTextBlock();
+            let styleSetDataTableClass = UE.Class.Load('/Game/NewDataTable.NewDataTable_C');
+            let styleSetDataTable = UE.NewObject(styleSetDataTableClass) as UE.DataTable;
+
+            let richText = '';
+            for (var child in childs) {
+                richText += this.stringfyPropsToString(child);
+            }
+
+            console.log("rich text: ", richText);
+
+            richTextWidget.SetText(richText);
+
+            // todo@Caleb196x: 根据标签中的样式内容，修改对应标签的RichTextStyle
+            richTextWidget.SetTextStyleSet(styleSetDataTable);
+
+            return richTextWidget;
+
+        } else {
+            let textWidget = new UE.TextBlock();
+            let text = this.props['children'];
+            if (typeof text === 'string') {
+                textWidget.SetText(text);
+            }
+
+            console.log("text: ", text);
+
+            // todo@Caleb196x: 设置text的样式
+            return textWidget;
+        }
     }
 
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
-        return;
+        let propsChange = false;
+        let richTextWidget = widget as UE.RichTextBlock;
+
+        for(var key in newProps) {
+            if (key == 'type') continue;
+
+            let oldProp = oldProps[key];
+            let newProp = newProps[key];
+
+            if (oldProp != newProp && key == 'children') { // fixme@Caleb196x: 这里比较可能会失效
+                let richText = '';
+
+                for (var child in newProp) {
+                    richText += this.stringfyPropsToString(child);
+                }
+
+                console.log("rich text when update widget property: ", richText);
+
+                richTextWidget.SetText(richText);
+                propsChange = true;
+            }
+        }
+        return propsChange;
     }
 
     override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {
@@ -861,18 +946,28 @@ const baseComponentsMap: Record<string, any> = {
     "li": "ListViewWrapper",
 
     // 富文本
-    "article": "RichTextBlockWrapper",
-    "code": "RichTextBlockWrapper",
-    "mark": "RichTextBlockWrapper",
-    "a": "RichTextBlockWrapper",
+    "article": TextBlockWrapper,
+    "code": TextBlockWrapper,
+    "mark": TextBlockWrapper,
+    "a": TextBlockWrapper,
+    "strong": TextBlockWrapper,
+    "em": TextBlockWrapper,
+    "del": TextBlockWrapper,
 
     // input
     "input": inputWrapper,
     
     // Text
-    "span": "TextBlockWrapper",
-    "p": "TextBlockWrapper",
-    "text": "TextBlockWrapper",
+    "span": TextBlockWrapper,
+    "p": TextBlockWrapper,
+    "text": TextBlockWrapper,
+    "label": TextBlockWrapper,
+    "h1": TextBlockWrapper,
+    "h2": TextBlockWrapper,
+    "h3": TextBlockWrapper,
+    "h4": TextBlockWrapper,
+    "h5": TextBlockWrapper,
+    "h6": TextBlockWrapper,
 
     // container
     "div": "containerWrapper",

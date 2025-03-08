@@ -66,6 +66,7 @@ export class MainComponent extends React.Component<Props, State> {
                             title='hello'>
                                 {'原生按钮'}
                     </button>
+                    <p>这是一个富文本嵌入测试<mark>高亮文字</mark>文本结束了！</p>
                 </HorizontalBox>
                 <HorizontalBox>
                     <img src={face} width={512} height={512}/>
