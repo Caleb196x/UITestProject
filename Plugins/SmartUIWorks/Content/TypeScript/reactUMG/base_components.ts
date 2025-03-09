@@ -27,6 +27,10 @@ export abstract class ComponentWrapper {
             widget.SetToolTipText(title);
         }
     }
+
+    appendChildItem(listItem: UE.Widget, listItemTypeName: string) {
+
+    }
 };
 
 class SelectWrapper extends ComponentWrapper {
@@ -603,6 +607,8 @@ class ImageWrapper extends ComponentWrapper {
         let width = this.props['width'];
         let height = this.props['height'];
 
+        this.commonPropertyInitialized(imageWidgt);
+
         return imageWidgt;
     }
 
@@ -683,7 +689,7 @@ class TextBlockWrapper extends ComponentWrapper {
 
             // todo@Caleb196x: 根据标签中的样式内容，修改对应标签的RichTextStyle
             richTextWidget.SetTextStyleSet(styleSetDataTable);
-
+            this.commonPropertyInitialized(richTextWidget);
             return richTextWidget;
 
         } else {
@@ -694,7 +700,7 @@ class TextBlockWrapper extends ComponentWrapper {
             }
 
             console.log("text: ", text);
-
+            this.commonPropertyInitialized(textWidget);
             // todo@Caleb196x: 设置text的样式
             return textWidget;
         }
@@ -702,7 +708,6 @@ class TextBlockWrapper extends ComponentWrapper {
 
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         let propsChange = false;
-        let richTextWidget = widget as UE.RichTextBlock;
 
         for(var key in newProps) {
             if (key == 'type') continue;
@@ -718,8 +723,14 @@ class TextBlockWrapper extends ComponentWrapper {
                 }
 
                 console.log("rich text when update widget property: ", richText);
-
-                richTextWidget.SetText(richText);
+                if (widget instanceof UE.TextBlock) {
+                    let textWidget = widget as UE.TextBlock;
+                    textWidget.SetText(richText);
+                } else if (widget instanceof UE.RichTextBlock) {
+                    let richTextWidget = widget as UE.RichTextBlock;
+                    richTextWidget.SetText(richText);
+                }
+                
                 propsChange = true;
             }
         }
@@ -732,26 +743,100 @@ class TextBlockWrapper extends ComponentWrapper {
 };
 
 class ListViewWrapper extends ComponentWrapper {
+    private listItemType: string;
+    private listView: UE.ListView;
+    private listItems: UE.Widget[];
+    private widgetNameToObject: Record<string, UE.Widget>;
     constructor(type: string, props: any) {
         super();
         this.typeName = type;
         this.props = props;
+        this.listItemType = '';
+        this.listView = undefined;
+        this.listItems = [];
+        this.widgetNameToObject = {};
     }
 
-    convertToWidget(): UE.Widget {
-        if (this.typeName == 'li') {
-            return null;
+    checkAllItemTypeIsSame(): string {
+        let children = this.props.children;
+        let itemType = '';
+        for (var key in children) {
+            let item = children[key]['props']['children'];
+            let currItemType = item['type'];
+
+            if (itemType === '') {
+                itemType = currItemType 
+            }
+
+            if (itemType !== currItemType) {
+                throw new Error('list item type must be same!');
+            }
         }
 
-        let list = new UE.ListView();
+        return itemType;
+    }
 
-        let listItems = this.props['children'];
-        
+    override convertToWidget(): UE.Widget {
+        if (this.typeName === 'li') {
+            // 读取children，如果是子标签，那么创建wrapper，然后调用convertToWidget创建对应的Widget
+            if (typeof this.props.children === 'string') {
+                let textWidget = new UE.TextBlock();
+                textWidget.SetText(this.props.children);
+                return textWidget;
+            } else {
+                
+                let child = this.props.children;
+                let childType = child['type'];
+
+                if (this.listItemType === '') {
+                    this.listItemType = childType;
+                }
+
+                if (this.listItemType !== childType) {
+                    throw new Error('list item type must be same!');
+                }
+
+                let component = CreateReactComponentWrapper(childType, child.props);
+                return component.convertToWidget();
+            }
+        } else if (this.typeName === 'ul') {
+            this.listView = new UE.ListView();
+            
+            // check all items' type is the same
+            let buttonClass = UE.Button.StaticClass();
+            this.listView.EntryWidgetClass = buttonClass;
+            this.commonPropertyInitialized(this.listView);
+            // todo@Caleb196x: support style
+            return this.listView;
+        }
 
         return undefined;
     }
 
+    override appendChildItem(listItem: UE.Widget, listItemTypeName: string) {
+        if (listItemTypeName === this.listItemType) {
+            this.listView.AddItem(listItem);
+        }
+    }
+
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
+        
+        if (this.typeName === 'li') {
+
+        } else if (this.typeName === 'ul') {
+            // todo@Caleb196x: 增加或者删除Item，需要额外信息标记已添加了哪些Item
+            // 1. 通过对比新旧props中item的数量
+            // 2. 如果数量减少，找出新旧props中的item，然后删除
+            // 3. 如果数量增加，找出新旧props中的item，然后添加
+            let oldChildren = oldProps['children'];
+            let newChildren = newProps['children'];
+            if (oldChildren.length > newChildren.length) {
+                // todo@Caleb196x: 删除
+            } else if (oldChildren.length < newChildren.length) {
+                // todo: 增加item
+            }
+        }
+
         return;
     }
 
@@ -946,8 +1031,8 @@ const baseComponentsMap: Record<string, any> = {
     "img": ImageWrapper,
 
     // 列表
-    "ul": "ListViewWrapper",
-    "li": "ListViewWrapper",
+    "ul": ListViewWrapper,
+    "li": ListViewWrapper,
 
     // 富文本
     "article": TextBlockWrapper,

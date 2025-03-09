@@ -51,7 +51,17 @@ class MainComponent extends React.Component {
                         React.createElement("strong", null, "\u5D4C\u5957\u52A0\u7C97"))),
                 React.createElement(reactUMG_1.HorizontalBox, null,
                     React.createElement("img", { src: face_png_1.default, width: 512, height: 512 }),
-                    React.createElement("textarea", { defaultValue: '默认内容', placeholder: '\u8BF7\u8F93\u5165\u591A\u884C\u5185\u5BB9...', onChange: (e) => { console.log("on change: " + e.target.value); }, onSubmit: (e) => { console.log("on submit: " + e.target); }, onBlur: (e) => { console.log("on blur: " + e.target.value); } }))));
+                    React.createElement("textarea", { defaultValue: '默认内容', placeholder: '\u8BF7\u8F93\u5165\u591A\u884C\u5185\u5BB9...', onChange: (e) => { console.log("on change: " + e.target.value); }, onSubmit: (e) => { console.log("on submit: " + e.target); }, onBlur: (e) => { console.log("on blur: " + e.target.value); } })),
+                React.createElement(reactUMG_1.HorizontalBox, null,
+                    React.createElement("ul", null,
+                        React.createElement("li", null,
+                            React.createElement("button", { onClick: () => { console.log('button1 click'); } }, "\u6309\u94AE1")),
+                        React.createElement("li", null,
+                            React.createElement("button", { onClick: () => { console.log('button2 click'); } }, "\u6309\u94AE2")),
+                        React.createElement("li", null,
+                            React.createElement("button", { onClick: () => { console.log('button3 click'); } }, "\u6309\u94AE3")),
+                        React.createElement("li", null,
+                            React.createElement("button", { onClick: () => { console.log('button4 click'); } }, "\u6309\u94AE4"))))));
     }
 }
 exports.MainComponent = MainComponent;
