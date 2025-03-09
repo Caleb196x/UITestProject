@@ -543,13 +543,16 @@ class TextBlockWrapper extends ComponentWrapper {
         }
         return false;
     }
-    stringfyPropsToString(prop) {
-        if (typeof prop === 'string')
-            return prop;
-        const children = prop.children
-            .map(child => this.stringfyPropsToString(child))
+    stringfyObjectToString(object) {
+        if (typeof object === 'string')
+            return object;
+        console.log('type of props: ', typeof object.props.children);
+        if (typeof object.props.children == 'string') {
+            return `<${object.type}>${object.props.children}</>`;
+        }
+        const children = object.props.children.map(child => this.stringfyObjectToString(child))
             .join('');
-        return `<${prop.type}>${children}</>`;
+        return `<${object.type}>${children}</>`;
     }
     convertToWidget() {
         // 对所有text类型的组件均有效：
@@ -564,8 +567,8 @@ class TextBlockWrapper extends ComponentWrapper {
             let richTextWidget = new UE.RichTextBlock();
             let styleSetDataTable = UE.DataTable.Find('/Game/NewDataTable.NewDataTable');
             let richText = '';
-            for (var child in childs) {
-                richText += this.stringfyPropsToString(child);
+            for (var key in childs) {
+                richText += this.stringfyObjectToString(childs[key]);
             }
             console.log("rich text: ", richText);
             richTextWidget.SetText(richText);
@@ -594,8 +597,8 @@ class TextBlockWrapper extends ComponentWrapper {
             let newProp = newProps[key];
             if (oldProp != newProp && key == 'children') { // fixme@Caleb196x: 这里比较可能会失效
                 let richText = '';
-                for (var child in newProp) {
-                    richText += this.stringfyPropsToString(child);
+                for (var key in newProp) {
+                    richText += this.stringfyObjectToString(newProp[key]);
                 }
                 console.log("rich text when update widget property: ", richText);
                 richTextWidget.SetText(richText);

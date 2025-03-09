@@ -642,14 +642,19 @@ class TextBlockWrapper extends ComponentWrapper {
         return false;
     }
 
-    stringfyPropsToString(prop: any): string {
-        if (typeof prop === 'string') return prop;
+    stringfyObjectToString(object: any): string {
+        if (typeof object === 'string') return object;
 
-        const children = prop.children
-        .map(child => this.stringfyPropsToString(child))
+        console.log('type of props: ', typeof object.props.children);
+
+        if (typeof object.props.children == 'string') {
+            return `<${object.type}>${object.props.children}</>`;
+        }
+
+        const children = object.props.children.map(child => this.stringfyObjectToString(child))
         .join('');
 
-        return `<${prop.type}>${children}</>`;
+        return `<${object.type}>${children}</>`;
     }
 
     override convertToWidget(): UE.Widget {
@@ -668,8 +673,8 @@ class TextBlockWrapper extends ComponentWrapper {
             let styleSetDataTable = UE.DataTable.Find('/Game/NewDataTable.NewDataTable') as UE.DataTable;
 
             let richText = '';
-            for (var child in childs) {
-                richText += this.stringfyPropsToString(child);
+            for (var key in childs) {
+                richText += this.stringfyObjectToString(childs[key]);
             }
 
             console.log("rich text: ", richText);
@@ -708,8 +713,8 @@ class TextBlockWrapper extends ComponentWrapper {
             if (oldProp != newProp && key == 'children') { // fixme@Caleb196x: 这里比较可能会失效
                 let richText = '';
 
-                for (var child in newProp) {
-                    richText += this.stringfyPropsToString(child);
+                for (var key in newProp) {
+                    richText += this.stringfyObjectToString(newProp[key]);
                 }
 
                 console.log("rich text when update widget property: ", richText);
