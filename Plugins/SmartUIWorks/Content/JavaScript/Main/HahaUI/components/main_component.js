@@ -47,7 +47,8 @@ class MainComponent extends React.Component {
                     React.createElement("p", null,
                         "\u8FD9\u662F\u4E00\u4E2A\u5BCC\u6587\u672C\u5D4C\u5165\u6D4B\u8BD5",
                         React.createElement("mark", null, "\u9AD8\u4EAE\u6587\u5B57"),
-                        "\u6587\u672C\u7ED3\u675F\u4E86\uFF01")),
+                        "\u6587\u672C\u7ED3\u675F\u4E86\uFF01",
+                        React.createElement("strong", null, "\u5D4C\u5957\u52A0\u7C97"))),
                 React.createElement(reactUMG_1.HorizontalBox, null,
                     React.createElement("img", { src: face_png_1.default, width: 512, height: 512 }),
                     React.createElement("textarea", { defaultValue: '默认内容', placeholder: '\u8BF7\u8F93\u5165\u591A\u884C\u5185\u5BB9...', onChange: (e) => { console.log("on change: " + e.target.value); }, onSubmit: (e) => { console.log("on submit: " + e.target); }, onBlur: (e) => { console.log("on blur: " + e.target.value); } }))));
