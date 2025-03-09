@@ -162,9 +162,16 @@ class UEWidget {
   
     appendChild(child: UEWidget) {
         console.log("appendChild: ", child.type)
+        // for 'select' and 'option' tags
         if (!this.nativePtr && this.reactWrapper)
         {
             return;
+        }
+
+        if (this.nativePtr instanceof UE.ListView ) {
+            if (this.reactWrapper) {
+                this.reactWrapper.appendChildItem(child.nativePtr, child.type);
+            }
         }
 
         if (this.nativePtr instanceof UE.PanelWidget)

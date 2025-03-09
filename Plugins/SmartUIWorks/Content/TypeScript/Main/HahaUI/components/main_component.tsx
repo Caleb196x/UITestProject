@@ -75,6 +75,22 @@ export class MainComponent extends React.Component<Props, State> {
                             onSubmit={(e) => {console.log("on submit: " + e.target)}}
                             onBlur={(e)=>{console.log("on blur: " + e.target.value)}}></textarea>
                 </HorizontalBox>
+                <HorizontalBox>
+                    <ul>
+                        <li>
+                            <button onClick={()=>{console.log('button1 click')}}>按钮1</button>
+                        </li>
+                        <li>
+                            <button onClick={()=>{console.log('button2 click')}}>按钮2</button>
+                        </li>
+                        <li>
+                            <button onClick={()=>{console.log('button3 click')}}>按钮3</button>
+                        </li>
+                        <li>
+                            <button onClick={()=>{console.log('button4 click')}}>按钮4</button>
+                        </li>
+                    </ul>
+                </HorizontalBox>
 
             </VerticalBox>
 
