@@ -7,150 +7,133 @@ exports.updateUMGWidgetPropertyUsingReactComponentProperty = updateUMGWidgetProp
 exports.convertEventToWidgetDelegate = convertEventToWidgetDelegate;
 const UE = require("ue");
 const puerts = require("puerts");
+// Base abstract class for all component wrappers
 class ComponentWrapper {
     typeName;
     props;
     parseStyleToWidget(widget) {
         if (this.props.hasOwnProperty('style') || this.props.hasOwnProperty('className')) {
-            // Handle the style property as needed
+            // Handle style property
             const style = this.props.style;
-            // Apply the style to the ComboBox or handle it accordingly
+            // Apply style to widget
         }
         return undefined;
     }
     commonPropertyInitialized(widget) {
         if (this.props.hasOwnProperty('title')) {
-            let title = this.props['title'];
-            widget.SetToolTipText(title);
+            widget.SetToolTipText(this.props.title);
         }
     }
     appendChildItem(listItem, listItemTypeName) {
+        // Default empty implementation
     }
 }
 exports.ComponentWrapper = ComponentWrapper;
-;
+// Factory function to create component wrappers
+function createWrapper(WrapperClass, type, props) {
+    return new WrapperClass(type, props);
+}
+// Component wrapper implementations
 class SelectWrapper extends ComponentWrapper {
     onChangeCallback;
-    propsReMapping;
+    propsReMapping = {
+        'disabled': 'bIsEnabled',
+        'onChange': 'OnSelectionChanged',
+        'defaultValue': 'SelectedOption'
+    };
     constructor(type, props) {
         super();
         this.typeName = type;
         this.props = props;
-        this.propsReMapping = {
-            'disabled': 'bIsEnabled',
-            'onChange': 'OnSelectionChanged',
-            'defaultValue': 'SelectedOption'
-        };
     }
-    convertToWidget() {
-        if (this.typeName == "option") {
-            console.log("Do not create anything for option");
-            return null;
+    setupChangeHandler(comboBox, onChange) {
+        if (typeof onChange === 'function') {
+            this.onChangeCallback = (selectedItem, selectionType) => {
+                onChange({ target: { value: selectedItem } });
+            };
+            comboBox.OnSelectionChanged.Add(this.onChangeCallback);
         }
-        // combox
-        let comboBox = new UE.ComboBoxString;
-        // get properties of select
-        let children = this.props['children'];
-        let defaultValue = this.props['defaultValue'];
-        let disabled = this.props['disabled'];
-        // let multiple = this.props['multiple'];
-        let onChangeEvent = this.props['onChange'];
-        if (disabled) {
-            comboBox.bIsEnabled = false;
-        }
-        // add default options
-        // fixme crash here
-        // let defaultOptions = UE.NewArray<UE.BuiltinString>(children.length);
-        for (let i = 0; i < children.length; i++) {
-            let child = children[i];
-            let option = child['type'];
-            if (option == 'option') {
-                let actualValue = child['props']['value'];
-                let text = child['props']['children'];
-                if (actualValue != null) {
-                    text = actualValue;
-                }
+    }
+    addOptions(comboBox, children) {
+        for (const child of children) {
+            if (child.type === 'option') {
+                const text = child.props.value ?? child.props.children;
                 comboBox.DefaultOptions.Add(text);
                 comboBox.AddOption(text);
             }
         }
-        if (typeof onChangeEvent == 'function') {
-            this.onChangeCallback = (SelectedItem, SelectionType) => {
-                onChangeEvent({ 'target': { 'value': SelectedItem } });
-            };
-            comboBox.OnSelectionChanged.Add(this.onChangeCallback);
+    }
+    handleChildrenUpdate(comboBox, oldChildren, newChildren) {
+        const oldChildNum = oldChildren.length;
+        const newChildNum = newChildren.length;
+        if (oldChildNum > newChildNum) {
+            this.removeOptions(comboBox, oldChildren, newChildren);
         }
+        else if (oldChildNum < newChildNum) {
+            this.addNewOptions(comboBox, oldChildren, newChildren);
+        }
+    }
+    removeOptions(comboBox, oldChildren, newChildren) {
+        const removeItems = [];
+        for (let i = 0; i < oldChildren.length; i++) {
+            if (oldChildren[i] in newChildren)
+                continue;
+            const text = oldChildren['value'] ?? oldChildren['children'];
+            removeItems.push(text);
+        }
+        for (const item of removeItems) {
+            comboBox.RemoveOption(item);
+        }
+    }
+    addNewOptions(comboBox, oldChildren, newChildren) {
+        const addItems = [];
+        for (let i = 0; i < newChildren.length; i++) {
+            if (newChildren[i] in oldChildren)
+                continue;
+            const text = newChildren['value'] ?? newChildren['children'];
+            addItems.push(text);
+        }
+        // todo@Caleb196x: update style
+        for (const item of addItems) {
+            comboBox.AddOption(item);
+        }
+    }
+    convertToWidget() {
+        if (this.typeName === "option")
+            return null;
+        const comboBox = new UE.ComboBoxString();
+        const { children, defaultValue, disabled, onChange } = this.props;
+        if (disabled)
+            comboBox.bIsEnabled = false;
+        this.addOptions(comboBox, children);
+        this.setupChangeHandler(comboBox, onChange);
         comboBox.SelectedOption = defaultValue;
-        super.parseStyleToWidget(comboBox);
+        this.parseStyleToWidget(comboBox);
         this.commonPropertyInitialized(comboBox);
         return comboBox;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
-        let propChange = false;
-        let comboBox = widget;
-        if (this.typeName == "option") {
+        if (this.typeName === "option") {
             console.log("Do not update anything for option");
             return false;
         }
-        // todo@Caleb196x: update style
-        for (var key in newProps) {
-            let oldProp = oldProps[key];
-            let newProp = newProps[key];
-            if (oldProp != newProp) {
-                if (key == 'children') {
-                    // change children items
-                    let oldChildNum = oldProp.length;
-                    let newChildNum = newProp.length;
-                    if (oldChildNum > newChildNum) {
-                        let removeItems;
-                        for (let i = 0; i < oldChildNum; i++) {
-                            if (oldProp[i] in newProp) {
-                                continue;
-                            }
-                            else {
-                                let actualValue = oldProp['value'];
-                                let text = oldProp['children'];
-                                if (actualValue != null) {
-                                    text = actualValue;
-                                }
-                                removeItems.push(text);
-                            }
-                        }
-                        for (var item in removeItems) {
-                            comboBox.RemoveOption(item);
-                        }
-                    }
-                    else if (oldChildNum < newChildNum) {
-                        let addItems;
-                        for (let i = 0; i < newChildNum; i++) {
-                            if (newProp[i] in oldProp) {
-                                continue;
-                            }
-                            else {
-                                let actualValue = newProp['value'];
-                                let text = newProp['children'];
-                                if (actualValue != null) {
-                                    text = actualValue;
-                                }
-                                addItems.push(text);
-                            }
-                        }
-                        for (var item in addItems) {
-                            comboBox.AddOption(item);
-                        }
-                    }
-                }
-                else if (typeof newProp === 'function' && key == 'onChange') {
-                    comboBox.OnSelectionChanged.Remove(this.onChangeCallback);
-                    this.onChangeCallback = (SelectedItem, SelectionType) => {
-                        newProp({ 'target': { 'value': SelectedItem } });
-                    };
-                    comboBox.OnSelectionChanged.Add(this.onChangeCallback);
-                }
-                else {
-                    updateProps[this.propsReMapping[key]] = newProp;
-                }
-                propChange = true;
+        let propChange = false;
+        const comboBox = widget;
+        for (const key in newProps) {
+            const oldProp = oldProps[key];
+            const newProp = newProps[key];
+            if (oldProp === newProp)
+                continue;
+            propChange = true;
+            if (key === 'children') {
+                this.handleChildrenUpdate(comboBox, oldProps[key], newProps[key]);
+            }
+            else if (key === 'onChange' && typeof newProp === 'function') {
+                comboBox.OnSelectionChanged.Remove(this.onChangeCallback);
+                this.setupChangeHandler(comboBox, newProp);
+            }
+            else {
+                updateProps[this.propsReMapping[key]] = newProp;
             }
         }
         this.commonPropertyInitialized(widget);
@@ -160,130 +143,75 @@ class SelectWrapper extends ComponentWrapper {
         return undefined;
     }
 }
-;
 class ButtonWrapper extends ComponentWrapper {
-    OnClickedCallback;
-    OnPressedCallback;
-    OnReleasedCallback;
-    OnHoveredCallback;
-    OnUnHoveredCallback;
-    OnFocusCallback;
-    OnBlurCallback;
+    eventCallbacks = {
+        onClick: undefined,
+        onMouseDown: undefined,
+        onMouseUp: undefined,
+        onMouseEnter: undefined,
+        onMouseLeave: undefined,
+        onFocus: undefined,
+        onBlur: undefined
+    };
+    eventMappings = {
+        onClick: { event: 'OnClicked', handler: 'onClick' },
+        onMouseDown: { event: 'OnPressed', handler: 'onMouseDown' },
+        onMouseUp: { event: 'OnReleased', handler: 'onMouseUp' },
+        onMouseEnter: { event: 'OnHovered', handler: 'onMouseEnter' },
+        onMouseLeave: { event: 'OnUnhovered', handler: 'onMouseLeave' },
+        onFocus: { event: 'OnHovered', handler: 'onFocus' },
+        onBlur: { event: 'OnUnhovered', handler: 'onBlur' }
+    };
     constructor(type, props) {
         super();
         this.typeName = type;
         this.props = props;
     }
+    setupEventHandler(button, eventName, handler) {
+        if (typeof handler === 'function') {
+            const mapping = this.eventMappings[eventName];
+            this.eventCallbacks[mapping.handler] = handler;
+            button[mapping.event].Add(handler);
+        }
+    }
+    removeEventHandler(button, eventName) {
+        const mapping = this.eventMappings[eventName];
+        const callback = this.eventCallbacks[mapping.handler];
+        if (callback) {
+            button[mapping.event].Remove(callback);
+        }
+    }
     convertToWidget() {
-        let button = new UE.Button();
-        let onClick = this.props['onClick'];
-        if (typeof onClick == 'function') {
-            this.OnClickedCallback = onClick;
-            button.OnClicked.Add(onClick);
+        const button = new UE.Button();
+        // Setup all event handlers
+        for (const eventName in this.eventMappings) {
+            this.setupEventHandler(button, eventName, this.props[eventName]);
         }
-        let onMouseDown = this.props['onMouseDown'];
-        if (typeof onMouseDown == 'function') {
-            this.OnPressedCallback = onMouseDown;
-            button.OnPressed.Add(onMouseDown);
-        }
-        let onMouseUp = this.props['onMouseUp'];
-        if (typeof onMouseUp == 'function') {
-            this.OnReleasedCallback = onMouseUp;
-            button.OnReleased.Add(onMouseUp);
-        }
-        let onMouseEnter = this.props['onMouseEnter'];
-        if (typeof onMouseEnter == 'function') {
-            this.OnHoveredCallback = onMouseEnter;
-            button.OnHovered.Add(onMouseEnter);
-        }
-        let onMouseLeave = this.props['onMouseLeave'];
-        if (typeof onMouseLeave == 'function') {
-            this.OnUnHoveredCallback = onMouseLeave;
-            button.OnUnhovered.Add(onMouseLeave);
-        }
-        let onFocus = this.props['onFocus'];
-        if (typeof onFocus == 'function') {
-            this.OnFocusCallback = onFocus;
-            button.OnHovered.Add(onFocus);
-        }
-        let onBlur = this.props['onBlur'];
-        if (typeof onBlur == 'function') {
-            this.OnBlurCallback = onBlur;
-            button.OnUnhovered.Add(onBlur);
-        }
-        let disabled = this.props['disabled'];
-        if (disabled) {
+        // Handle disabled state
+        if (this.props.disabled) {
             button.bIsEnabled = false;
         }
-        super.parseStyleToWidget(button);
+        this.parseStyleToWidget(button);
         this.commonPropertyInitialized(button);
         return button;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
         let propsChange = false;
-        let button = widget;
-        // todo@Caleb196x: update style
-        for (var key in newProps) {
-            let oldProp = oldProps[key];
-            let newProp = newProps[key];
-            if (oldProp != newProp) {
-                switch (key) {
-                    case 'onClick':
-                        if (typeof newProp === 'function') {
-                            button.OnClicked.Remove(this.OnClickedCallback);
-                            this.OnClickedCallback = newProp;
-                            button.OnClicked.Add(this.OnClickedCallback);
-                        }
-                        break;
-                    case 'onMouseDown':
-                        if (typeof newProp === 'function') {
-                            button.OnPressed.Remove(this.OnPressedCallback);
-                            this.OnPressedCallback = newProp;
-                            button.OnPressed.Add(this.OnPressedCallback);
-                        }
-                        break;
-                    case 'onMouseUp':
-                        if (typeof newProp === 'function') {
-                            button.OnReleased.Remove(this.OnReleasedCallback);
-                            this.OnReleasedCallback = newProp;
-                            button.OnReleased.Add(this.OnReleasedCallback);
-                        }
-                        break;
-                    case 'onMouseEnter':
-                        if (typeof newProp === 'function') {
-                            button.OnHovered.Remove(this.OnHoveredCallback);
-                            this.OnHoveredCallback = newProp;
-                            button.OnHovered.Add(this.OnHoveredCallback);
-                        }
-                        break;
-                    case 'onMouseLeave':
-                        if (typeof newProp === 'function') {
-                            button.OnUnhovered.Remove(this.OnUnHoveredCallback);
-                            this.OnUnHoveredCallback = newProp;
-                            button.OnUnhovered.Add(this.OnUnHoveredCallback);
-                        }
-                        break;
-                    case 'onFocus':
-                        if (typeof newProp === 'function') {
-                            button.OnHovered.Remove(this.OnFocusCallback);
-                            this.OnFocusCallback = newProp;
-                            button.OnHovered.Add(this.OnFocusCallback);
-                        }
-                        break;
-                    case 'onBlur':
-                        if (typeof newProp === 'function') {
-                            button.OnUnhovered.Remove(this.OnBlurCallback);
-                            this.OnBlurCallback = newProp;
-                            button.OnUnhovered.Add(this.OnBlurCallback);
-                        }
-                        break;
-                    case 'disabled':
-                        button.bIsEnabled = !newProp;
-                        break;
-                    // Add other properties to update if needed
-                    default:
-                        break;
+        const button = widget;
+        for (const key in newProps) {
+            const oldProp = oldProps[key];
+            const newProp = newProps[key];
+            if (oldProp === newProp)
+                continue;
+            propsChange = true;
+            if (key in this.eventMappings) {
+                if (typeof newProp === 'function') {
+                    this.removeEventHandler(button, key);
+                    this.setupEventHandler(button, key, newProp);
                 }
+            }
+            else if (key === 'disabled') {
+                button.bIsEnabled = !newProp;
             }
         }
         this.commonPropertyInitialized(widget);
@@ -293,198 +221,171 @@ class ButtonWrapper extends ComponentWrapper {
         return undefined;
     }
 }
-;
-class inputWrapper extends ComponentWrapper {
+class InputWrapper extends ComponentWrapper {
     textChangeCallback;
     checkboxChangeCallback;
-    propertySetters;
-    eventSetters;
     constructor(type, props) {
         super();
         this.typeName = type;
         this.props = props;
-        this.setupPropertySetters();
-        this.setupEventSetters();
     }
-    setupPropertySetters() {
-        this.propertySetters = {
-            'placeholder': (widget, props) => {
-                let textInput = widget;
-                let placeHolder = props['placeholder'];
-                if (placeHolder) {
-                    textInput.SetHintText(placeHolder);
-                }
-            },
-            'defaultValue': (widget, props) => {
-                let textInput = widget;
-                let defaultValue = props['defaultValue'];
-                if (defaultValue) {
-                    textInput.SetText(defaultValue);
-                }
-            },
-            'disabled': (widget, props) => {
-                let textInput = widget;
-                let disabled = props['disabled'];
-                if (disabled) {
-                    textInput.SetIsEnabled(false);
-                }
-            },
-            'readOnly': (widget, props) => {
-                let textInput = widget;
-                let readOnly = props['readOnly'];
-                if (readOnly) {
-                    textInput.SetIsReadOnly(true);
-                }
-            },
-            'checked': (widget, props) => {
-                let checkbox = widget;
-                let checked = props['checked'];
-                if (checked) {
-                    checkbox.SetIsChecked(true);
-                }
-            }
-        };
-    }
-    setupEventSetters() {
-        this.eventSetters = {
-            'onChange': (widget, props, update) => {
-                if (widget instanceof UE.EditableText) {
-                    let textInput = widget;
-                    let onChange = props['onChange'];
-                    if (typeof onChange === 'function') {
-                        if (update && this.checkboxChangeCallback) {
-                            textInput.OnTextChanged.Remove(this.textChangeCallback);
-                        }
-                        this.textChangeCallback = (text) => { onChange({ 'target': { 'value': text } }); };
-                        textInput.OnTextChanged.Add(this.textChangeCallback);
-                    }
-                }
-                else if (widget instanceof UE.CheckBox) {
-                    let checkbox = widget;
-                    let onChange = props['onChange'];
-                    if (typeof onChange === 'function') {
-                        if (update && this.checkboxChangeCallback) {
-                            checkbox.OnCheckStateChanged.Remove(this.checkboxChangeCallback);
-                        }
-                        this.checkboxChangeCallback = (isChecked) => { onChange({ 'target': { 'checked': isChecked } }); };
-                        checkbox.OnCheckStateChanged.Add(this.checkboxChangeCallback);
-                    }
-                }
-            }
-        };
-    }
-    initOrUpdateWidgetProperties(initPropsName, widget, propsValue, isUpdate) {
-        for (let propName of initPropsName) {
-            if (propName in this.propertySetters) {
-                this.propertySetters[propName](widget, propsValue);
-            }
-            if (propName in this.eventSetters) {
-                this.eventSetters[propName](widget, propsValue, isUpdate);
-            }
+    handleTextChange(widget, onChange) {
+        if (this.textChangeCallback) {
+            widget.OnTextChanged.Remove(this.textChangeCallback);
         }
+        this.textChangeCallback = (text) => onChange({ target: { value: text } });
+        widget.OnTextChanged.Add(this.textChangeCallback);
+    }
+    handleCheckboxChange(widget, onChange) {
+        if (this.checkboxChangeCallback) {
+            widget.OnCheckStateChanged.Remove(this.checkboxChangeCallback);
+        }
+        this.checkboxChangeCallback = (isChecked) => onChange({ target: { checked: isChecked } });
+        widget.OnCheckStateChanged.Add(this.checkboxChangeCallback);
+    }
+    setupTextInput(widget, props) {
+        const { placeholder, defaultValue, disabled, readOnly, onChange } = props;
+        if (placeholder)
+            widget.SetHintText(placeholder);
+        if (defaultValue)
+            widget.SetText(defaultValue);
+        if (disabled)
+            widget.SetIsEnabled(false);
+        if (readOnly)
+            widget.SetIsReadOnly(true);
+        if (typeof onChange === 'function')
+            this.handleTextChange(widget, onChange);
+    }
+    setupCheckbox(widget, props) {
+        const { checked, onChange } = props;
+        if (checked)
+            widget.SetIsChecked(true);
+        if (typeof onChange === 'function')
+            this.handleCheckboxChange(widget, onChange);
     }
     convertToWidget() {
-        let inputType = this.props['type'];
-        if (!inputType) {
-            inputType = 'text';
+        const inputType = this.props.type || 'text';
+        let widget;
+        if (inputType === 'checkbox') {
+            widget = new UE.CheckBox();
+            this.setupCheckbox(widget, this.props);
         }
-        let returnWidget;
-        if (inputType == 'text') {
-            let textInput = new UE.EditableText();
-            this.initOrUpdateWidgetProperties(['onChange', 'placeholder', 'defaultValue', 'disabled', 'readOnly'], textInput, this.props, false);
-            returnWidget = textInput;
-        }
-        else if (inputType == 'checkbox') {
-            let checkbox = new UE.CheckBox();
-            this.initOrUpdateWidgetProperties(['onChange', 'checked'], checkbox, this.props, false);
-            returnWidget == checkbox;
-        }
-        else if (inputType == 'password') {
-            let passwordInput = new UE.EditableText();
-            passwordInput.SetIsPassword(true);
-            this.initOrUpdateWidgetProperties(['onChange', 'defaultValue', 'readOnly'], passwordInput, this.props, false);
-            returnWidget = passwordInput;
-        }
-        this.commonPropertyInitialized(returnWidget);
-        return returnWidget;
-    }
-    updateWidgetProperty(widget, oldProps, newProps, updateProps) {
-        let propsChange = false;
-        let oldType = oldProps['type'];
-        let newType = newProps['type'];
-        if (oldType != newType) {
-            console.error('Cannot change input type');
-            return propsChange;
-        }
-        // todo@Caleb196x: update style
-        for (var key in newProps) {
-            if (key == 'type')
-                continue;
-            let oldProp = oldProps[key];
-            let newProp = newProps[key];
-            if (oldProp != newProp) {
-                if (newType == 'text' && widget instanceof UE.EditableText) {
-                    this.initOrUpdateWidgetProperties(['onChange', 'placeholder', 'defaultValue', 'disabled', 'readOnly'], widget, newProps, true);
-                }
-                else if (newType == 'checkbox' && widget instanceof UE.CheckBox) {
-                    this.initOrUpdateWidgetProperties(['onChange', 'checked'], widget, this.props, true);
-                }
-                else if (newType == 'password' && widget instanceof UE.EditableText) {
-                    this.initOrUpdateWidgetProperties(['onChange', 'defaultValue', 'readOnly'], widget, this.props, true);
-                }
-                propsChange = true;
+        else {
+            widget = new UE.EditableText();
+            if (inputType === 'password') {
+                widget.SetIsPassword(true);
             }
+            this.setupTextInput(widget, this.props);
         }
         this.commonPropertyInitialized(widget);
-        return propsChange;
+        return widget;
+    }
+    updateWidgetProperty(widget, oldProps, newProps, updateProps) {
+        if (oldProps.type !== newProps.type) {
+            console.error('Cannot change input type');
+            return false;
+        }
+        const type = newProps.type || 'text';
+        let changed = false;
+        if (type === 'checkbox' && widget instanceof UE.CheckBox) {
+            if (oldProps.checked !== newProps.checked || oldProps.onChange !== newProps.onChange) {
+                this.setupCheckbox(widget, newProps);
+                changed = true;
+            }
+        }
+        else if (widget instanceof UE.EditableText) {
+            const props = ['placeholder', 'defaultValue', 'disabled', 'readOnly', 'onChange'];
+            for (const prop of props) {
+                if (oldProps[prop] !== newProps[prop]) {
+                    this.setupTextInput(widget, newProps);
+                    changed = true;
+                    break;
+                }
+            }
+        }
+        if (changed) {
+            this.commonPropertyInitialized(widget);
+        }
+        return changed;
     }
     convertReactEventToWidgetEvent(reactProp, originCallback) {
         return undefined;
     }
 }
-;
 class ProgressBarWrapper extends ComponentWrapper {
+    defaultProps = {
+        value: 0.0,
+        max: 100.0
+    };
     constructor(type, props) {
         super();
         this.typeName = type;
-        this.props = props;
+        this.props = { ...this.defaultProps, ...props };
+    }
+    calculatePercent(value, max) {
+        // Ensure max is not 0 to avoid division by zero
+        max = max || this.defaultProps.max;
+        // Clamp value between 0 and max
+        value = Math.max(0, Math.min(value, max));
+        return value / max;
+    }
+    updateProgressBar(progressBar, value, max) {
+        const percent = this.calculatePercent(value, max);
+        progressBar.SetPercent(percent);
     }
     convertToWidget() {
-        let progressBar = new UE.ProgressBar();
-        let progressVal = this.props['value'] || 0.0; // Default to 0 if not provided
-        let maxVal = this.props['max'] || 100.0; // Default to false if not provided
-        let precent = progressVal / maxVal;
-        progressBar.SetPercent(precent);
+        const progressBar = new UE.ProgressBar();
+        const { value, max } = this.props;
+        this.updateProgressBar(progressBar, value, max);
+        this.parseStyleToWidget(progressBar);
         this.commonPropertyInitialized(progressBar);
         return progressBar;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
-        let propsChange = false;
-        let progressBar = widget;
-        let oldVal = oldProps['value'];
-        let newVal = newProps['value'];
-        let newMaxVal = newProps['max'];
-        if (oldVal != newVal) {
-            let precent = newVal / newMaxVal;
-            progressBar.SetPercent(precent);
-            propsChange = true;
+        const progressBar = widget;
+        let hasChanged = false;
+        // Check if value or max have changed
+        if (oldProps.value !== newProps.value || oldProps.max !== newProps.max) {
+            this.updateProgressBar(progressBar, newProps.value, newProps.max);
+            hasChanged = true;
         }
-        this.commonPropertyInitialized(widget);
-        // todo@Caleb196x: update style
-        return propsChange;
+        // Update common properties if needed
+        if (hasChanged) {
+            this.parseStyleToWidget(progressBar);
+            this.commonPropertyInitialized(progressBar);
+        }
+        return hasChanged;
     }
     convertReactEventToWidgetEvent(reactProp, originCallback) {
         return undefined;
     }
 }
-;
 class ImageWrapper extends ComponentWrapper {
     constructor(type, props) {
         super();
         this.typeName = type;
         this.props = props;
     }
+    loadTexture(src) {
+        if (!src)
+            return undefined;
+        // Handle texture object directly
+        if (typeof src !== 'string') {
+            return src;
+        }
+        // todo@Caleb196x: 如果是网络图片，则需要先下载到本地，同时还要加入缓存，防止每次都下载
+        // Import texture from file path
+        const texture = UE.KismetRenderingLibrary.ImportFileAsTexture2D(null, src);
+        return texture;
+    }
+    setImageBrush(image, texture) {
+        if (!texture)
+            return;
+        image.SetBrushFromTexture(texture, true);
+    }
     convertToWidget() {
+        const image = new UE.Image();
+        const texture = this.loadTexture(this.props.src);
         // 关键问题：如何解决图片导入的问题
         // 功能设想
         // 1. 使用import image from '图片路径'的方式导入一张图片，image在UE中的类型为UTexture， 可以直接设置到img标签的src属性中
@@ -495,134 +396,106 @@ class ImageWrapper extends ComponentWrapper {
         // 2. hook js的require逻辑，实现图片的导入；只导入一次，以及通过hash值对比文件是否发生变化，如果发生变化，重新导入
         // 3. 图片导入时，首先读取图片数据，调用ImportFileAsTexture2D API来创建UTexture（创建后是否能够将UTexture保存为本地uasset资产文件？）（思考如何做异步和批量导入，做性能优化）
         // 4. 读取img的标签属性，例如src, width, height
-        let imageWidgt = new UE.Image();
-        let srcImage = this.props['src'];
-        if (typeof srcImage == 'string') {
-            // todo@Caleb196x: 如果是网络图片，则需要先下载到本地，同时还要加入缓存，防止每次都下载
-            let fullpath = srcImage;
-            // todo@Caleb196x: 获取文件全路径，判断文件是否存在
-            let texture = UE.KismetRenderingLibrary.ImportFileAsTexture2D(null, fullpath);
-            // todo@Caleb196x: 将texture加入全局缓存，如果是相同路径，直接读缓存数据
-            if (texture) {
-                imageWidgt.SetBrushFromTexture(texture, true);
-            }
-        }
-        else if (srcImage) {
-            imageWidgt.SetBrushFromTexture(srcImage, true);
-        }
-        // todo@Caleb196x: 在style中去设置width和height
-        // todo@Caleb196x: 
-        let width = this.props['width'];
-        let height = this.props['height'];
-        this.commonPropertyInitialized(imageWidgt);
-        return imageWidgt;
+        this.setImageBrush(image, texture);
+        this.parseStyleToWidget(image);
+        this.commonPropertyInitialized(image);
+        return image;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
-        return;
+        const image = widget;
+        let hasChanged = false;
+        // Check if src has changed
+        if (oldProps.src !== newProps.src) {
+            const texture = this.loadTexture(newProps.src);
+            this.setImageBrush(image, texture);
+            hasChanged = true;
+        }
+        // Check if size has changed
+        if (oldProps.width !== newProps.width || oldProps.height !== newProps.height) {
+            // this.updateImageSize(image);
+            hasChanged = true;
+        }
+        // Update common properties if needed
+        if (hasChanged) {
+            this.parseStyleToWidget(image);
+            this.commonPropertyInitialized(image);
+        }
+        return hasChanged;
     }
     convertReactEventToWidgetEvent(reactProp, originCallback) {
         return undefined;
     }
 }
-;
 class TextBlockWrapper extends ComponentWrapper {
-    richTextSupportTag = ['a', 'code', 'mark', 'article', 'strong', 'em', 'del'];
+    richTextSupportTags = ['a', 'code', 'mark', 'article', 'strong', 'em', 'del'];
     constructor(type, props) {
         super();
         this.typeName = type;
         this.props = props;
     }
-    shouldUseRichTextBlock(children) {
-        if (typeof children == 'string')
+    isRichTextContent(content) {
+        if (typeof content === 'string')
             return false;
-        for (var key in children) {
-            let value = children[key];
-            if (typeof value == 'string') {
-                continue;
-            }
-            if (this.richTextSupportTag.includes(value['type'])) {
-                return true;
-            }
+        if (Array.isArray(content)) {
+            return content.some(child => typeof child === 'object' &&
+                this.richTextSupportTags.includes(child.type));
         }
-        return false;
+        return typeof content === 'object' &&
+            this.richTextSupportTags.includes(content.type);
     }
-    stringfyObjectToString(object) {
-        if (typeof object === 'string')
-            return object;
-        console.log('type of props: ', typeof object.props.children);
-        if (typeof object.props.children == 'string') {
-            return `<${object.type}>${object.props.children}</>`;
+    convertToRichText(content) {
+        if (typeof content === 'string')
+            return content;
+        if (Array.isArray(content)) {
+            return content.map(child => this.convertToRichText(child)).join('');
         }
-        const children = object.props.children.map(child => this.stringfyObjectToString(child))
-            .join('');
-        return `<${object.type}>${children}</>`;
+        const tag = content.type;
+        const children = content.props.children;
+        const childContent = this.convertToRichText(children);
+        return `<${tag}>${childContent}</>`;
+    }
+    createRichTextBlock(content) {
+        const richTextBlock = new UE.RichTextBlock();
+        const styleSet = UE.DataTable.Find('/Game/NewDataTable.NewDataTable');
+        const richText = this.convertToRichText(content);
+        richTextBlock.SetText(richText);
+        richTextBlock.SetTextStyleSet(styleSet);
+        return richTextBlock;
+    }
+    createTextBlock(text) {
+        const textBlock = new UE.TextBlock();
+        textBlock.SetText(text);
+        return textBlock;
     }
     convertToWidget() {
-        // 对所有text类型的组件均有效：
-        // 1. 如果text中child标签中包含或者自身就是<a>, <code>, <mark>，<article> 那么就走rich text block的逻辑
-        // 2. 如果text中只有文本数据，那么就走text block的逻辑。（所以判断的逻辑需要写一个单独的判断函数）
-        // 3. 如果是rich text block，需要将孩子标签转换为RichTextStyle支持的标签格式并进行处理；
-        // 4. 提前创建RichTextStyle资产，在ts中load，然后赋给RichTextBlock
-        // 5. todo@Caleb196x: 暂时不处理文本中嵌入img的情况
-        // 6. todo@Caleb196x: 可能涉及到修改某个标签的RichTextStyle的情况
-        let childs = this.props['children'];
-        if (this.shouldUseRichTextBlock(childs)) {
-            let richTextWidget = new UE.RichTextBlock();
-            let styleSetDataTable = UE.DataTable.Find('/Game/NewDataTable.NewDataTable');
-            let richText = '';
-            for (var key in childs) {
-                richText += this.stringfyObjectToString(childs[key]);
-            }
-            console.log("rich text: ", richText);
-            richTextWidget.SetText(richText);
-            // todo@Caleb196x: 根据标签中的样式内容，修改对应标签的RichTextStyle
-            richTextWidget.SetTextStyleSet(styleSetDataTable);
-            this.commonPropertyInitialized(richTextWidget);
-            return richTextWidget;
+        const content = this.props.children;
+        let widget;
+        if (this.isRichTextContent(content)) {
+            widget = this.createRichTextBlock(content);
         }
         else {
-            let textWidget = new UE.TextBlock();
-            let text = this.props['children'];
-            if (typeof text === 'string') {
-                textWidget.SetText(text);
-            }
-            console.log("text: ", text);
-            this.commonPropertyInitialized(textWidget);
-            // todo@Caleb196x: 设置text的样式
-            return textWidget;
+            widget = this.createTextBlock(typeof content === 'string' ? content : '');
         }
+        this.commonPropertyInitialized(widget);
+        return widget;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
-        let propsChange = false;
-        for (var key in newProps) {
-            if (key == 'type')
-                continue;
-            let oldProp = oldProps[key];
-            let newProp = newProps[key];
-            if (oldProp != newProp && key == 'children') { // fixme@Caleb196x: 这里比较可能会失效
-                let richText = '';
-                for (var key in newProp) {
-                    richText += this.stringfyObjectToString(newProp[key]);
-                }
-                console.log("rich text when update widget property: ", richText);
-                if (widget instanceof UE.TextBlock) {
-                    let textWidget = widget;
-                    textWidget.SetText(richText);
-                }
-                else if (widget instanceof UE.RichTextBlock) {
-                    let richTextWidget = widget;
-                    richTextWidget.SetText(richText);
-                }
-                propsChange = true;
-            }
+        if (!('children' in newProps) || newProps.children === oldProps.children) {
+            return false;
         }
-        return propsChange;
+        const content = this.convertToRichText(newProps.children);
+        if (widget instanceof UE.TextBlock) {
+            widget.SetText(content);
+        }
+        else if (widget instanceof UE.RichTextBlock) {
+            widget.SetText(content);
+        }
+        return true;
     }
     convertReactEventToWidgetEvent(reactProp, originCallback) {
         return undefined;
     }
 }
-;
 class ListViewWrapper extends ComponentWrapper {
     listItemType;
     listView;
@@ -676,8 +549,8 @@ class ListViewWrapper extends ComponentWrapper {
         else if (this.typeName === 'ul') {
             this.listView = new UE.ListView();
             // check all items' type is the same
-            let buttonClass = UE.Button.StaticClass();
-            this.listView.EntryWidgetClass = buttonClass;
+            let buttonClass = UE.UserWidget.Load('/Game/Button.Button');
+            // this.listView.EntryWidgetClass = buttonClass.StaticClass();
             this.commonPropertyInitialized(this.listView);
             // todo@Caleb196x: support style
             return this.listView;
@@ -714,128 +587,95 @@ class ListViewWrapper extends ComponentWrapper {
 }
 ;
 class TextareaWrapper extends ComponentWrapper {
-    propertySetters;
-    eventSetters;
-    onTextChange;
-    onTextSubmit;
-    onLostFocus;
+    propertySetters = {
+        'value': (widget, value) => value && widget.SetText(value),
+        'defaultValue': (widget, value) => value && widget.SetText(value),
+        'placeholder': (widget, value) => value && widget.SetHintText(value),
+        'readOnly': (widget, value) => value && widget.SetIsReadOnly(value),
+        'disabled': (widget, value) => value && widget.SetIsEnabled(!value)
+    };
+    eventHandlers = {
+        'onChange': {
+            event: 'OnTextChanged',
+            setup: (widget, handler) => {
+                const callback = (text) => handler({ target: { value: text } });
+                widget.OnTextChanged.Add(callback);
+                return callback;
+            }
+        },
+        'onSubmit': {
+            event: 'OnTextCommitted',
+            setup: (widget, handler) => {
+                const callback = (text, commitMethod) => {
+                    if (commitMethod === UE.ETextCommit.Default) {
+                        handler({ target: text });
+                    }
+                };
+                widget.OnTextCommitted.Add(callback);
+                return callback;
+            }
+        },
+        'onBlur': {
+            event: 'OnTextCommitted',
+            setup: (widget, handler) => {
+                const callback = (text, commitMethod) => {
+                    if (commitMethod === UE.ETextCommit.OnUserMovedFocus) {
+                        handler({ target: { value: text } });
+                    }
+                };
+                widget.OnTextCommitted.Add(callback);
+                return callback;
+            }
+        }
+    };
+    eventCallbacks = {};
     constructor(type, props) {
         super();
         this.typeName = type;
         this.props = props;
-        this.setupPropertySetters();
-        this.setupEventSetters();
-    }
-    setupPropertySetters() {
-        this.propertySetters = {
-            'value': (widget) => {
-                let textVal = this.props['value'];
-                if (textVal) {
-                    widget.SetText(textVal);
-                }
-            },
-            'defaultValue': (widget) => {
-                let textVal = this.props['value'];
-                if (textVal) {
-                    widget.SetText(textVal);
-                }
-            },
-            'placeholder': (widget) => {
-                let placeholder = this.props['placeholder'];
-                if (placeholder) {
-                    widget.SetHintText(placeholder);
-                }
-            },
-            'readOnly': (widget) => {
-                let readOnly = this.props['readOnly'];
-                if (readOnly) {
-                    widget.SetIsReadOnly(readOnly);
-                }
-            },
-            'disabled': (widget) => {
-                let disabled = this.props['disabled'];
-                if (disabled) {
-                    widget.SetIsEnabled(!disabled);
-                }
-            },
-        };
-    }
-    setupEventSetters() {
-        this.eventSetters = {
-            'onChange': (widget, update) => {
-                let onChange = this.props['onChange'];
-                if (onChange) {
-                    if (update && this.onTextChange) {
-                        widget.OnTextChanged.Remove(this.onTextChange);
-                    }
-                    this.onTextChange = (Text) => { onChange({ 'target': { 'value': Text } }); };
-                    widget.OnTextChanged.Add(this.onTextChange);
-                }
-            },
-            'onSubmit': (widget, update) => {
-                let onSubmit = this.props['onSubmit'];
-                if (onSubmit) {
-                    if (update && this.onTextSubmit) {
-                        widget.OnTextCommitted.Remove(this.onTextSubmit);
-                    }
-                    this.onTextSubmit = (Text, commitMethod) => {
-                        if (commitMethod == UE.ETextCommit.Default) {
-                            onSubmit({ 'target': Text });
-                        }
-                    };
-                    widget.OnTextCommitted.Add(this.onTextSubmit);
-                }
-            },
-            'onBlur': (widget, update) => {
-                let onBlur = this.props['onBlur'];
-                if (onBlur) {
-                    if (update && this.onLostFocus) {
-                        widget.OnTextCommitted.Remove(this.onLostFocus);
-                    }
-                    this.onLostFocus = (Text, commitMethod) => {
-                        if (commitMethod == UE.ETextCommit.OnUserMovedFocus) {
-                            onBlur({ 'target': { 'value': Text } });
-                        }
-                    };
-                    widget.OnTextCommitted.Add(this.onLostFocus);
-                }
-            },
-        };
     }
     convertToWidget() {
-        let multiLineText = new UE.MultiLineEditableText();
-        this.propertySetters['value'](multiLineText);
-        this.propertySetters['defaultValue'](multiLineText);
-        this.propertySetters['placeholder'](multiLineText);
-        this.propertySetters['readOnly'](multiLineText);
-        this.propertySetters['disabled'](multiLineText);
-        this.eventSetters['onChange'](multiLineText, false);
-        this.eventSetters['onSubmit'](multiLineText, false);
-        this.eventSetters['onBlur'](multiLineText, false);
-        return multiLineText;
-    }
-    updateWidgetProperty(widget, oldProps, newProps, updateProps) {
-        let multiLine = widget;
-        let propsChange = false;
-        for (var key in newProps) {
-            if (key in this.propertySetters) {
-                let oldProp = oldProps[key];
-                let newProp = newProps[key];
-                if (oldProp != newProp) {
-                    this.propertySetters[key](multiLine);
-                    propsChange = true;
-                }
-            }
-            if (key in this.eventSetters) {
-                let oldProp = oldProps[key];
-                let newProp = newProps[key];
-                if (oldProp != newProp) {
-                    this.eventSetters[key](multiLine, true);
-                    propsChange = true;
-                }
+        const widget = new UE.MultiLineEditableText();
+        // Apply properties
+        for (const [key, setter] of Object.entries(this.propertySetters)) {
+            if (key in this.props) {
+                setter(widget, this.props[key]);
             }
         }
-        return propsChange;
+        // Setup event handlers
+        for (const [key, handler] of Object.entries(this.eventHandlers)) {
+            if (typeof this.props[key] === 'function') {
+                this.eventCallbacks[key] = handler.setup(widget, this.props[key]);
+            }
+        }
+        return widget;
+    }
+    updateWidgetProperty(widget, oldProps, newProps, updateProps) {
+        const multiLine = widget;
+        let hasChanges = false;
+        // Update properties
+        for (const [key, setter] of Object.entries(this.propertySetters)) {
+            if (oldProps[key] !== newProps[key]) {
+                setter(multiLine, newProps[key]);
+                hasChanges = true;
+            }
+        }
+        // Update event handlers
+        for (const [key, handler] of Object.entries(this.eventHandlers)) {
+            if (oldProps[key] !== newProps[key]) {
+                if (this.eventCallbacks[key]) {
+                    const eventDelegate = multiLine[handler.event];
+                    if (eventDelegate && typeof eventDelegate.Remove === 'function') {
+                        eventDelegate.Remove(this.eventCallbacks[key]);
+                    }
+                }
+                if (typeof newProps[key] === 'function') {
+                    this.eventCallbacks[key] = handler.setup(multiLine, newProps[key]);
+                }
+                hasChanges = true;
+            }
+        }
+        return hasChanges;
     }
     convertReactEventToWidgetEvent(reactProp, originCallback) {
         return undefined;
@@ -887,7 +727,7 @@ const baseComponentsMap = {
     "em": TextBlockWrapper,
     "del": TextBlockWrapper,
     // input
-    "input": inputWrapper,
+    "input": InputWrapper,
     // Text
     "span": TextBlockWrapper,
     "p": TextBlockWrapper,
