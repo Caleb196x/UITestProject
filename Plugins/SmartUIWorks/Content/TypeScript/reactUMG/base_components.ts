@@ -801,6 +801,104 @@ class TextareaWrapper extends ComponentWrapper {
     }
 }
 
+class DivWrapper extends ContainerWrapper {
+    constructor(type: string, props: any) {
+        super(type, props);
+    }
+    private static StyleRegistry = {
+        styles: new Map<string, Record<string, any>>(),
+
+        registerStyle(className: string, styles: Record<string, any>) {
+            this.styles.set(className, styles);
+        },
+
+        getStyleForClass(className: string): Record<string, any> | undefined {
+            return this.styles.get(className);
+        },
+
+        clearStyles() {
+            this.styles.clear();
+        }
+    };
+
+    override convertToWidget(): UE.Widget {
+        let widget: UE.Widget;
+        // Extract styles from className if provided
+        let classNameStyles = {};
+        if (this.props.className) {
+            // Split multiple classes
+            const classNames = this.props.className.split(' ');
+            for (const className of classNames) {
+                // Get styles associated with this class name
+                // This assumes there's a style registry or system in place
+                const classStyle = StyleRegistry?.getStyleForClass?.(className) ?? {};
+                if (classStyle) {
+                    // Merge the class styles into our style object
+                    classNameStyles = { ...classNameStyles, ...classStyle };
+                }
+            }
+        }
+
+        // Merge className styles with inline styles, giving precedence to inline styles
+        this.props.style = { ...classNameStyles, ...(this.props.style || {}) };
+        const style = typeof this.props.style === 'string' ? {} : this.props.style;
+        const display = style?.display;
+        const flexDirection = style?.flexDirection;
+        const overflow = style?.overflow;
+        const gridTemplateColumns = style?.gridTemplateColumns;
+
+        // Convert to appropriate UMG container based on style
+        if (overflow === 'scroll' || overflow === 'auto') {
+            widget = UE.WidgetBlueprintLibrary.CreateScrollBox();
+        } else if (display === 'grid' && gridTemplateColumns) {
+            widget = UE.WidgetBlueprintLibrary.CreateGridPanel();
+            // Configure grid columns based on gridTemplateColumns
+        } else if (display === 'flex') {
+            if (flexDirection === 'row') {
+                widget = UE.WidgetBlueprintLibrary.CreateHorizontalBox();
+            } else if (flexDirection === 'column') {
+                widget = UE.WidgetBlueprintLibrary.CreateVerticalBox();
+            } else if (flexDirection === 'row-wrap' || flexDirection === 'wrap') {
+                widget = UE.WidgetBlueprintLibrary.CreateWrapBox();
+            }
+        }
+
+        // Default to Overlay if no specific layout style is matched
+        if (!widget) {
+            widget = UE.WidgetBlueprintLibrary.CreateOverlay();
+        }
+
+        // Add children to the container
+        const children = this.getChildren();
+        for (const child of children) {
+            if (child && typeof child.convertToWidget === 'function') {
+                const childWidget = child.convertToWidget();
+                if (childWidget) {
+                    widget.AddChild(childWidget);
+                }
+            }
+        }
+
+        return widget;
+    }
+
+    override updateWidgetProperty(widget: UE.Widget, oldProps: any, newProps: any, updateProps: Record<string, any>): boolean {
+        let hasChanges = false;
+        
+        // Handle style updates that might affect layout
+        if (oldProps.style?.display !== newProps.style?.display ||
+            oldProps.style?.flexDirection !== newProps.style?.flexDirection ||
+            oldProps.style?.overflow !== newProps.style?.overflow ||
+            oldProps.style?.gridTemplateColumns !== newProps.style?.gridTemplateColumns) {
+            hasChanges = true;
+            // Recreate widget with new container type if needed
+        }
+
+        return hasChanges;
+    }
+}
+
+
 class ContainerWrapper extends ComponentWrapper {
     private children: any[];
 
@@ -832,7 +930,11 @@ class ContainerWrapper extends ComponentWrapper {
     override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {
         return undefined;
     }
-};
+
+    override appendChildItem(listItem: UE.Widget, listItemTypeName: string): void {
+        
+    }
+}
 
 const baseComponentsMap: Record<string, any> = {
     // base

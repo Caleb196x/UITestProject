@@ -2,7 +2,12 @@ import * as Reconciler from 'react-reconciler'
 import { FunctionComponent, ComponentClass, Component } from 'react';
 import * as puerts from 'puerts'
 import * as UE from 'ue'
-import { CreateReactComponentWrapper, createUMGWidgetFromReactComponent, updateUMGWidgetPropertyUsingReactComponentProperty, ComponentWrapper } from './base_components';
+import { 
+    CreateReactComponentWrapper, 
+    createUMGWidgetFromReactComponent, 
+    updateUMGWidgetPropertyUsingReactComponentProperty, 
+    ComponentWrapper
+} from './base_components';
 
 /**
  * Compares two values for deep equality.
