@@ -175,7 +175,7 @@ class UEWidget {
 
         if (this.nativePtr instanceof UE.ListView ) {
             if (this.reactWrapper) {
-                this.reactWrapper.appendChildItem(child.nativePtr, child.type);
+                this.reactWrapper.appendChildItem(this.nativePtr, child.nativePtr, child.type);
             }
         }
 

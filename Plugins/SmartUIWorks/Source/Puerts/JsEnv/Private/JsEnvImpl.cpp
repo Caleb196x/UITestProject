@@ -517,6 +517,8 @@ FJsEnvImpl::FJsEnvImpl(std::shared_ptr<IJSModuleLoader> InModuleLoader, std::sha
     MethodBindingHelper<&FJsEnvImpl::SetInspectorCallback>::Bind(Isolate, Context, Global, "__tgjsSetInspectorCallback", This);
 
     MethodBindingHelper<&FJsEnvImpl::ReadImageFileAsTexture2D>::Bind(Isolate, Context, Global, "__tgjsReadImageFileAsTexture2D", This);
+    
+    MethodBindingHelper<&FJsEnvImpl::ReadTextFileContent>::Bind(Isolate, Context, Global, "__tgjsReadFileContent", This);
 
     MethodBindingHelper<&FJsEnvImpl::DispatchProtocolMessage>::Bind(
         Isolate, Context, Global, "__tgjsDispatchProtocolMessage", This);
@@ -4603,6 +4605,30 @@ void FJsEnvImpl::ReadImageFileAsTexture2D(const v8::FunctionCallbackInfo<v8::Val
     }
 
     FV8Utils::ThrowException(Isolate, FString::Printf(TEXT("Image path not exist: %s"), *ImagePath));
+}
+
+void FJsEnvImpl::ReadTextFileContent(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+    v8::Isolate* Isolate = Info.GetIsolate();
+    v8::Isolate::Scope Isolatescope(Isolate);
+    v8::HandleScope HandleScope(Isolate);
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    v8::Context::Scope ContextScope(Context);
+
+    CHECK_V8_ARGS(EArgString);
+
+    const FString TextFilePath = FV8Utils::ToFString(Isolate, Info[0]);
+    if (FPaths::FileExists(TextFilePath))
+    {
+        FString OutContent;
+        if (FFileHelper::LoadFileToString(OutContent, *TextFilePath))
+        {
+            const auto Result = FV8Utils::ToV8String(Isolate, OutContent);
+            Info.GetReturnValue().Set(Result);
+        }
+    }
+
+    FV8Utils::ThrowException(Isolate, FString::Printf(TEXT("Text file path not exist: %s"), *TextFilePath));
 }
 
 void FJsEnvImpl::DumpStatisticsLog(const v8::FunctionCallbackInfo<v8::Value>& Info)

@@ -25,7 +25,7 @@ export abstract class ComponentWrapper {
         }
     }
 
-    appendChildItem(listItem: UE.Widget, listItemTypeName: string) {
+    appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any) {
         // Default empty implementation
     }
 }
@@ -659,9 +659,9 @@ class ListViewWrapper extends ComponentWrapper {
         return undefined;
     }
 
-    override appendChildItem(listItem: UE.Widget, listItemTypeName: string) {
-        if (listItemTypeName === this.listItemType) {
-            this.listView.AddItem(listItem);
+    override appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any) {
+        if (childItemTypeName === this.listItemType) {
+            this.listView.AddItem(childItem);
         }
     }
 
@@ -801,37 +801,35 @@ class TextareaWrapper extends ComponentWrapper {
     }
 }
 
-class DivWrapper extends ContainerWrapper {
+enum UMGContainerType {
+    ScrollBox,
+    GridPanel, 
+    HorizontalBox,
+    VerticalBox,
+    WrapBox
+}
+
+class ContainerWrapper extends ComponentWrapper {
+    private children: any[];
+    private containerStyle: any;
+    private containerType: UMGContainerType;
     constructor(type: string, props: any) {
-        super(type, props);
+        super();
+        this.children = [];
+        this.typeName = type;
+        this.props = props;
+        this.containerType = UMGContainerType.HorizontalBox;
     }
-    private static StyleRegistry = {
-        styles: new Map<string, Record<string, any>>(),
 
-        registerStyle(className: string, styles: Record<string, any>) {
-            this.styles.set(className, styles);
-        },
-
-        getStyleForClass(className: string): Record<string, any> | undefined {
-            return this.styles.get(className);
-        },
-
-        clearStyles() {
-            this.styles.clear();
-        }
-    };
-
-    override convertToWidget(): UE.Widget {
-        let widget: UE.Widget;
-        // Extract styles from className if provided
+    override convertToWidget(): UE.Widget { 
         let classNameStyles = {};
         if (this.props.className) {
             // Split multiple classes
             const classNames = this.props.className.split(' ');
             for (const className of classNames) {
                 // Get styles associated with this class name
-                // This assumes there's a style registry or system in place
-                const classStyle = StyleRegistry?.getStyleForClass?.(className) ?? {};
+                const classStyle = getCssStyleForClass(className) ?? {};
+                // todo@Caleb196x: 解析classStyle
                 if (classStyle) {
                     // Merge the class styles into our style object
                     classNameStyles = { ...classNameStyles, ...classStyle };
@@ -841,86 +839,98 @@ class DivWrapper extends ContainerWrapper {
 
         // Merge className styles with inline styles, giving precedence to inline styles
         this.props.style = { ...classNameStyles, ...(this.props.style || {}) };
+        
         const style = typeof this.props.style === 'string' ? {} : this.props.style;
-        const display = style?.display;
-        const flexDirection = style?.flexDirection;
-        const overflow = style?.overflow;
+        this.containerStyle = style;
+
+        const display = style?.display || 'flex';
+        const flexDirection = style?.flexDirection || 'row';
+        const overflow = style?.overflow || 'hidden';
         const gridTemplateColumns = style?.gridTemplateColumns;
 
+        let widget: UE.Widget;
         // Convert to appropriate UMG container based on style
         if (overflow === 'scroll' || overflow === 'auto') {
-            widget = UE.WidgetBlueprintLibrary.CreateScrollBox();
+            widget = new UE.ScrollBox();
+            this.containerType = UMGContainerType.ScrollBox;
         } else if (display === 'grid' && gridTemplateColumns) {
-            widget = UE.WidgetBlueprintLibrary.CreateGridPanel();
-            // Configure grid columns based on gridTemplateColumns
+            // grid panel
+            widget = new UE.GridPanel();
+            this.containerType = UMGContainerType.GridPanel;
+            // todo@Caleb196x: Configure grid columns based on gridTemplateColumns
         } else if (display === 'flex') {
-            if (flexDirection === 'row') {
-                widget = UE.WidgetBlueprintLibrary.CreateHorizontalBox();
-            } else if (flexDirection === 'column') {
-                widget = UE.WidgetBlueprintLibrary.CreateVerticalBox();
-            } else if (flexDirection === 'row-wrap' || flexDirection === 'wrap') {
-                widget = UE.WidgetBlueprintLibrary.CreateWrapBox();
-            }
-        }
+            const flexWrap = style?.flexWrap || 'nowrap';
+            if (flexWrap === 'wrap' || flexWrap === 'wrap-reverse') {
+                widget = new UE.WrapBox();
+                this.containerType = UMGContainerType.WrapBox;
+                let wrapBox = widget as UE.WrapBox;
 
-        // Default to Overlay if no specific layout style is matched
-        if (!widget) {
-            widget = UE.WidgetBlueprintLibrary.CreateOverlay();
-        }
+                wrapBox.Orientation = 
+                    (flexDirection === 'column'|| flexDirection === 'column-reverse')
+                    ? UE.EOrientation.Orient_Vertical : UE.EOrientation.Orient_Horizontal;
 
-        // Add children to the container
-        const children = this.getChildren();
-        for (const child of children) {
-            if (child && typeof child.convertToWidget === 'function') {
-                const childWidget = child.convertToWidget();
-                if (childWidget) {
-                    widget.AddChild(childWidget);
-                }
+            } else if (flexDirection === 'row' || flexDirection === 'row-reverse') {
+
+                widget = new UE.HorizontalBox();
+                this.containerType = UMGContainerType.HorizontalBox;
+
+            } else if (flexDirection === 'column' || flexDirection === 'column-reverse') {
+
+                widget = new UE.VerticalBox();
+                this.containerType = UMGContainerType.VerticalBox;
+
             }
+        } else if (display === 'block') {
+            widget = new UE.VerticalBox();
+            this.containerType = UMGContainerType.VerticalBox;
         }
 
         return widget;
     }
 
-    override updateWidgetProperty(widget: UE.Widget, oldProps: any, newProps: any, updateProps: Record<string, any>): boolean {
-        let hasChanges = false;
-        
-        // Handle style updates that might affect layout
-        if (oldProps.style?.display !== newProps.style?.display ||
-            oldProps.style?.flexDirection !== newProps.style?.flexDirection ||
-            oldProps.style?.overflow !== newProps.style?.overflow ||
-            oldProps.style?.gridTemplateColumns !== newProps.style?.gridTemplateColumns) {
-            hasChanges = true;
-            // Recreate widget with new container type if needed
+    override appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any): void {
+        const backgroundImage = this.containerStyle?.backgroundImage;
+        const backgroundColor = this.containerStyle?.backgroundColor;
+        if (backgroundImage || backgroundColor) {
+            let border = new UE.Border();
+            // todo@Caleb196x: 加载图片
+            border.SetBrush(backgroundImage);
+            border.AddChild(childItem);
+            childItem = border;
         }
 
-        return hasChanges;
-    }
-}
+        // todo@Caleb196x: 单独写一个函数用来处理布局参数 
+        // 1. 如果display是row-reverse, 设置Widget.FlowDirectionPreference为from right to left
 
+        // 2. 如果flexDirection是row(为horizontal box), 主轴为Horizontal，交叉轴为Vertical，读取justifyContent的内容，
+        //    flex-start对应设置为HorizontalAlignment.HAlign_Left，flex-end对应设置为HorizontalAlignment.HAlign_Right，
+        //    center对应设置为HorizontalAlignment.HAlign_Center，stretch对应设置为HorizontalAlignment.HAlign_Fill，
+        //    space-between将Size设置成Fill, space-around和space-evenly需要根据器原理计算Padding
 
-class ContainerWrapper extends ComponentWrapper {
-    private children: any[];
+        //    读取alignItems的内容设置VerticalAlignment，stretch对应设置为VAlign_Fill，center对应设置为VAlign_Center，
+        //    flex-start对应设置为VAlign_Top，flex-end对应设置为VAlign_Bottom
 
-    constructor(type: string, props: any) {
-        super();
-        this.children = [];
-    }
+        // 3. 如果flexDirection是column(为vertical box), 主轴为Vertical，交叉轴为Horizontal，读取justifyContent的内容，
+        //    flex-start对应设置为VerticalAlignment.VAlign_Top，flex-end对应设置为VerticalAlignment.VAlign_Bottom，
+        //    center对应设置为VerticalAlignment.VAlign_Center，stretch对应设置为VAlign_Fill
+        //    space-between将Size设置成Fill, space-around和space-evenly需要根据器原理计算Padding
 
-    override convertToWidget(): UE.Widget {
-        return undefined;
-    }
-
-    addChild(child: any) {
-        this.children.push(child);
-    }
-
-    getChildren() {
-        return this.children;
-    }
-
-    render() {
-        console.log("Rendering container with children:", this.children);
+        // 4. 根据gap的值对元素的padding进行设置，注意需要进行单位换算，根据DPI计算像素值
+        // 5. 直接设置padding，如果padding是百分比，则根据父元素的宽度计算像素值
+        // 6. 直接设置margin，按照padding的计算方式进行设置
+        // 7. 读取子元素的style，注意其flex属性
+        if (this.containerType === UMGContainerType.HorizontalBox) {
+            let horizontalBox = parentItem as UE.HorizontalBox;
+            let horizontalBoxSlot = horizontalBox.AddChildToHorizontalBox(childItem);
+            horizontalBoxSlot.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Fill;
+        } else if (this.containerType === UMGContainerType.VerticalBox) {
+            let verticalBox = parentItem as UE.VerticalBox;
+            let verticalBoxSlot = verticalBox.AddChildToVerticalBox(childItem);
+            verticalBoxSlot.HorizontalAlignment
+        } else if (this.containerType === UMGContainerType.WrapBox) {
+            let wrapBox = parentItem as UE.WrapBox;
+            let wrapBoxSlot = wrapBox.AddChildToWrapBox(childItem);
+        }
     }
 
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
@@ -931,9 +941,7 @@ class ContainerWrapper extends ComponentWrapper {
         return undefined;
     }
 
-    override appendChildItem(listItem: UE.Widget, listItemTypeName: string): void {
-        
-    }
+
 }
 
 const baseComponentsMap: Record<string, any> = {

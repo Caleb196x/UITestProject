@@ -351,6 +351,7 @@ private:
 
     // used by reactUMG
     void ReadImageFileAsTexture2D(const v8::FunctionCallbackInfo<v8::Value>& Info);
+    void ReadTextFileContent(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
 #ifndef WITH_QUICKJS
     v8::MaybeLocal<v8::Module> FetchESModuleTree(v8::Local<v8::Context> Context, const FString& FileName);
