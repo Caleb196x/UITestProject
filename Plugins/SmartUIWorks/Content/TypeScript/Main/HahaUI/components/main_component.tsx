@@ -74,6 +74,10 @@ export class MainComponent extends React.Component<Props, State> {
                             onChange={(e)=>{console.log("on change: " + e.target.value)}} 
                             onSubmit={(e) => {console.log("on submit: " + e.target)}}
                             onBlur={(e)=>{console.log("on blur: " + e.target.value)}}></textarea>
+                    <div style={{backgroundImage: 'url(face.png)', backgroundSize: 'cover', backgroundPosition: 'center', 
+                        width: '512px', height: '512px', justifyContent: 'stretch', padding: '10px', gap: '10px'}}>
+
+                    </div>
                 </HorizontalBox>
                 <HorizontalBox>
                     <ul>

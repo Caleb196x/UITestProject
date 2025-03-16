@@ -37,8 +37,14 @@ var global = global || (function () { return this; }());
 
     let readImageAsTexture = global.__tgjsReadImageFileAsTexture2D;
     global.__tgjsReadImageFileAsTexture2D = undefined;
+
+    let readFileContent = global.__tgjsReadFileContent;
+    global.__tgjsReadFileContent = undefined;
     
     let tmpModuleStorage = [];
+
+    // save css style classes
+    let styleClassesCache = Object.create(null);
     
     function addModule(m) {
         for (var i = 0; i < tmpModuleStorage.length; i++) {
@@ -48,6 +54,49 @@ var global = global || (function () { return this; }());
             }
         }
         return tmpModuleStorage.push(m) - 1;
+    }
+
+    function getCssStyleForClass(className) {
+        if (styleClassesCache[className]) {
+            return styleClassesCache[className];
+        }
+
+        return undefined;
+    }
+
+    function registerStyleClass(className, content) {
+        if (styleClassesCache[className]) {
+            console.warn(`style class ${className} already registered, will override it`);
+            return;
+        }
+
+        styleClassesCache[className] = content;
+    }
+
+    // extract the style class from the CSS file
+    function extractStyleClassFromFile(filePath) {
+        let cssContent = readFileContent(filePath);
+        // Remove comments and extra white space
+        cssContent = cssContent.replace(/\/\*[\s\S]*?\*\//g, '')
+                         .replace(/\s+/g, ' ')
+                         .trim();
+
+        // Match each CSS rule block
+        const ruleRegex = /\.([a-zA-Z0-9_-]+)\s*{([^}]*)}/g;
+        let match;
+
+        while ((match = ruleRegex.exec(cssContent)) !== null) {
+            const className = match[1];
+            let styleContent = match[2].trim();
+
+            // Ensure the style content is surrounded by curly braces
+            if (!styleContent.startsWith('{')) {
+                styleContent = '{' + styleContent + '}';
+            }
+
+            // Store to cache
+            registerStyleClass(className, styleContent);
+        }
     }
     
     function getModuleBySID(id) {
@@ -190,7 +239,11 @@ var global = global || (function () { return this; }());
                     let texture = readImageAsTexture(fullPath); 
                     console.log(texture);
                     m.exports = {'default': texture};
-                } else {
+                } else if (fullPath.endsWith('.css') || fullPath.endsWith('.scss')) {
+                    // support import css
+                    extractStyleClassFromFile(fullPath);
+                }
+                else {
                     let r = executeModule(fullPath, script, debugPath, sid, isESM, bytecode);
                     if (isESM) {
                         m.exports = r;
@@ -259,4 +312,6 @@ var global = global || (function () { return this; }());
     puerts.getModuleByUrl = getModuleByUrl;
     
     puerts.generateEmptyCode = generateEmptyCode;
+
+    global.getCssStyleForClass = getCssStyleForClass;
 }(global));
