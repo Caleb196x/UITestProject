@@ -848,6 +848,8 @@ class ContainerWrapper extends ComponentWrapper {
         const overflow = style?.overflow || 'hidden';
         const gridTemplateColumns = style?.gridTemplateColumns;
 
+        // todo@Caleb196x: 处理flex-flow参数
+
         let widget: UE.Widget;
         // Convert to appropriate UMG container based on style
         if (overflow === 'scroll' || overflow === 'auto') {
@@ -888,6 +890,161 @@ class ContainerWrapper extends ComponentWrapper {
         return widget;
     }
 
+    private convertPixelToSU(pixel: string): number {
+        // todo@Caleb196x: 将react中的单位转换为SU单位(UMG中的单位值)
+        return 0; 
+    }
+    
+    private setupAlignment(Slot: UE.PanelSlot, childProps: any) {
+        const style = this.containerStyle || {};
+        const justifyContent = style.justifyContent || 'flex-start';
+        const alignItems = style.alignItems || 'stretch';
+        const display = style.display;
+        let rowReverse = display === 'row-reverse';
+        const flexValue = childProps.style?.flex || 1;
+
+        // Set horizontal alignment based on justifyContent
+        const hSlotJustifyContentActionMap = {
+            'flex-start': (horizontalBoxSlot: UE.HorizontalBoxSlot) => horizontalBoxSlot.SetHorizontalAlignment(rowReverse ? UE.EHorizontalAlignment.HAlign_Right : UE.EHorizontalAlignment.HAlign_Left),
+            'flex-end': (horizontalBoxSlot: UE.HorizontalBoxSlot) => horizontalBoxSlot.SetHorizontalAlignment(rowReverse ? UE.EHorizontalAlignment.HAlign_Left : UE.EHorizontalAlignment.HAlign_Right),
+            'center': (horizontalBoxSlot: UE.HorizontalBoxSlot) => horizontalBoxSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Center),
+            'stretch': (horizontalBoxSlot: UE.HorizontalBoxSlot) => horizontalBoxSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Fill),
+            'space-between': (horizontalBoxSlot: UE.HorizontalBoxSlot) => horizontalBoxSlot.SetSize(new UE.SlateChildSize(flexValue, UE.ESlateSizeRule.Fill))
+        };
+
+        const vSlotJustifyContentActionMap = {
+            'flex-start': (verticalBoxSlot: UE.VerticalBoxSlot) => verticalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
+            'flex-end': (verticalBoxSlot: UE.VerticalBoxSlot) => verticalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
+            'center': (verticalBoxSlot: UE.VerticalBoxSlot) => verticalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Center),
+            'stretch': (verticalBoxSlot: UE.VerticalBoxSlot) => verticalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Fill),
+            'space-between': (verticalBoxSlot: UE.VerticalBoxSlot) => verticalBoxSlot.SetSize(new UE.SlateChildSize(flexValue, UE.ESlateSizeRule.Fill))
+        };
+        
+        const hAlignItemActionMap = {
+            'stretch': (horizontalBoxSlot: UE.HorizontalBoxSlot) => horizontalBoxSlot.SetSize(new UE.SlateChildSize(1, UE.ESlateSizeRule.Fill)),
+            'center': (horizontalBoxSlot: UE.HorizontalBoxSlot) => horizontalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Center),
+            'flex-start': (horizontalBoxSlot: UE.HorizontalBoxSlot) => horizontalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
+            'flex-end': (horizontalBoxSlot: UE.HorizontalBoxSlot) => horizontalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom)
+        }
+
+        const vAlignItemActionMap = {
+            'stretch': (verticalBoxSlot: UE.VerticalBoxSlot) => verticalBoxSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Fill),
+            'center': (verticalBoxSlot: UE.VerticalBoxSlot) => verticalBoxSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Center),
+            'flex-start': (verticalBoxSlot: UE.VerticalBoxSlot) => verticalBoxSlot.SetHorizontalAlignment(rowReverse ? UE.EHorizontalAlignment.HAlign_Right : UE.EHorizontalAlignment.HAlign_Left),
+            'flex-end': (verticalBoxSlot: UE.VerticalBoxSlot) => verticalBoxSlot.SetHorizontalAlignment(rowReverse ? UE.EHorizontalAlignment.HAlign_Left : UE.EHorizontalAlignment.HAlign_Right)
+        }
+
+        if (this.containerType === UMGContainerType.HorizontalBox) {
+            const horizontalBoxSlot = Slot as UE.HorizontalBoxSlot;
+            justifyContent?.split(' ')
+                .filter(value => hSlotJustifyContentActionMap[value])
+                .forEach(value => hSlotJustifyContentActionMap[value](horizontalBoxSlot));
+
+            const hAlignItemValues = alignItems?.split(' ') || [];
+            const hAlignItemValidValue = hAlignItemValues.find(v => hAlignItemActionMap[v]);
+            if (hAlignItemValidValue) {
+                hAlignItemActionMap[hAlignItemValidValue](horizontalBoxSlot);
+            }
+        } else if (this.containerType === UMGContainerType.VerticalBox) {
+            const verticalBoxSlot = Slot as UE.VerticalBoxSlot;
+            justifyContent?.split(' ')
+                .filter(value => vSlotJustifyContentActionMap[value])
+                .forEach(value => vSlotJustifyContentActionMap[value](verticalBoxSlot));
+
+            const vAlignItemValues = alignItems?.split(' ') || [];
+            const vAlignItemValidValue = vAlignItemValues.find(v => vAlignItemActionMap[v]);
+            if (vAlignItemValidValue) {
+                vAlignItemActionMap[vAlignItemValidValue](verticalBoxSlot);
+            }
+        }
+    }
+
+    private expandPaddingValues(paddingValues: number[]): number[] {
+        if (paddingValues.length === 2) {
+            return [paddingValues[0], paddingValues[1], paddingValues[0], paddingValues[1]];
+        } else if (paddingValues.length === 1) {
+            return [paddingValues[0], paddingValues[0], paddingValues[0], paddingValues[0]];
+        } else if (paddingValues.length === 3) {
+            // padding: top right bottom
+            return [paddingValues[0], paddingValues[1], paddingValues[2], paddingValues[1]];
+        }
+
+        return paddingValues;
+    }
+
+    private convertMargin(margin: string): UE.Margin {
+        if (!margin) {
+            return new UE.Margin(0, 0, 0, 0);
+        }
+
+        const marginValues = margin.split(' ').map(v => {
+            // todo@Caleb196x: 处理margin的单位
+            v = v.trim();
+            return this.convertPixelToSU(v);
+        });
+
+        let expandedMarginValues = this.expandPaddingValues(marginValues);
+
+        // React Padding: top right bottom left
+        // UMG Padding: Left, Top, Right, Bottom
+        return new UE.Margin(expandedMarginValues[3], expandedMarginValues[0], expandedMarginValues[1], expandedMarginValues[2]);
+    }
+
+    private convertGap(gap: string) {
+        if (!gap) {
+            return new UE.Vector2D(0, 0);
+        }
+        const gapValues = gap.split(' ').map(v => {
+            // todo@Caleb196x: 处理react的单位
+            v = v.trim();
+            return this.convertPixelToSU(v);
+        });
+
+        if (gapValues.length === 2) {
+            // gap: row column
+            // innerSlotPadding: x(column) y(row)
+            return new UE.Vector2D(gapValues[1], gapValues[0]);
+        }
+
+        return new UE.Vector2D(gapValues[0], gapValues[0]);
+    }
+
+    private initSlot(Slot: UE.PanelSlot, childProps: any) {
+        this.setupAlignment(Slot, childProps);
+        let gapPadding = this.convertGap(this.containerStyle?.gap);
+        // todo@Caleb196x: 只有父元素为border，SizeBox, ScaleBox, BackgroundBlur这些只能容纳一个子元素的容器时，padding才有意义，
+        // 对于容器来说，读取margin值
+        let margin = this.convertMargin(childProps.style?.margin); 
+        margin.Left += gapPadding.X;
+        margin.Right += gapPadding.X;
+        margin.Top += gapPadding.Y;
+        margin.Bottom += gapPadding.Y;
+
+        (Slot as any).SetPadding(margin);
+    }
+
+    private initWrapBoxSlot(wrapBox: UE.WrapBox, Slot: UE.WrapBoxSlot, childProps: any) {
+        const gap = this.containerStyle?.gap;
+        wrapBox.SetInnerSlotPadding(this.convertGap(gap));
+
+        const justifyContentActionMap = {
+            'flex-start': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Left,
+            'flex-end': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Right,
+            'center': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Center,
+            'stretch': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Fill
+        }
+
+        const justifyContent = this.containerStyle?.justifyContent;
+        if (justifyContent) {
+            justifyContent.split(' ')
+                .filter(value => justifyContentActionMap[value])
+                .forEach(value => justifyContentActionMap[value]());
+        }
+
+        const margin = this.containerStyle?.margin;
+        Slot.SetPadding(this.convertMargin(margin));
+    }
+
     override appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any): void {
         const backgroundImage = this.containerStyle?.backgroundImage;
         const backgroundColor = this.containerStyle?.backgroundColor;
@@ -899,37 +1056,23 @@ class ContainerWrapper extends ComponentWrapper {
             childItem = border;
         }
 
-        // todo@Caleb196x: 单独写一个函数用来处理布局参数 
-        // 1. 如果display是row-reverse, 设置Widget.FlowDirectionPreference为from right to left
+        const addChildActionMap = {
+            [UMGContainerType.HorizontalBox]: (horizontalBox: UE.HorizontalBox, childItem: UE.Widget) => {
+                let horizontalBoxSlot = horizontalBox.AddChildToHorizontalBox(childItem);
+                this.initSlot(horizontalBoxSlot, childProps);
+            },
+            [UMGContainerType.VerticalBox]: (verticalBox: UE.VerticalBox, childItem: UE.Widget) => {
+                let verticalBoxSlot = verticalBox.AddChildToVerticalBox(childItem);
+                this.initSlot(verticalBoxSlot, childProps);
+            },
+            [UMGContainerType.WrapBox]: (wrapBox: UE.WrapBox, childItem: UE.Widget) => {
+                let wrapBoxSlot = wrapBox.AddChildToWrapBox(childItem);
+                this.initWrapBoxSlot(wrapBox, wrapBoxSlot, childProps);
+            }
+        };
 
-        // 2. 如果flexDirection是row(为horizontal box), 主轴为Horizontal，交叉轴为Vertical，读取justifyContent的内容，
-        //    flex-start对应设置为HorizontalAlignment.HAlign_Left，flex-end对应设置为HorizontalAlignment.HAlign_Right，
-        //    center对应设置为HorizontalAlignment.HAlign_Center，stretch对应设置为HorizontalAlignment.HAlign_Fill，
-        //    space-between将Size设置成Fill, space-around和space-evenly需要根据器原理计算Padding
-
-        //    读取alignItems的内容设置VerticalAlignment，stretch对应设置为VAlign_Fill，center对应设置为VAlign_Center，
-        //    flex-start对应设置为VAlign_Top，flex-end对应设置为VAlign_Bottom
-
-        // 3. 如果flexDirection是column(为vertical box), 主轴为Vertical，交叉轴为Horizontal，读取justifyContent的内容，
-        //    flex-start对应设置为VerticalAlignment.VAlign_Top，flex-end对应设置为VerticalAlignment.VAlign_Bottom，
-        //    center对应设置为VerticalAlignment.VAlign_Center，stretch对应设置为VAlign_Fill
-        //    space-between将Size设置成Fill, space-around和space-evenly需要根据器原理计算Padding
-
-        // 4. 根据gap的值对元素的padding进行设置，注意需要进行单位换算，根据DPI计算像素值
-        // 5. 直接设置padding，如果padding是百分比，则根据父元素的宽度计算像素值
-        // 6. 直接设置margin，按照padding的计算方式进行设置
-        // 7. 读取子元素的style，注意其flex属性
-        if (this.containerType === UMGContainerType.HorizontalBox) {
-            let horizontalBox = parentItem as UE.HorizontalBox;
-            let horizontalBoxSlot = horizontalBox.AddChildToHorizontalBox(childItem);
-            horizontalBoxSlot.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Fill;
-        } else if (this.containerType === UMGContainerType.VerticalBox) {
-            let verticalBox = parentItem as UE.VerticalBox;
-            let verticalBoxSlot = verticalBox.AddChildToVerticalBox(childItem);
-            verticalBoxSlot.HorizontalAlignment
-        } else if (this.containerType === UMGContainerType.WrapBox) {
-            let wrapBox = parentItem as UE.WrapBox;
-            let wrapBoxSlot = wrapBox.AddChildToWrapBox(childItem);
+        if (this.containerType in addChildActionMap) {
+            addChildActionMap[this.containerType](parentItem as any, childItem);
         }
     }
 
@@ -982,9 +1125,9 @@ const baseComponentsMap: Record<string, any> = {
     "h6": TextBlockWrapper,
 
     // container
-    "div": "containerWrapper",
-    "view": "containerWrapper",
-    "canvas": "CanvasPanelWrapper",
+    "div": ContainerWrapper,
+    "view": ContainerWrapper,
+    "canvas": ContainerWrapper,
 };
 
 function isKeyOfRecord(key: any, record: Record<string, any>): key is keyof Record<string, any> {
