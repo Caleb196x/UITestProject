@@ -810,12 +810,10 @@ enum UMGContainerType {
 }
 
 class ContainerWrapper extends ComponentWrapper {
-    private children: any[];
     private containerStyle: any;
     private containerType: UMGContainerType;
     constructor(type: string, props: any) {
         super();
-        this.children = [];
         this.typeName = type;
         this.props = props;
         this.containerType = UMGContainerType.HorizontalBox;
@@ -892,6 +890,28 @@ class ContainerWrapper extends ComponentWrapper {
 
     private convertPixelToSU(pixel: string): number {
         // todo@Caleb196x: 将react中的单位转换为SU单位(UMG中的单位值)
+        // get font size of parent
+        const fontSize = this.containerStyle?.fontSize || '16px';
+        const numSize = parseInt(fontSize.replace('px', '')); 
+        if (pixel.endsWith('px')) {
+            const match = pixel.match(/(\d+)px/);
+            if (match) {
+                return parseInt(match[1]);
+            }
+        } else if (pixel.endsWith('%')) {
+            // todo@Caleb196x: 需要获取父元素的值
+        } else if (pixel.endsWith('em')) {
+            const match = pixel.match(/(\d+)em/);
+            if (match) {
+                return parseInt(match[1]) * numSize;
+            }
+        } else if (pixel.endsWith('rem')) {
+            const match = pixel.match(/(\d+)rem/);
+            if (match) {
+                return parseInt(match[1]) * numSize;
+            }
+        }
+
         return 0; 
     }
     
@@ -1083,8 +1103,6 @@ class ContainerWrapper extends ComponentWrapper {
     override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {
         return undefined;
     }
-
-
 }
 
 const baseComponentsMap: Record<string, any> = {
