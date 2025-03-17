@@ -819,6 +819,14 @@ class ContainerWrapper extends ComponentWrapper {
         this.containerType = UMGContainerType.HorizontalBox;
     }
 
+    private setupGridRowAndColumns(gridPanel: UE.GridPanel) {
+        const gridTemplateColumns = this.containerStyle?.gridTemplateColumns;
+        const gridTemplateRows = this.containerStyle?.gridTemplateRows;
+        const gridTemplate = this.containerStyle?.gridTemplate;
+
+        // todo@Caleb196x: 处理gridTemplate
+    }
+
     override convertToWidget(): UE.Widget { 
         let classNameStyles = {};
         if (this.props.className) {
@@ -844,7 +852,6 @@ class ContainerWrapper extends ComponentWrapper {
         const display = style?.display || 'flex';
         const flexDirection = style?.flexDirection || 'row';
         const overflow = style?.overflow || 'hidden';
-        const gridTemplateColumns = style?.gridTemplateColumns;
 
         // todo@Caleb196x: 处理flex-flow参数
 
@@ -853,10 +860,11 @@ class ContainerWrapper extends ComponentWrapper {
         if (overflow === 'scroll' || overflow === 'auto') {
             widget = new UE.ScrollBox();
             this.containerType = UMGContainerType.ScrollBox;
-        } else if (display === 'grid' && gridTemplateColumns) {
+        } else if (display === 'grid') {
             // grid panel
             widget = new UE.GridPanel();
             this.containerType = UMGContainerType.GridPanel;
+            this.setupGridRowAndColumns(widget as UE.GridPanel);
             // todo@Caleb196x: Configure grid columns based on gridTemplateColumns
         } else if (display === 'flex') {
             const flexWrap = style?.flexWrap || 'nowrap';
@@ -1060,6 +1068,13 @@ class ContainerWrapper extends ComponentWrapper {
                 .filter(value => justifyContentActionMap[value])
                 .forEach(value => justifyContentActionMap[value]());
         }
+
+        const margin = this.containerStyle?.margin;
+        Slot.SetPadding(this.convertMargin(margin));
+    }
+
+    private initGridPanelSlot(gridPanel: UE.GridPanel, Slot: UE.GridSlot, childProps: any) {
+        // todo@Caleb196x: 处理网格布局中的子元素位置
 
         const margin = this.containerStyle?.margin;
         Slot.SetPadding(this.convertMargin(margin));
