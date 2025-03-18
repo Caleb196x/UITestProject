@@ -4,6 +4,7 @@ import { Props, CanvasPanel, VerticalBox, HorizontalBox,
 from 'reactUMG';
 import {EButtonClickMethod} from 'ue';
 import face from '../assets/face.png';
+import './style.css';
 
 interface State {
     username: string;
@@ -96,6 +97,21 @@ export class MainComponent extends React.Component<Props, State> {
                     </ul>
                 </HorizontalBox>
 
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    height: '100%',
+                }}>
+                    <button style={{alignSelf: 'flex-start'}}>按我1</button>
+                    <button style={{alignSelf: 'flex-end'}}>按我2</button>
+                </div>
+                <div className='container'>
+                    <button style={{alignSelf: 'stretch'}}>敲我1</button>
+                    <button style={{alignSelf: 'stretch'}}>敲我2</button>
+                </div>
             </VerticalBox>
 
             {/* <div style={{ 

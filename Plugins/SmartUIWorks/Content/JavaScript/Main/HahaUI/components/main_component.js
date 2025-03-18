@@ -5,6 +5,7 @@ const React = require("react");
 const reactUMG_1 = require("reactUMG");
 const ue_1 = require("ue");
 const face_png_1 = require("../assets/face.png");
+require("./style.css");
 class MainComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -51,7 +52,9 @@ class MainComponent extends React.Component {
                         React.createElement("strong", null, "\u5D4C\u5957\u52A0\u7C97"))),
                 React.createElement(reactUMG_1.HorizontalBox, null,
                     React.createElement("img", { src: face_png_1.default, width: 512, height: 512 }),
-                    React.createElement("textarea", { defaultValue: '默认内容', placeholder: '\u8BF7\u8F93\u5165\u591A\u884C\u5185\u5BB9...', onChange: (e) => { console.log("on change: " + e.target.value); }, onSubmit: (e) => { console.log("on submit: " + e.target); }, onBlur: (e) => { console.log("on blur: " + e.target.value); } })),
+                    React.createElement("textarea", { defaultValue: '默认内容', placeholder: '\u8BF7\u8F93\u5165\u591A\u884C\u5185\u5BB9...', onChange: (e) => { console.log("on change: " + e.target.value); }, onSubmit: (e) => { console.log("on submit: " + e.target); }, onBlur: (e) => { console.log("on blur: " + e.target.value); } }),
+                    React.createElement("div", { style: { backgroundImage: 'url(face.png)', backgroundSize: 'cover', backgroundPosition: 'center',
+                            width: '512px', height: '512px', justifyContent: 'stretch', padding: '10px', gap: '10px' } })),
                 React.createElement(reactUMG_1.HorizontalBox, null,
                     React.createElement("ul", null,
                         React.createElement("li", null,
@@ -61,7 +64,20 @@ class MainComponent extends React.Component {
                         React.createElement("li", null,
                             React.createElement("button", { onClick: () => { console.log('button3 click'); } }, "\u6309\u94AE3")),
                         React.createElement("li", null,
-                            React.createElement("button", { onClick: () => { console.log('button4 click'); } }, "\u6309\u94AE4"))))));
+                            React.createElement("button", { onClick: () => { console.log('button4 click'); } }, "\u6309\u94AE4")))),
+                React.createElement("div", { style: {
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        width: '100%',
+                        height: '100%',
+                    } },
+                    React.createElement("button", { style: { alignSelf: 'flex-start' } }, "\u6309\u62111"),
+                    React.createElement("button", { style: { alignSelf: 'flex-end' } }, "\u6309\u62112")),
+                React.createElement("div", { className: 'container' },
+                    React.createElement("button", { style: { alignSelf: 'stretch' } }, "\u6572\u62111"),
+                    React.createElement("button", { style: { alignSelf: 'stretch' } }, "\u6572\u62112"))));
     }
 }
 exports.MainComponent = MainComponent;
