@@ -97,6 +97,8 @@ var global = global || (function () { return this; }());
             // Store to cache
             registerStyleClass(className, styleContent);
         }
+
+        console.log(styleClassesCache);
     }
     
     function getModuleBySID(id) {

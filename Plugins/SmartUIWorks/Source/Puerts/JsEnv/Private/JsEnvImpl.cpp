@@ -4625,6 +4625,7 @@ void FJsEnvImpl::ReadTextFileContent(const v8::FunctionCallbackInfo<v8::Value>& 
         {
             const auto Result = FV8Utils::ToV8String(Isolate, OutContent);
             Info.GetReturnValue().Set(Result);
+            return;
         }
     }
 
