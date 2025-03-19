@@ -801,12 +801,11 @@ class ContainerWrapper extends ComponentWrapper {
             }
         }
         // Merge className styles with inline styles, giving precedence to inline styles
-        this.props.style = { ...classNameStyles, ...(this.props.style || {}) };
-        const style = typeof this.props.style === 'string' ? {} : this.props.style;
-        this.containerStyle = style;
-        const display = style?.display || 'flex';
-        const flexDirection = style?.flexDirection || 'row';
-        const overflow = style?.overflow || 'hidden';
+        const mergedStyle = { ...classNameStyles, ...(this.props.style || {}) };
+        this.containerStyle = mergedStyle;
+        const display = mergedStyle?.display || 'flex';
+        const flexDirection = mergedStyle?.flexDirection || 'row';
+        const overflow = mergedStyle?.overflow || 'hidden';
         // todo@Caleb196x: 处理flex-flow参数
         let widget;
         // Convert to appropriate UMG container based on style
@@ -822,7 +821,7 @@ class ContainerWrapper extends ComponentWrapper {
             this.setupGridRowAndColumns(widget);
         }
         else if (display === 'flex') {
-            const flexWrap = style?.flexWrap || 'nowrap';
+            const flexWrap = mergedStyle?.flexWrap || 'nowrap';
             if (flexWrap === 'wrap' || flexWrap === 'wrap-reverse') {
                 widget = new UE.WrapBox();
                 this.containerType = UMGContainerType.WrapBox;

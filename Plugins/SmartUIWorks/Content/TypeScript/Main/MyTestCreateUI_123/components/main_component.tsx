@@ -3,7 +3,8 @@ import { Props, CanvasPanel, VerticalBox, HorizontalBox,
     TextBlock, EditableText, Button, CanvasPanelSlot } 
 from 'reactUMG';
 import { StatusBar } from './status_bar_compoennt';
-import { ButtonSlot, ButtonStyle, LinearColor, ESlateColorStylingMode, Margin} from 'ue';
+import './style.css';
+import face from '../assets/face.png';
 
 interface State {
     username: string;
@@ -73,20 +74,27 @@ export class MainComponent extends React.Component<Props, State> {
                                 placeholder='输入内容...' aria-label='用户名' required/>
                     <button style={this.buttonStyle} onClick={()=>this.handleLogin()}>测试原生按钮</button>
                 </HorizontalBox>
-                <HorizontalBox>
-                    <select defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
+                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                    <select style={{alignSelf: 'flex-start'}} defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
                         <option value={"A"}>a</option>
                         <option value={"B"}>b</option>
                         <option value={"C"}>c</option>
                         <option value={"D"}>d</option>
                     </select>
 
-                <progress value={this.state.progressVal} max={100}>
+                    <img src={face} style={{width: '100%', height: '100%'}}/>
+
+                    <progress style={{alignSelf: 'stretch'}} value={this.state.progressVal} max={100}>
                     进度条
-                </progress>
-                <button onClick={()=>{this.setState({progressVal: Math.min(this.state.progressVal + 5, 100)})}}>增加进度</button>
-                <button onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>
-                </HorizontalBox>
+                    </progress>
+                    <button style={{alignSelf: 'end'}} onClick={()=>{this.setState({progressVal: Math.min(this.state.progressVal + 5, 100)})}}>增加进度</button>
+                    <button style={{alignSelf: 'left'}} onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>
+                </div>
+                <div className='container'>
+                    <div className='item'>1</div>
+                    <div className='item'>2</div>
+                    <div className='item'>3</div>
+                </div>
             </VerticalBox>
         </CanvasPanel>
     }

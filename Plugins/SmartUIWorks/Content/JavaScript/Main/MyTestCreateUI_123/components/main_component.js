@@ -4,6 +4,8 @@ exports.MainComponent = void 0;
 const React = require("react");
 const reactUMG_1 = require("reactUMG");
 const status_bar_compoennt_1 = require("./status_bar_compoennt");
+require("./style.css");
+const face_png_1 = require("../assets/face.png");
 class MainComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -53,15 +55,20 @@ class MainComponent extends React.Component {
                 React.createElement(reactUMG_1.HorizontalBox, null,
                     React.createElement("input", { type: 'text', value: this.state.username, onChange: (e) => this.setState({ username: e.target.value }), placeholder: '\u8F93\u5165\u5185\u5BB9...', "aria-label": '\u7528\u6237\u540D', required: true }),
                     React.createElement("button", { style: this.buttonStyle, onClick: () => this.handleLogin() }, "\u6D4B\u8BD5\u539F\u751F\u6309\u94AE")),
-                React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement("select", { defaultValue: "C", onChange: (e) => { console.log("onChange: ", e.target); } },
+                React.createElement("div", { style: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' } },
+                    React.createElement("select", { style: { alignSelf: 'flex-start' }, defaultValue: "C", onChange: (e) => { console.log("onChange: ", e.target); } },
                         React.createElement("option", { value: "A" }, "a"),
                         React.createElement("option", { value: "B" }, "b"),
                         React.createElement("option", { value: "C" }, "c"),
                         React.createElement("option", { value: "D" }, "d")),
-                    React.createElement("progress", { value: this.state.progressVal, max: 100 }, "\u8FDB\u5EA6\u6761"),
-                    React.createElement("button", { onClick: () => { this.setState({ progressVal: Math.min(this.state.progressVal + 5, 100) }); } }, "\u589E\u52A0\u8FDB\u5EA6"),
-                    React.createElement("button", { onClick: () => { this.setState({ progressVal: Math.max(this.state.progressVal - 5, 0) }); } }, "\u51CF\u5C11\u8FDB\u5EA6"))));
+                    React.createElement("img", { src: face_png_1.default, style: { width: '100%', height: '100%' } }),
+                    React.createElement("progress", { style: { alignSelf: 'stretch' }, value: this.state.progressVal, max: 100 }, "\u8FDB\u5EA6\u6761"),
+                    React.createElement("button", { style: { alignSelf: 'end' }, onClick: () => { this.setState({ progressVal: Math.min(this.state.progressVal + 5, 100) }); } }, "\u589E\u52A0\u8FDB\u5EA6"),
+                    React.createElement("button", { style: { alignSelf: 'left' }, onClick: () => { this.setState({ progressVal: Math.max(this.state.progressVal - 5, 0) }); } }, "\u51CF\u5C11\u8FDB\u5EA6")),
+                React.createElement("div", { className: 'container' },
+                    React.createElement("div", { className: 'item' }, "1"),
+                    React.createElement("div", { className: 'item' }, "2"),
+                    React.createElement("div", { className: 'item' }, "3"))));
     }
 }
 exports.MainComponent = MainComponent;
