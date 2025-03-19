@@ -1,5 +1,6 @@
 import * as UE from 'ue';
 import * as puerts from 'puerts'
+import { convertCssToStyles } from './css_converter';
 
 // Base abstract class for all component wrappers
 export abstract class ComponentWrapper {
@@ -912,7 +913,6 @@ class ContainerWrapper extends ComponentWrapper {
                 }
             }
         }
-  
     }
 
     override convertToWidget(): UE.Widget { 
@@ -922,7 +922,7 @@ class ContainerWrapper extends ComponentWrapper {
             const classNames = this.props.className.split(' ');
             for (const className of classNames) {
                 // Get styles associated with this class name
-                const classStyle = getCssStyleForClass(className) ?? {};
+                const classStyle = convertCssToStyles(getCssStyleForClass(className));
                 // todo@Caleb196x: 解析classStyle
                 if (classStyle) {
                     // Merge the class styles into our style object

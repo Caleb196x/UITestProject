@@ -42,6 +42,7 @@ declare const exports: {lazyloadComponents:{}}
 
 class UEWidget {
     type: string;
+    props: any;
     callbackRemovers: {[key: string] : () => void};
     nativePtr: UE.Widget;
     slot: any;
@@ -50,6 +51,7 @@ class UEWidget {
 
     constructor (type: string, props: any) {
         this.type = type;
+        this.props = props;
         this.callbackRemovers = {};
         
         try {
@@ -173,10 +175,11 @@ class UEWidget {
             return;
         }
 
-        if (this.nativePtr instanceof UE.ListView ) {
+        if (this.nativePtr instanceof UE.ListView || this.type === 'div') {
             if (this.reactWrapper) {
-                this.reactWrapper.appendChildItem(this.nativePtr, child.nativePtr, child.type);
+                this.reactWrapper.appendChildItem(this.nativePtr, child.nativePtr, child.type, child.props);
             }
+            return;
         }
 
         if (this.nativePtr instanceof UE.PanelWidget)

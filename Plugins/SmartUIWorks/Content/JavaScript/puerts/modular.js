@@ -98,6 +98,38 @@ var global = global || (function () { return this; }());
             registerStyleClass(className, styleContent);
         }
 
+        // Handle @media queries
+        const mediaQueryRegex = /@media\s+([^{]+)\s*{([^}]*(?:{[^}]*}[^}]*)*)}/g;
+        let mediaMatch;
+        
+        while ((mediaMatch = mediaQueryRegex.exec(cssContent)) !== null) {
+            const mediaCondition = mediaMatch[1].trim().replace(/\s+/g, '_');
+            const mediaKey = `media__${mediaCondition}`;
+            const mediaContent = mediaMatch[2].trim();
+            
+            // Process rules inside the media query
+            const nestedRuleRegex = /\.([a-zA-Z0-9_-]+)\s*{([^}]*)}/g;
+            let nestedMatch;
+            
+            // Create an object to hold all the class styles for this media query
+            const mediaStyles = {};
+            
+            while ((nestedMatch = nestedRuleRegex.exec(mediaContent)) !== null) {
+                const className = nestedMatch[1];
+                let styleContent = nestedMatch[2].trim();
+                
+                // Ensure the style content is properly formatted
+                if (!styleContent.startsWith('{')) {
+                    styleContent = '{' + styleContent + '}';
+                }
+                
+                mediaStyles[className] = styleContent;
+            }
+            
+            // Register the media query with all its styles
+            registerStyleClass(mediaKey, mediaStyles);
+        }
+
         console.log(styleClassesCache);
     }
     

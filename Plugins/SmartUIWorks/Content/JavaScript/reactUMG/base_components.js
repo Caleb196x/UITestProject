@@ -7,6 +7,7 @@ exports.updateUMGWidgetPropertyUsingReactComponentProperty = updateUMGWidgetProp
 exports.convertEventToWidgetDelegate = convertEventToWidgetDelegate;
 const UE = require("ue");
 const puerts = require("puerts");
+const css_converter_1 = require("./css_converter");
 // Base abstract class for all component wrappers
 class ComponentWrapper {
     typeName;
@@ -792,7 +793,7 @@ class ContainerWrapper extends ComponentWrapper {
             const classNames = this.props.className.split(' ');
             for (const className of classNames) {
                 // Get styles associated with this class name
-                const classStyle = getCssStyleForClass(className) ?? {};
+                const classStyle = (0, css_converter_1.convertCssToStyles)(getCssStyleForClass(className));
                 // todo@Caleb196x: 解析classStyle
                 if (classStyle) {
                     // Merge the class styles into our style object
