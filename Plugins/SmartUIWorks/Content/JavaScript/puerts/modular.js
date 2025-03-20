@@ -82,6 +82,7 @@ var global = global || (function () { return this; }());
                          .trim();
 
         // Match each CSS rule block
+        // fixme@Caleb196x: 无法支持带下划线的名称
         const ruleRegex = /\.([a-zA-Z0-9_-]+)\s*{([^}]*)}/g;
         let match;
 
