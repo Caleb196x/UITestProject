@@ -1,22 +1,24 @@
 import * as React from 'react';
 import { Props, CanvasPanel, VerticalBox, HorizontalBox, 
-    TextBlock, EditableText, Button, CanvasPanelSlot } 
+    TextBlock, EditableText, Button, CanvasPanelSlot, SizeBox } 
 from 'reactUMG';
-import {EButtonClickMethod} from 'ue';
-import face from '../assets/face.png';
+import { StatusBar } from './status_bar_compoennt';
 import './style.css';
+import face from '../assets/face.png';
 
 interface State {
     username: string;
     password: string;
+    progressVal: number;
 }
 
 export class MainComponent extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            username: '',
+            username: 'test.name',
             password: '',
+            progressVal: 0.0,
         };
     }
 
@@ -26,6 +28,8 @@ export class MainComponent extends React.Component<Props, State> {
         console.log('Username:', this.state.username);
         console.log('Password:', this.state.password);
         console.log(`Welcome, ${this.state.username}!`);
+        this.textblock_ref.current.nativePtr.SetText('你好啊, ' + this.state.username);
+        // this.css.color = '#0f13';
     };
 
     SlotOfVerticalBox: CanvasPanelSlot = {
@@ -38,91 +42,77 @@ export class MainComponent extends React.Component<Props, State> {
             }
         }
     }
+
+    textblock_ref = React.createRef<TextBlock>();
+    css: React.CSSProperties;
+
+    buttonStyle = {
+        backgroundColor: 'green',
+        color: 'white',
+        padding: '10px 20px',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer'
+      };
+      
     
     render() {
         return <CanvasPanel >
             <VerticalBox Slot={this.SlotOfVerticalBox}>
                 <HorizontalBox>
-                    <TextBlock Text='用户名: '/>
+                    <TextBlock ref={this.textblock_ref} Text='Username: '/>
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
                 </HorizontalBox>
                 <HorizontalBox>
-                    <Button OnClicked={() => this.handleLogin()} ClickMethod={EButtonClickMethod.MouseDown}>
-                        {'登录'}
-                    </Button>
+                <Button OnClicked={() => this.handleLogin()}>
+                    {'Login'}
+                </Button>
+                <StatusBar name={'Healthy: '} initialPercent={60}></StatusBar>
                 </HorizontalBox>
                 <HorizontalBox>
-                    <select onChange={(e) => this.handleLogin()} defaultValue={'test1'}>
-                        <option>test1</option>
-                        <option>test2</option>
+                    <input type='text' value={this.state.username} onChange={(e)=>this.setState({username: e.target.value})} 
+                                placeholder='输入内容...' aria-label='用户名' required/>
+                    <button style={this.buttonStyle} onClick={()=>this.handleLogin()}>测试原生按钮</button>
+                </HorizontalBox>
+                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                    <select style={{alignSelf: 'flex-start'}} defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
+                        <option value={"A"}>a</option>
+                        <option value={"B"}>b</option>
+                        <option value={"C"}>c</option>
+                        <option value={"D"}>d</option>
                     </select>
-                    <textarea onSubmit={(e)=>{console.log(e.target)}}></textarea>
-                </HorizontalBox>
-                <HorizontalBox>
-                    <button onClick={()=>{console.log("hello")}} 
-                            onMouseDown={()=>{console.log("mouse down and press")}} 
-                            onMouseUp={()=>{console.log("mouse up and release")}}
-                            onMouseEnter={()=>{console.log("mouse enter")}}
-                            onMouseLeave={()=>{console.log("mouse leave")}}
-                            title='hello'>
-                                {'原生按钮'}
-                    </button>
-                    <p>这是一个富文本嵌入测试<mark>高亮文字</mark>文本结束了！<strong>嵌套加粗</strong></p>
-                </HorizontalBox>
-                <HorizontalBox>
-                    <img src={face} width={512} height={512}/>
-                    <textarea defaultValue={'默认内容'} placeholder='请输入多行内容...' 
-                            onChange={(e)=>{console.log("on change: " + e.target.value)}} 
-                            onSubmit={(e) => {console.log("on submit: " + e.target)}}
-                            onBlur={(e)=>{console.log("on blur: " + e.target.value)}}></textarea>
-                    <div style={{backgroundImage: 'url(face.png)', backgroundSize: 'cover', backgroundPosition: 'center', 
-                        width: '512px', height: '512px', justifyContent: 'stretch', padding: '10px', gap: '10px'}}>
 
-                    </div>
-                </HorizontalBox>
-                <HorizontalBox>
-                    <ul>
-                        <li>
-                            <button onClick={()=>{console.log('button1 click')}}>按钮1</button>
-                        </li>
-                        <li>
-                            <button onClick={()=>{console.log('button2 click')}}>按钮2</button>
-                        </li>
-                        <li>
-                            <button onClick={()=>{console.log('button3 click')}}>按钮3</button>
-                        </li>
-                        <li>
-                            <button onClick={()=>{console.log('button4 click')}}>按钮4</button>
-                        </li>
-                    </ul>
-                </HorizontalBox>
+                    <img src={face} style={{width: '100%', height: '100%'}}/>
 
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                    height: '100%',
-                }}>
-                    <button style={{alignSelf: 'flex-start'}}>按我1</button>
-                    <button style={{alignSelf: 'flex-end'}}>按我2</button>
+                    <progress style={{alignSelf: 'stretch'}} value={this.state.progressVal} max={100}>
+                    进度条
+                    </progress>
+                    <button style={{alignSelf: 'end'}} onClick={()=>{this.setState({progressVal: Math.min(this.state.progressVal + 5, 100)})}}>增加进度</button>
+                    <button style={{alignSelf: 'start'}} onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>
+                    <SizeBox HeightOverride={50} WidthOverride={100}>
+                        <div style={{overflow: 'scroll', scrollbarWidth: 'auto', scrollPadding: '5px', alignSelf: 'start'}}>
+                            <text style={{width: '100%', height: '100%'}}>scroll-1</text>
+                            <text style={{width: '100%', height: '100%'}}>scroll-2</text>
+                            <text style={{width: '100%', height: '100%'}}>scroll-3</text>
+                            <text style={{width: '100%', height: '100%'}}>scroll-4</text>
+                            <text style={{width: '100%', height: '100%'}}>scroll-5</text>
+                            <text style={{width: '100%', height: '100%'}}>scroll-6</text>
+                        </div>
+                    </SizeBox>
+
                 </div>
                 <div className='container'>
-                    <button style={{alignSelf: 'stretch'}}>敲我1</button>
-                    <button style={{alignSelf: 'stretch'}}>敲我2</button>
+                    <div className='scrollbox'>
+                        <text style={{width: '100%', height: '100%'}}>scroll-1</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-2</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-3</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-4</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-5</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-6</text>
+                    </div>
                 </div>
-            </VerticalBox>
 
-            {/* <div style={{ 
-                width: 100, 
-                height: "200px", 
-                backgroundColor: "lightblue",
-                border: "2px solid darkblue"
-                }}>
-                    内联样式示例
-            </div>
-            <view className='test.container'></view> */}
+            </VerticalBox>
         </CanvasPanel>
     }
 }

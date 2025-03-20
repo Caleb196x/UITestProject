@@ -6,8 +6,8 @@ import {
     CreateReactComponentWrapper, 
     createUMGWidgetFromReactComponent, 
     updateUMGWidgetPropertyUsingReactComponentProperty, 
-    ComponentWrapper
 } from './base_components';
+import { ComponentWrapper } from './elements/common_wrapper';
 
 /**
  * Compares two values for deep equality.
