@@ -88,13 +88,29 @@ export class MainComponent extends React.Component<Props, State> {
                     进度条
                     </progress>
                     <button style={{alignSelf: 'end'}} onClick={()=>{this.setState({progressVal: Math.min(this.state.progressVal + 5, 100)})}}>增加进度</button>
-                    <button style={{alignSelf: 'left'}} onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>
+                    <button style={{alignSelf: 'satrt'}} onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>
+                    <div style={{overflow: 'scroll', scrollbarWidth: 'thin', scrollPadding: '5px', justifyContent: 'space-between'}}>
+                        <text style={{width: '100%', height: '100%'}}>scroll-1</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-2</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-3</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-4</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-5</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-6</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-7</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-8</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-9</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-10</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-11</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-12</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-13</text>
+                    </div>
                 </div>
                 <div className='container'>
                     <div className='item'>1</div>
                     <div className='item'>2</div>
                     <div className='item'>3</div>
                 </div>
+
             </VerticalBox>
         </CanvasPanel>
     }
