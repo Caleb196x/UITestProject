@@ -1,8 +1,9 @@
 import * as UE from 'ue';
 import { ComponentWrapper } from "../common_wrapper";
 import { convertCssToStyles } from 'reactUMG/css_converter';
+import { mergeClassStyleAndInlineStyle } from '../common_utils';
 
-enum UMGContainerType {
+export enum UMGContainerType {
     ScrollBox,
     GridPanel, 
     HorizontalBox,
@@ -20,101 +21,6 @@ export class ContainerWrapper extends ComponentWrapper {
         this.containerType = UMGContainerType.HorizontalBox;
     }
   
-    // Helper method to parse grid template values
-    private parseGridTemplate(template: string): Array<{type: string, value: number}> {
-        const result: Array<{type: string, value: number}> = [];
-        
-        // Handle repeat syntax: repeat(3, 1fr)
-        if (template.includes('repeat(')) {
-            const repeatRegex = /repeat\((\d+),\s*([^)]+)\)/g;
-            let match;
-            
-            while ((match = repeatRegex.exec(template)) !== null) {
-                const count = parseInt(match[1], 10);
-                const value = match[2].trim();
-                
-                // Create the specified number of identical definitions
-                for (let i = 0; i < count; i++) {
-                    result.push(this.parseGridValue(value));
-                }
-            }
-        } else {
-            // Handle normal space-separated values: 1fr auto 100px
-            const values = template.split(/\s+/);
-            for (const value of values) {
-                result.push(this.parseGridValue(value));
-            }
-        }
-        
-        return result;
-    }
-    
-    // Helper method to parse individual grid values
-    private parseGridValue(value: string): {type: string, value: number} {
-        if (value === 'auto') {
-            return { type: 'auto', value: 0 };
-        }
-        
-        // Match numeric value and unit
-        const match = value.match(/^(\d*\.?\d+)([a-z%]*)$/);
-        if (match) {
-            let numValue = parseFloat(match[1]);
-            const unit = match[2] || 'px';
-            
-            if (unit === 'em' || unit === 'rem') {
-                numValue = numValue * 16;
-            }
-
-            // todo@Caleb196x: 需要知道父控件的宽度和长度所占像素值，然后根据px值转换成占比值fr
-            return { type: unit, value: numValue };
-        }
-        
-        // Default fallback
-        return { type: 'fr', value: 1 };
-    }
-
-    private setupGridRowAndColumns(gridPanel: UE.GridPanel) {
-        const gridTemplateColumns = this.containerStyle?.gridTemplateColumns;
-        const gridTemplateRows = this.containerStyle?.gridTemplateRows;
-        const gridTemplate = this.containerStyle?.gridTemplate;
-
-        // todo@Caleb196x: 目前只处理gridTemplateColumns和gridTemplateRows两个参数
-        // Parse gridTemplateColumns and gridTemplateRows
-        if (gridTemplateColumns) {
-            const columnDefinitions = this.parseGridTemplate(gridTemplateColumns);
-            for (let i = 0; i < columnDefinitions.length; i++) {
-                const columnDef = columnDefinitions[i];
-                if (columnDef.type === 'fr') {
-                    // For fr units, we use proportional sizing
-                    gridPanel.SetColumnFill(i, columnDef.value);
-                } else if (columnDef.type === 'auto') {
-                    // For auto, we use auto-sizing
-                    gridPanel.SetColumnFill(i, 0); // Default fill value
-                } else{
-                    // For fixed sizes (px, em, etc.), we set a fixed size
-                    gridPanel.SetColumnFill(i, columnDef.value);
-                }
-            }
-        }
-
-        if (gridTemplateRows) {
-            const rowDefinitions = this.parseGridTemplate(gridTemplateRows);
-            for (let i = 0; i < rowDefinitions.length; i++) {
-                const rowDef = rowDefinitions[i];
-                if (rowDef.type === 'fr') {
-                    // For fr units, we use proportional sizing
-                    gridPanel.SetRowFill(i, rowDef.value);
-                } else if (rowDef.type === 'auto') {
-                    // For auto, we use auto-sizing
-                    gridPanel.SetRowFill(i, 0); // Default fill value
-                } else {
-                    // For fixed sizes (px, em, etc.), we set a fixed size
-                    gridPanel.SetRowFill(i, rowDef.value);
-                }
-            }
-        }
-    }
-
     private setupScrollBox(scrollBox: UE.ScrollBox, isScrollX: boolean) {
         if (isScrollX) {
             scrollBox.SetOrientation(UE.EOrientation.Orient_Horizontal);
@@ -151,31 +57,13 @@ export class ContainerWrapper extends ComponentWrapper {
     }
 
     override convertToWidget(): UE.Widget { 
-        let classNameStyles = {};
-        if (this.props.className) {
-            // Split multiple classes
-            const classNames = this.props.className.split(' ');
-            for (const className of classNames) {
-                // Get styles associated with this class name
-                const classStyle = convertCssToStyles(getCssStyleForClass(className));
-                // todo@Caleb196x: 解析classStyle
-                if (classStyle) {
-                    // Merge the class styles into our style object
-                    classNameStyles = { ...classNameStyles, ...classStyle };
-                }
-            }
-        }
+        this.containerStyle = mergeClassStyleAndInlineStyle(this.props);
 
-        // Merge className styles with inline styles, giving precedence to inline styles
-        const mergedStyle = { ...classNameStyles, ...(this.props.style || {}) };
-        
-        this.containerStyle = mergedStyle;
-
-        const display = mergedStyle?.display || 'flex';
-        const flexDirection = mergedStyle?.flexDirection || 'row';
-        const overflow = mergedStyle?.overflow || 'visible';
-        const overflowX = mergedStyle?.overflowX || 'visible';
-        const overflowY = mergedStyle?.overflowY || 'visible';
+        const display = this.containerStyle?.display || 'flex';
+        const flexDirection = this.containerStyle?.flexDirection || 'row';
+        const overflow = this.containerStyle?.overflow || 'visible';
+        const overflowX = this.containerStyle?.overflowX || 'visible';
+        const overflowY = this.containerStyle?.overflowY || 'visible';
 
         // todo@Caleb196x: 处理flex-flow参数
 
@@ -198,7 +86,7 @@ export class ContainerWrapper extends ComponentWrapper {
             this.setupGridRowAndColumns(widget as UE.GridPanel);
             
         } else if (display === 'flex') {
-            const flexWrap = mergedStyle?.flexWrap || 'nowrap';
+            const flexWrap = this.containerStyle?.flexWrap || 'nowrap';
             if (flexWrap === 'wrap' || flexWrap === 'wrap-reverse') {
                 widget = new UE.WrapBox();
                 this.containerType = UMGContainerType.WrapBox;
@@ -226,47 +114,16 @@ export class ContainerWrapper extends ComponentWrapper {
 
         return widget;
     }
-
-    private convertPixelToSU(pixel: string): number {
-        // todo@Caleb196x: 将react中的单位转换为SU单位(UMG中的单位值)
-        // get font size of parent
-        let fontSize = this.containerStyle?.fontSize || '16px';
-        if (!fontSize.endsWith('px')) {
-            fontSize = '16px';
-        }
-
-        const numSize = parseInt(fontSize.replace('px', '')); 
-        if (pixel.endsWith('px')) {
-            const match = pixel.match(/(\d+)px/);
-            if (match) {
-                return parseInt(match[1]);
-            }
-        } else if (pixel.endsWith('%')) {
-            // todo@Caleb196x: 需要获取父元素的值
-        } else if (pixel.endsWith('em')) {
-            const match = pixel.match(/(\d+)em/);
-            if (match) {
-                return parseInt(match[1]) * numSize;
-            }
-        } else if (pixel.endsWith('rem')) {
-            const match = pixel.match(/(\d+)rem/);
-            if (match) {
-                return parseInt(match[1]) * numSize;
-            }
-        }
-
-        return 0; 
-    }
     
-    private setupAlignment(Slot: UE.PanelSlot, childProps: any) {
+    private setupAlignment(Slot: UE.PanelSlot, childStyle: any) {
         const style = this.containerStyle || {};
-        const justifyContent = childProps.style?.justifyContent || style.justifyContent || 'flex-start';
-        const alignItems = childProps.style?.alignItems || style.alignItems || 'stretch';
-        const display = style.display;
+        const justifyContent = childStyle?.justifyContent || style?.justifyContent || 'flex-start';
+        const alignItems = childStyle?.alignItems || style?.alignItems || 'stretch';
+        const display = style?.display;
         let rowReverse = display === 'row-reverse';
-        const flexValue = childProps.style?.flex || 0;
-        const alignSelf = childProps.style?.alignSelf || 'stretch';
-        const justifySelf = childProps.style?.justifySelf || 'stretch';
+        const flexValue = childStyle?.flex || 0;
+        const alignSelf = childStyle?.alignSelf || 'stretch';
+        const justifySelf = childStyle?.justifySelf || 'stretch';
 
         // Set horizontal alignment based on justifyContent
         const hStartSetHorizontalAlignmentFunc = (horizontalBoxSlot: UE.HorizontalBoxSlot) => {
@@ -486,200 +343,19 @@ export class ContainerWrapper extends ComponentWrapper {
         }
     }
 
-    private expandPaddingValues(paddingValues: number[]): number[] {
-        if (paddingValues.length === 2) {
-            return [paddingValues[0], paddingValues[1], paddingValues[0], paddingValues[1]];
-        } else if (paddingValues.length === 1) {
-            return [paddingValues[0], paddingValues[0], paddingValues[0], paddingValues[0]];
-        } else if (paddingValues.length === 3) {
-            // padding: top right bottom
-            return [paddingValues[0], paddingValues[1], paddingValues[2], paddingValues[1]];
-        }
-
-        return paddingValues;
-    }
-
-    private convertMargin(margin: string): UE.Margin {
-        if (!margin) {
-            return new UE.Margin(0, 0, 0, 0);
-        }
-
-        const marginValues = margin.split(' ').map(v => {
-            // todo@Caleb196x: 处理margin的单位
-            v = v.trim();
-            return this.convertPixelToSU(v);
-        });
-
-        let expandedMarginValues = this.expandPaddingValues(marginValues);
-
-        // React Padding: top right bottom left
-        // UMG Padding: Left, Top, Right, Bottom
-        return new UE.Margin(expandedMarginValues[3], expandedMarginValues[0], expandedMarginValues[1], expandedMarginValues[2]);
-    }
-
-    private convertGap(gap: string) {
-        if (!gap) {
-            return new UE.Vector2D(0, 0);
-        }
-        const gapValues = gap.split(' ').map(v => {
-            // todo@Caleb196x: 处理react的单位
-            v = v.trim();
-            return this.convertPixelToSU(v);
-        });
-
-        if (gapValues.length === 2) {
-            // gap: row column
-            // innerSlotPadding: x(column) y(row)
-            return new UE.Vector2D(gapValues[1], gapValues[0]);
-        }
-
-        return new UE.Vector2D(gapValues[0], gapValues[0]);
-    }
-
     private initSlot(Slot: UE.PanelSlot, childProps: any) {
-        this.setupAlignment(Slot, childProps);
+        const childStyle = this.mergeClassStyleAndInlineStyle(childProps);
+        this.setupAlignment(Slot, childStyle);
         let gapPadding = this.convertGap(this.containerStyle?.gap);
         // todo@Caleb196x: 只有父元素为border，SizeBox, ScaleBox, BackgroundBlur这些只能容纳一个子元素的容器时，padding才有意义，
         // 对于容器来说，读取margin值
-        let margin = this.convertMargin(childProps.style?.margin); 
+        let margin = this.convertMargin(childStyle.margin); 
         margin.Left += gapPadding.X;
         margin.Right += gapPadding.X;
         margin.Top += gapPadding.Y;
         margin.Bottom += gapPadding.Y;
 
         (Slot as any).SetPadding(margin);
-    }
-
-    private initWrapBoxSlot(wrapBox: UE.WrapBox, Slot: UE.WrapBoxSlot, childProps: any) {
-        const gap = this.containerStyle?.gap;
-        wrapBox.SetInnerSlotPadding(this.convertGap(gap));
-
-        const justifyContentActionMap = {
-            'flex-start': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Left,
-            'flex-end': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Right,
-            'center': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Center,
-            'stretch': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Fill
-        }
-
-        // WrapBox中定义的justifyContent决定了子元素的对齐方式
-        const justifyContent = this.containerStyle?.justifyContent;
-        if (justifyContent) {
-            justifyContent.split(' ')
-                .filter(value => justifyContentActionMap[value])
-                .forEach(value => justifyContentActionMap[value]());
-        }
-
-        const margin = this.containerStyle?.margin;
-        Slot.SetPadding(this.convertMargin(margin));
-    }
-
-    private parseGridColumnOrRow(value: string) {
-        const values = value.split('/').map(v => v.trim());
-        if (values.length === 2) {
-            let start = parseInt(values[0]);
-            let end = parseInt(values[1]);
-            if (end < start) {
-                return [start, 0];
-            }
-
-            return [start, end - start];
-        }
-
-        return [0, 1];
-    }
-
-    private setupGridItemLoc(GridSlot: UE.GridSlot, childProps: any) {
-        // 优先解析gridColumn和gridRow
-        const gridColumn = childProps.style?.gridColumn;
-        const gridRow = childProps.style?.gridRow;
-
-        let columnStart = 0, columnSpan = 1;
-        let rowStart = 0, rowSpan = 1;
-
-        if (gridColumn) {
-            const [start, span] = this.parseGridColumnOrRow(gridColumn);
-            columnStart = start;
-            columnSpan = span;
-        } else {
-            const gridColumnStart = childProps.style?.gridColumnStart;
-            const gridColumnEnd = childProps.style?.gridColumnEnd;
-            let start = parseInt(gridColumnStart);
-            let end = parseInt(gridColumnEnd);
-            if (end < start) {
-                columnSpan = 0;
-            } else {
-                columnSpan = end - start;
-            }
-            columnStart = start;
-        }
-
-        if (gridRow) {
-            const [start, span] = this.parseGridColumnOrRow(gridRow);
-            rowStart = start;
-            rowSpan = span;
-        } else {
-            const gridRowStart = childProps.style?.gridRowStart;
-            const gridRowEnd = childProps.style?.gridRowEnd;
-            let start = parseInt(gridRowStart);
-            let end = parseInt(gridRowEnd);
-            if (end < start) {
-                rowSpan = 0;
-            } else {
-                rowSpan = end - start;
-            }
-            rowStart = start;
-        }
-
-        GridSlot.SetColumn(columnStart);
-        GridSlot.SetColumnSpan(columnSpan);
-        GridSlot.SetRow(rowStart);
-        GridSlot.SetRowSpan(rowSpan);
-    }
-
-    private setupGridAlignment(GridSlot: UE.GridSlot, childProps: any) {
-        const placeSelf = childProps.style?.placeSelf;
-        let hAlign = 'stretch', vAlign = 'stretch';
-        if (placeSelf) {
-            const [h, v] = placeSelf.split(' ').map(v => v.trim());
-            hAlign = h;
-            vAlign = v;
-        } else {
-            const alignSelf = childProps.style?.alignSelf;
-            const justifySelf = childProps.style?.justifySelf;
-            if (alignSelf) {
-                hAlign = alignSelf;
-            }
-
-            if (justifySelf) {
-                vAlign = justifySelf;
-            }
-        }
-
-        const hAlignActionMap = {
-            'start': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
-            'end': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
-            'center': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Center),
-            'stretch': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Fill)
-        }
-
-        const vAlignActionMap = {
-            'start': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
-            'end': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
-            'center': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Center),
-            'stretch': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Fill)
-        }
-
-        hAlignActionMap[hAlign]();
-        vAlignActionMap[vAlign]();
-    }
-
-    private initGridPanelSlot(gridPanel: UE.GridPanel, Slot: UE.GridSlot, childProps: any) {
-        // todo@Caleb196x: 处理网格布局中的子元素位置
-
-        this.setupGridItemLoc(Slot, childProps);
-        this.setupGridAlignment(Slot, childProps);
-        const margin = this.containerStyle?.margin;
-        Slot.SetPadding(this.convertMargin(margin));
     }
 
     override appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any): void {
@@ -706,10 +382,7 @@ export class ContainerWrapper extends ComponentWrapper {
                 let wrapBoxSlot = wrapBox.AddChildToWrapBox(childItem);
                 this.initWrapBoxSlot(wrapBox, wrapBoxSlot, childProps);
             },
-            [UMGContainerType.GridPanel]: (gridPanel: UE.GridPanel, childItem: UE.Widget) => {
-                let gridSlot = gridPanel.AddChildToGrid(childItem);
-                this.initGridPanelSlot(gridPanel, gridSlot, childProps);
-            },
+
             [UMGContainerType.ScrollBox]: (scrollBox: UE.ScrollBox, childItem: UE.Widget) => {
                 let scrollBoxSlot = scrollBox.AddChild(childItem);
                 this.initSlot(scrollBoxSlot, childProps);
@@ -723,9 +396,5 @@ export class ContainerWrapper extends ComponentWrapper {
 
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {
         return;
-    }
-
-    override convertReactEventToWidgetEvent(reactProp: string, originCallback: Function) : Function {
-        return undefined;
     }
 }

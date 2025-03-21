@@ -57,8 +57,7 @@ export class MainComponent extends React.Component<Props, State> {
       
     
     render() {
-        return <CanvasPanel >
-            <VerticalBox Slot={this.SlotOfVerticalBox}>
+        return <VerticalBox >
                 <HorizontalBox>
                     <TextBlock ref={this.textblock_ref} Text='Username: '/>
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
@@ -112,6 +111,5 @@ export class MainComponent extends React.Component<Props, State> {
                 </div>
 
             </VerticalBox>
-        </CanvasPanel>
     }
 }
