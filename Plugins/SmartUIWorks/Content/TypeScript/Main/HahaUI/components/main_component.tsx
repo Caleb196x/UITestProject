@@ -57,8 +57,7 @@ export class MainComponent extends React.Component<Props, State> {
       
     
     render() {
-        return <CanvasPanel >
-            <VerticalBox Slot={this.SlotOfVerticalBox}>
+        return  <VerticalBox >
                 <HorizontalBox>
                     <TextBlock ref={this.textblock_ref} Text='Username: '/>
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
@@ -89,16 +88,15 @@ export class MainComponent extends React.Component<Props, State> {
                     </progress>
                     <button style={{alignSelf: 'end'}} onClick={()=>{this.setState({progressVal: Math.min(this.state.progressVal + 5, 100)})}}>增加进度</button>
                     <button style={{alignSelf: 'start'}} onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>
-                    <SizeBox HeightOverride={50} WidthOverride={100}>
-                        <div style={{overflow: 'scroll', scrollbarWidth: 'auto', scrollPadding: '5px', alignSelf: 'start'}}>
-                            <text style={{width: '100%', height: '100%'}}>scroll-1</text>
-                            <text style={{width: '100%', height: '100%'}}>scroll-2</text>
-                            <text style={{width: '100%', height: '100%'}}>scroll-3</text>
-                            <text style={{width: '100%', height: '100%'}}>scroll-4</text>
-                            <text style={{width: '100%', height: '100%'}}>scroll-5</text>
-                            <text style={{width: '100%', height: '100%'}}>scroll-6</text>
-                        </div>
-                    </SizeBox>
+
+                    <div style={{overflow: 'scroll', scrollbarWidth: 'auto', scrollPadding: '5px', alignSelf: 'start'}}>
+                        <text style={{width: '100%', height: '100%'}}>scroll-1</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-2</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-3</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-4</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-5</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-6</text>
+                    </div>
 
                 </div>
                 <div className='container'>
@@ -113,6 +111,5 @@ export class MainComponent extends React.Component<Props, State> {
                 </div>
 
             </VerticalBox>
-        </CanvasPanel>
     }
 }

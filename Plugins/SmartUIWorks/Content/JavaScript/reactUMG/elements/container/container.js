@@ -143,11 +143,11 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
         scrollBox.SetScrollbarPadding(this.convertMargin(scrollPadding));
         scrollBox.SetAlwaysShowScrollbar(true);
     }
-    convertToWidget() {
+    mergeClassStyleAndInlineStyle(props) {
         let classNameStyles = {};
-        if (this.props.className) {
+        if (props.className) {
             // Split multiple classes
-            const classNames = this.props.className.split(' ');
+            const classNames = props.className.split(' ');
             for (const className of classNames) {
                 // Get styles associated with this class name
                 const classStyle = (0, css_converter_1.convertCssToStyles)(getCssStyleForClass(className));
@@ -159,13 +159,16 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
             }
         }
         // Merge className styles with inline styles, giving precedence to inline styles
-        const mergedStyle = { ...classNameStyles, ...(this.props.style || {}) };
-        this.containerStyle = mergedStyle;
-        const display = mergedStyle?.display || 'flex';
-        const flexDirection = mergedStyle?.flexDirection || 'row';
-        const overflow = mergedStyle?.overflow || 'visible';
-        const overflowX = mergedStyle?.overflowX || 'visible';
-        const overflowY = mergedStyle?.overflowY || 'visible';
+        const mergedStyle = { ...classNameStyles, ...(props.style || {}) };
+        return mergedStyle;
+    }
+    convertToWidget() {
+        this.containerStyle = this.mergeClassStyleAndInlineStyle(this.props);
+        const display = this.containerStyle?.display || 'flex';
+        const flexDirection = this.containerStyle?.flexDirection || 'row';
+        const overflow = this.containerStyle?.overflow || 'visible';
+        const overflowX = this.containerStyle?.overflowX || 'visible';
+        const overflowY = this.containerStyle?.overflowY || 'visible';
         // todo@Caleb196x: 处理flex-flow参数
         let widget;
         // Convert to appropriate UMG container based on style
@@ -184,7 +187,7 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
             this.setupGridRowAndColumns(widget);
         }
         else if (display === 'flex') {
-            const flexWrap = mergedStyle?.flexWrap || 'nowrap';
+            const flexWrap = this.containerStyle?.flexWrap || 'nowrap';
             if (flexWrap === 'wrap' || flexWrap === 'wrap-reverse') {
                 widget = new UE.WrapBox();
                 this.containerType = UMGContainerType.WrapBox;
@@ -239,15 +242,15 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
         }
         return 0;
     }
-    setupAlignment(Slot, childProps) {
+    setupAlignment(Slot, childStyle) {
         const style = this.containerStyle || {};
-        const justifyContent = childProps.style?.justifyContent || style.justifyContent || 'flex-start';
-        const alignItems = childProps.style?.alignItems || style.alignItems || 'stretch';
-        const display = style.display;
+        const justifyContent = childStyle?.justifyContent || style?.justifyContent || 'flex-start';
+        const alignItems = childStyle?.alignItems || style?.alignItems || 'stretch';
+        const display = style?.display;
         let rowReverse = display === 'row-reverse';
-        const flexValue = childProps.style?.flex || 0;
-        const alignSelf = childProps.style?.alignSelf || 'stretch';
-        const justifySelf = childProps.style?.justifySelf || 'stretch';
+        const flexValue = childStyle?.flex || 0;
+        const alignSelf = childStyle?.alignSelf || 'stretch';
+        const justifySelf = childStyle?.justifySelf || 'stretch';
         // Set horizontal alignment based on justifyContent
         const hStartSetHorizontalAlignmentFunc = (horizontalBoxSlot) => {
             horizontalBoxSlot.SetHorizontalAlignment(rowReverse ? UE.EHorizontalAlignment.HAlign_Right : UE.EHorizontalAlignment.HAlign_Left);
@@ -473,11 +476,12 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
         return new UE.Vector2D(gapValues[0], gapValues[0]);
     }
     initSlot(Slot, childProps) {
-        this.setupAlignment(Slot, childProps);
+        const childStyle = this.mergeClassStyleAndInlineStyle(childProps);
+        this.setupAlignment(Slot, childStyle);
         let gapPadding = this.convertGap(this.containerStyle?.gap);
         // todo@Caleb196x: 只有父元素为border，SizeBox, ScaleBox, BackgroundBlur这些只能容纳一个子元素的容器时，padding才有意义，
         // 对于容器来说，读取margin值
-        let margin = this.convertMargin(childProps.style?.margin);
+        let margin = this.convertMargin(childStyle.margin);
         margin.Left += gapPadding.X;
         margin.Right += gapPadding.X;
         margin.Top += gapPadding.Y;
