@@ -1,91 +1,81 @@
-import { UMGContainerType } from "./container";
-import { ComponentWrapper } from "../common_wrapper";
-import * as UE from 'ue';
-import { convertGap, convertMargin, mergeClassStyleAndInlineStyle } from "../common_utils";
-
-export class ScrollBoxWrapper extends ComponentWrapper {
-    private containerStyle: any;
-    constructor(type: string, props: any) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ScrollBoxWrapper = void 0;
+const common_wrapper_1 = require("../common_wrapper");
+const UE = require("ue");
+const common_utils_1 = require("../common_utils");
+class ScrollBoxWrapper extends common_wrapper_1.ComponentWrapper {
+    containerStyle;
+    constructor(type, props) {
         super();
         this.typeName = type;
         this.props = props;
     }
-  
-    private setupScrollBox(scrollBox: UE.ScrollBox, isScrollX: boolean) {
+    setupScrollBox(scrollBox, isScrollX) {
         if (isScrollX) {
             scrollBox.SetOrientation(UE.EOrientation.Orient_Horizontal);
-        } else {
+        }
+        else {
             scrollBox.SetOrientation(UE.EOrientation.Orient_Vertical);
         }
-
         // setup scrollbar thickness
         const scrollbarWidth = this.containerStyle?.scrollbarWidth || 'auto';
         const scrollbarLevel = {
             'auto': 12,
             'thin': 8
-        }
-
+        };
         if (scrollbarWidth === 'none') {
             scrollBox.SetScrollBarVisibility(UE.ESlateVisibility.Collapsed);
-        } else {
+        }
+        else {
             if (scrollbarWidth in scrollbarLevel) {
                 scrollBox.SetScrollbarThickness(new UE.Vector2D(scrollbarLevel[scrollbarWidth], scrollbarLevel[scrollbarWidth]));
-            } else if (scrollbarWidth.endsWith('px')) {
+            }
+            else if (scrollbarWidth.endsWith('px')) {
                 // Extract the numeric part by removing the 'px' suffix
                 const numericWidth = parseInt(scrollbarWidth.slice(0, -2));
                 let thickness = new UE.Vector2D(numericWidth, numericWidth);
                 scrollBox.SetScrollbarThickness(thickness);
-            } else {
+            }
+            else {
                 scrollBox.SetScrollbarThickness(new UE.Vector2D(scrollbarLevel['auto'], scrollbarLevel['auto']));
             }
             scrollBox.SetScrollBarVisibility(UE.ESlateVisibility.Visible);
         }
-
         const scrollPadding = this.containerStyle?.scrollPadding || '0px';
-        scrollBox.SetScrollbarPadding(convertMargin(scrollPadding, this.containerStyle));
+        scrollBox.SetScrollbarPadding((0, common_utils_1.convertMargin)(scrollPadding, this.containerStyle));
         scrollBox.SetAlwaysShowScrollbar(true);
     }
-
-    
-    private setupAlignment(Slot: UE.PanelSlot, childStyle: any) {
+    setupAlignment(Slot, childStyle) {
         const style = this.containerStyle || {};
         const display = style?.display;
         let rowReverse = display === 'row-reverse';
         const alignSelf = childStyle?.alignSelf || 'stretch';
         const justifySelf = childStyle?.justifySelf || 'stretch';
-
-        const scrollBoxStretchHorizontalAlignmentFunc = (scrollBoxSlot: UE.ScrollBoxSlot) => {
+        const scrollBoxStretchHorizontalAlignmentFunc = (scrollBoxSlot) => {
             scrollBoxSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Fill);
-        }
-
-        const scrollBoxLeftHorizontalAlignmentFunc = (scrollBoxSlot: UE.ScrollBoxSlot) => {
+        };
+        const scrollBoxLeftHorizontalAlignmentFunc = (scrollBoxSlot) => {
             scrollBoxSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left);
-        }
-
-        const scrollBoxRightHorizontalAlignmentFunc = (scrollBoxSlot: UE.ScrollBoxSlot) => {
+        };
+        const scrollBoxRightHorizontalAlignmentFunc = (scrollBoxSlot) => {
             scrollBoxSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right);
-        }
-
-        const scrollBoxCenterHorizontalAlignmentFunc = (scrollBoxSlot: UE.ScrollBoxSlot) => {
+        };
+        const scrollBoxCenterHorizontalAlignmentFunc = (scrollBoxSlot) => {
             scrollBoxSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Center);
-        }
-
-        const scrollBoxStretchVerticalAlignmentFunc = (scrollBoxSlot: UE.ScrollBoxSlot) => {
+        };
+        const scrollBoxStretchVerticalAlignmentFunc = (scrollBoxSlot) => {
             scrollBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Fill);
-        }
-
-        const scrollBoxTopVerticalAlignmentFunc = (scrollBoxSlot: UE.ScrollBoxSlot) => {
+        };
+        const scrollBoxTopVerticalAlignmentFunc = (scrollBoxSlot) => {
             scrollBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top);
-        }
-
-        const scrollBoxBottomVerticalAlignmentFunc = (scrollBoxSlot: UE.ScrollBoxSlot) => {
+        };
+        const scrollBoxBottomVerticalAlignmentFunc = (scrollBoxSlot) => {
             scrollBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom);
-        }
-
-        const scrollBoxCenterVerticalAlignmentFunc = (scrollBoxSlot: UE.ScrollBoxSlot) => { 
+        };
+        const scrollBoxCenterVerticalAlignmentFunc = (scrollBoxSlot) => {
             scrollBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Center);
-        }
-
+        };
         const scrollBoxJustifySelfActionMap = {
             'stretch': scrollBoxStretchHorizontalAlignmentFunc,
             'left': scrollBoxLeftHorizontalAlignmentFunc,
@@ -95,8 +85,7 @@ export class ScrollBoxWrapper extends ComponentWrapper {
             'end': scrollBoxRightHorizontalAlignmentFunc,
             'flex-start': scrollBoxLeftHorizontalAlignmentFunc,
             'flex-end': scrollBoxRightHorizontalAlignmentFunc,
-        }
-
+        };
         const scrollBoxAlignSelfActionMap = {
             'stretch': scrollBoxStretchVerticalAlignmentFunc,
             'top': scrollBoxTopVerticalAlignmentFunc,
@@ -106,51 +95,44 @@ export class ScrollBoxWrapper extends ComponentWrapper {
             'end': scrollBoxBottomVerticalAlignmentFunc,
             'flex-start': scrollBoxTopVerticalAlignmentFunc,
             'flex-end': scrollBoxBottomVerticalAlignmentFunc,
-        }
-        const scrollBoxSlot = Slot as UE.ScrollBoxSlot;
-
+        };
+        const scrollBoxSlot = Slot;
         const scrollBoxJustifySelfValue = justifySelf?.split(' ').find(v => scrollBoxJustifySelfActionMap[v]);
         if (scrollBoxJustifySelfValue) {
             scrollBoxJustifySelfActionMap[scrollBoxJustifySelfValue](scrollBoxSlot);
         }
-
         const scrollBoxAlignSelfValue = alignSelf?.split(' ').find(v => scrollBoxAlignSelfActionMap[v]);
         if (scrollBoxAlignSelfValue) {
             scrollBoxAlignSelfActionMap[scrollBoxAlignSelfValue](scrollBoxSlot);
         }
     }
-    
-    private initScrollBoxSlot(scrollBox: UE.ScrollBox, Slot: UE.PanelSlot, childProps: any) {
-        const childStyle = mergeClassStyleAndInlineStyle(childProps);
+    initScrollBoxSlot(scrollBox, Slot, childProps) {
+        const childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(childProps);
         this.setupAlignment(Slot, childStyle);
-        let gapPadding = convertGap(this.containerStyle?.gap, this.containerStyle);
+        let gapPadding = (0, common_utils_1.convertGap)(this.containerStyle?.gap, this.containerStyle);
         // todo@Caleb196x: 只有父元素为border，SizeBox, ScaleBox, BackgroundBlur这些只能容纳一个子元素的容器时，padding才有意义，
         // 对于容器来说，读取margin值
-        let margin = convertMargin(childStyle.margin, this.containerStyle); 
+        let margin = (0, common_utils_1.convertMargin)(childStyle.margin, this.containerStyle);
         margin.Left += gapPadding.X;
-        margin.Right += gapPadding.X;   
+        margin.Right += gapPadding.X;
         margin.Top += gapPadding.Y;
         margin.Bottom += gapPadding.Y;
-
-        (Slot as any).SetPadding(margin);
+        Slot.SetPadding(margin);
     }
-
-    override convertToWidget(): UE.Widget {
-        this.containerStyle = mergeClassStyleAndInlineStyle(this.props);
+    convertToWidget() {
+        this.containerStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(this.props);
         const scrollBox = new UE.ScrollBox();
-        this.setupScrollBox(scrollBox,
-             this.containerStyle?.overflowX === 'scroll' || this.containerStyle?.overflowX === 'auto'
-        );
+        this.setupScrollBox(scrollBox, this.containerStyle?.overflowX === 'scroll' || this.containerStyle?.overflowX === 'auto');
         return scrollBox;
     }
-
-    override updateWidgetProperty(widget: UE.Widget, oldProps: any, newProps: any, updateProps: Record<string, any>): boolean {
+    updateWidgetProperty(widget, oldProps, newProps, updateProps) {
         return true;
     }
-
-    override appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any): void {
-        let scrollBox = parentItem as UE.ScrollBox;
+    appendChildItem(parentItem, childItem, childItemTypeName, childProps) {
+        let scrollBox = parentItem;
         let scrollBoxSlot = scrollBox.AddChild(childItem);
         this.initScrollBoxSlot(scrollBox, scrollBoxSlot, childProps);
     }
 }
+exports.ScrollBoxWrapper = ScrollBoxWrapper;
+//# sourceMappingURL=scrollbox.js.map

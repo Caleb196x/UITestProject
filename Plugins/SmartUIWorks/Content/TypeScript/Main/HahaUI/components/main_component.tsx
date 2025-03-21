@@ -109,6 +109,9 @@ export class MainComponent extends React.Component<Props, State> {
                         <text style={{width: '100%', height: '100%'}}>scroll-6</text>
                     </div>
                 </div>
+                <canvas style={{offsetAnchor: 'top left', width: '100px', height: '100px', scale: '1.0'}} >
+
+                </canvas>
 
             </VerticalBox>
     }
