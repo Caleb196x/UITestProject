@@ -1,11 +1,13 @@
 .container {
-    width: 100%;
-    height: 100%;
+    width: 200px;
+    height: 100px;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     color: #0f13;
+    position-area: bottom left;
+    top: -200px;
 }
 
 .item {
@@ -17,4 +19,10 @@
     scrollbar-width: auto;
     scroll-padding: 5px;
     align-self: start;
+}
+
+.canvaspanel {
+    position: absolute;
+    position-anchor: top-left;
+    position-area: top left;
 }

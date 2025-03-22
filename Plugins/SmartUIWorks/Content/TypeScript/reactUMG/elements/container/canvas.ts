@@ -1,6 +1,6 @@
 import { ComponentWrapper } from "../common_wrapper";
 import * as UE from 'ue';
-import { convertGap, convertLengthUnitToSlateUnit, convertMargin, mergeClassStyleAndInlineStyle } from "../common_utils";
+import { convertGap, convertLengthUnitToSlateUnit, convertMargin, mergeClassStyleAndInlineStyle, parseAspectRatio } from "../common_utils";
 
 export class CanvasWrapper extends ComponentWrapper {
     private predefinedAnchors: Record<string, any>;
@@ -58,31 +58,73 @@ export class CanvasWrapper extends ComponentWrapper {
         const canvasSlot = canvasPanel.AddChildToCanvas(childItem);
         
         const mergedStyle = mergeClassStyleAndInlineStyle(childProps);
-        let positionArea = mergedStyle?.positionArea || 'none';
-        let offsetAnchor = mergedStyle?.offsetAnchor || 'none';
-        let width = mergedStyle?.width || '100px';
-        let height = mergedStyle?.height || '100px';
-        let scale = mergedStyle?.scale || 1.0;
-        const position = mergedStyle?.position || 'none';
-        const offset = mergedStyle?.offset || 'none';
+        const positionArea = mergedStyle?.positionArea;
+        const offsetAnchor = mergedStyle?.offsetAnchor;
 
-        const minMax = this.predefinedAnchors[positionArea];
-        if (minMax) {
-            canvasSlot.SetAnchors(new UE.Anchors(new UE.Vector2D(minMax.min_x, minMax.min_y), 
-                                                new UE.Vector2D(minMax.max_x, minMax.max_y)));
+        const width = mergedStyle?.width || 'none';
+        const height = mergedStyle?.height || 'none';
+
+        const scale = mergedStyle?.scale || 1.0;
+        const aspectRatio = mergedStyle?.aspectRatio || 'auto';
+        
+        let positionAnchors: any = null;
+        if (positionArea) {
+            positionAnchors = this.predefinedAnchors[positionArea];
+
+        } else if (offsetAnchor) {
+            positionAnchors = this.predefinedAnchors[offsetAnchor];
         }
 
-        const widthSU = convertLengthUnitToSlateUnit(width, this.containerStyle);
-        const heightSU = convertLengthUnitToSlateUnit(height, this.containerStyle);
-
-        canvasSlot.SetSize(new UE.Vector2D(widthSU * scale, heightSU * scale));
-
-        if (position !== 'none') {
-            canvasSlot.SetPosition(convertGap(position, this.containerStyle));
+        if (positionAnchors) {
+            canvasSlot.SetAnchors(new UE.Anchors(new UE.Vector2D(positionAnchors.min_x, positionAnchors.min_y), 
+                                                new UE.Vector2D(positionAnchors.max_x, positionAnchors.max_y)));
+        } else {
+            canvasSlot.SetAnchors(new UE.Anchors(new UE.Vector2D(0, 0), new UE.Vector2D(0, 0)));
         }
 
-        if (offset !== 'none') {
-            canvasSlot.SetOffsets(convertMargin(offset, this.containerStyle));
+        // loction
+        const top = mergedStyle?.top || '0px';
+        const left = mergedStyle?.left || '0px';
+        const right = mergedStyle?.right || '0px';
+        const bottom = mergedStyle?.bottom || '0px';
+
+        const topSU = convertLengthUnitToSlateUnit(top, this.containerStyle);
+        const leftSU = convertLengthUnitToSlateUnit(left, this.containerStyle);
+        if (!(positionArea?.includes('fill')) || !(positionArea?.includes('span-all'))) {
+            canvasSlot.SetPosition(new UE.Vector2D(leftSU, topSU));
+        } else {
+            const rightSU = convertLengthUnitToSlateUnit(right, this.containerStyle);
+            const bottomSU = convertLengthUnitToSlateUnit(bottom, this.containerStyle);
+            canvasSlot.SetOffsets(new UE.Margin(leftSU, topSU, rightSU, bottomSU));
+        }
+        
+        if (width !== 'none' && height !== 'none') {
+            const widthSU = convertLengthUnitToSlateUnit(width, this.containerStyle);
+            const heightSU = convertLengthUnitToSlateUnit(height, this.containerStyle);
+
+            canvasSlot.SetSize(new UE.Vector2D(widthSU * scale, heightSU * scale));
+        } else if (width !== 'none' && height === 'none') {
+
+            const widthSU = convertLengthUnitToSlateUnit(width, this.containerStyle);
+            if (aspectRatio !== 'auto') {
+                const desiredHeight = widthSU / parseAspectRatio(aspectRatio);
+                canvasSlot.SetSize(new UE.Vector2D(widthSU * scale, desiredHeight * scale));
+            } else {
+                canvasSlot.SetSize(new UE.Vector2D(widthSU * scale, widthSU * scale));
+            }
+
+        } else if (height !== 'none' && width === 'none') {
+
+            const heightSU = convertLengthUnitToSlateUnit(height, this.containerStyle);
+            if (aspectRatio !== 'auto') {
+                const desiredWidth = heightSU * parseAspectRatio(aspectRatio);
+                canvasSlot.SetSize(new UE.Vector2D(desiredWidth * scale, heightSU * scale));
+            } else {
+                canvasSlot.SetSize(new UE.Vector2D(heightSU * scale, heightSU * scale));
+            }
+
+        } else {
+            canvasSlot.SetAutoSize(true);
         }
         
         return;

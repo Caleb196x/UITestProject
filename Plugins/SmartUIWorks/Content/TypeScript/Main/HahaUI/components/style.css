@@ -1,11 +1,12 @@
 .container {
-    width: 100%;
-    height: 100%;
+    width: 150px;
+    height: 50px;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     color: #0f13;
+    position-area: bottom left;
 }
 
 .item {

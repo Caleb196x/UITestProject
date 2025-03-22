@@ -57,24 +57,30 @@ export class MainComponent extends React.Component<Props, State> {
       
     
     render() {
-        return  <VerticalBox >
-                <HorizontalBox>
+        return  <canvas>
+                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', 
+                    top: '100px', left: '100px', width: '200px', height: '50px',
+                }}>
                     <TextBlock ref={this.textblock_ref} Text='Username: '/>
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
-                </HorizontalBox>
-                <HorizontalBox>
-                <Button OnClicked={() => this.handleLogin()}>
+                </div>
+                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                    top: '200px', left: '400px', width: '200px', height: '100px',
+                }}>
+                    <Button OnClicked={() => this.handleLogin()}>
                     {'Login'}
-                </Button>
-                <StatusBar name={'Healthy: '} initialPercent={60}></StatusBar>
-                </HorizontalBox>
-                <HorizontalBox>
+                    </Button>
+                    <StatusBar name={'Healthy: '} initialPercent={60}></StatusBar>
+                </div>
+                <div>
                     <input type='text' value={this.state.username} onChange={(e)=>this.setState({username: e.target.value})} 
                                 placeholder='输入内容...' aria-label='用户名' required/>
                     <button style={this.buttonStyle} onClick={()=>this.handleLogin()}>测试原生按钮</button>
-                </HorizontalBox>
-                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                    <select style={{alignSelf: 'flex-start'}} defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
+                </div>
+                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+                    offsetAnchor: 'top center', top: '250px'
+                }}>
+                    <select style={{alignSelf: 'flex-end'}} defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
                         <option value={"A"}>a</option>
                         <option value={"B"}>b</option>
                         <option value={"C"}>c</option>
@@ -89,17 +95,17 @@ export class MainComponent extends React.Component<Props, State> {
                     <button style={{alignSelf: 'end'}} onClick={()=>{this.setState({progressVal: Math.min(this.state.progressVal + 5, 100)})}}>增加进度</button>
                     <button style={{alignSelf: 'start'}} onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>
 
-                    <div style={{overflow: 'scroll', scrollbarWidth: 'auto', scrollPadding: '5px', alignSelf: 'start'}}>
+                    <div style={{overflow: 'scroll', scrollbarWidth: 'auto', scrollPadding: '5px', alignSelf: 'start',
+                        width: '100px', height: '30px',
+                    }}>
                         <text style={{width: '100%', height: '100%'}}>scroll-1</text>
                         <text style={{width: '100%', height: '100%'}}>scroll-2</text>
                         <text style={{width: '100%', height: '100%'}}>scroll-3</text>
-                        <text style={{width: '100%', height: '100%'}}>scroll-4</text>
-                        <text style={{width: '100%', height: '100%'}}>scroll-5</text>
-                        <text style={{width: '100%', height: '100%'}}>scroll-6</text>
                     </div>
 
                 </div>
                 <div className='container'>
+                    <button>This is a placeholder button</button>
                     <div className='scrollbox'>
                         <text style={{width: '100%', height: '100%'}}>scroll-1</text>
                         <text style={{width: '100%', height: '100%'}}>scroll-2</text>
@@ -109,10 +115,7 @@ export class MainComponent extends React.Component<Props, State> {
                         <text style={{width: '100%', height: '100%'}}>scroll-6</text>
                     </div>
                 </div>
-                <canvas style={{offsetAnchor: 'top left', width: '100px', height: '100px', scale: '1.0'}} >
+        </canvas>
 
-                </canvas>
-
-            </VerticalBox>
     }
 }

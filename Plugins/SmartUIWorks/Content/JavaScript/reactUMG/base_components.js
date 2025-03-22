@@ -16,6 +16,7 @@ const textblock_1 = require("./elements/textblock");
 const container_1 = require("./elements/container/container");
 const input_1 = require("./elements/input");
 const common_wrapper_1 = require("./elements/common_wrapper");
+const canvas_1 = require("./elements/container/canvas");
 const baseComponentsMap = {
     // base
     "select": selector_1.SelectWrapper,
@@ -51,7 +52,7 @@ const baseComponentsMap = {
     // container
     "div": container_1.ContainerWrapper,
     "view": container_1.ContainerWrapper,
-    "canvas": container_1.ContainerWrapper,
+    "canvas": canvas_1.CanvasWrapper,
 };
 function isKeyOfRecord(key, record) {
     return key in record;
