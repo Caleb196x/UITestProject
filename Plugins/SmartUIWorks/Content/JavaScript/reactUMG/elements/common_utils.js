@@ -5,6 +5,7 @@ exports.mergeClassStyleAndInlineStyle = mergeClassStyleAndInlineStyle;
 exports.expandPaddingValues = expandPaddingValues;
 exports.convertMargin = convertMargin;
 exports.convertGap = convertGap;
+exports.parseAspectRatio = parseAspectRatio;
 const css_converter_1 = require("../css_converter");
 const UE = require("ue");
 /**
@@ -22,7 +23,7 @@ function convertLengthUnitToSlateUnit(length, style) {
     }
     const numSize = parseInt(fontSize.replace('px', ''));
     if (length.endsWith('px')) {
-        const match = length.match(/(\d+)px/);
+        const match = length.match(/([+-]?\d+)px/);
         if (match) {
             return parseInt(match[1]);
         }
@@ -110,5 +111,29 @@ function convertGap(gap, style) {
         return new UE.Vector2D(gapValues[1], gapValues[0]);
     }
     return new UE.Vector2D(gapValues[0], gapValues[0]);
+}
+/**
+ * Parses a string representing an aspect ratio and returns a number
+ * @param aspectRatio - String representing aspect ratio (e.g., "16/9", "0.5", "1/1")
+ * @returns Number representing aspect ratio (e.g., 1.7777777777777777)
+ */
+function parseAspectRatio(aspectRatio) {
+    if (!aspectRatio) {
+        return 1.0;
+    }
+    // Handle decimal format like '0.5'
+    if (!isNaN(Number(aspectRatio))) {
+        return Number(aspectRatio);
+    }
+    // Handle ratio format like '16/9' or '1/1'
+    const parts = aspectRatio.split('/');
+    if (parts.length === 2) {
+        const numerator = Number(parts[0]);
+        const denominator = Number(parts[1]);
+        if (!isNaN(numerator) && !isNaN(denominator) && denominator !== 0) {
+            return numerator / denominator;
+        }
+    }
+    return 1.0;
 }
 //# sourceMappingURL=common_utils.js.map

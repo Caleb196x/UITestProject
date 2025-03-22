@@ -10,6 +10,7 @@ import { TextBlockWrapper } from './elements/textblock';
 import { ContainerWrapper } from './elements/container/container';
 import { InputWrapper } from './elements/input';
 import { ComponentWrapper } from './elements/common_wrapper';
+import { CanvasWrapper } from './elements/container/canvas';
 
 const baseComponentsMap: Record<string, any> = {
     // base
@@ -51,7 +52,7 @@ const baseComponentsMap: Record<string, any> = {
     // container
     "div": ContainerWrapper,
     "view": ContainerWrapper,
-    "canvas": ContainerWrapper,
+    "canvas": CanvasWrapper,
 };
 
 function isKeyOfRecord(key: any, record: Record<string, any>): key is keyof Record<string, any> {

@@ -16,9 +16,9 @@ export function convertLengthUnitToSlateUnit(length: string, style: any): number
 
         const numSize = parseInt(fontSize.replace('px', '')); 
         if (length.endsWith('px')) {
-            const match = length.match(/(\d+)px/);
+            const match = length.match(/([+-]?\d+)px/);
             if (match) {
-                return parseInt(match[1]);
+                return parseInt(match[1]); 
             }
         } else if (length.endsWith('%')) {
             // todo@Caleb196x: 需要获取父元素的值
@@ -111,4 +111,32 @@ export function convertGap(gap: string, style: any): UE.Vector2D {
     }
 
     return new UE.Vector2D(gapValues[0], gapValues[0]);
+}
+
+/**
+ * Parses a string representing an aspect ratio and returns a number
+ * @param aspectRatio - String representing aspect ratio (e.g., "16/9", "0.5", "1/1")
+ * @returns Number representing aspect ratio (e.g., 1.7777777777777777)
+ */
+export function parseAspectRatio(aspectRatio: string) {
+    if (!aspectRatio) {
+        return 1.0;
+    }
+
+    // Handle decimal format like '0.5'
+    if (!isNaN(Number(aspectRatio))) {
+        return Number(aspectRatio);
+    }
+
+    // Handle ratio format like '16/9' or '1/1'
+    const parts = aspectRatio.split('/');
+    if (parts.length === 2) {
+        const numerator = Number(parts[0]);
+        const denominator = Number(parts[1]);
+        if (!isNaN(numerator) && !isNaN(denominator) && denominator !== 0) {
+            return numerator / denominator;
+        }
+    }
+
+    return 1.0;
 }
