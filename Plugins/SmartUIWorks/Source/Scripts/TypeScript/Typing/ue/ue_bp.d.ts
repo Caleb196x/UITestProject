@@ -6,324 +6,661 @@ declare module "ue" {
 
     import * as UE from "ue"
 
-// __TYPE_DECL_START: B4B18A9840AE0492154B23AA4DFAF1BE
-    namespace Game.ActorComp {
-        class ActorComp_C extends UE.ActorComponent {
+// __TYPE_DECL_START: A0AD22D447F99B83A9A31C9B9426B5C0
+    namespace Game.StarterContent.Blueprints.Blueprint_Effect_Fire {
+        class Blueprint_Effect_Fire_C extends UE.Actor {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            ["Fire Audio"]: UE.AudioComponent;
+            P_Fire: UE.ParticleSystemComponent;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Blueprint_Effect_Fire_C;
+            static Load(InName: string): Blueprint_Effect_Fire_C;
+        
+            __tid_Blueprint_Effect_Fire_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 2678356F40E4E16306BDD687933AE2D1
+    namespace Game.StarterContent.Blueprints.Blueprint_Effect_Smoke {
+        class Blueprint_Effect_Smoke_C extends UE.Actor {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            ["Smoke Audio"]: UE.AudioComponent;
+            P_Smoke: UE.ParticleSystemComponent;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Blueprint_Effect_Smoke_C;
+            static Load(InName: string): Blueprint_Effect_Smoke_C;
+        
+            __tid_Blueprint_Effect_Smoke_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 0D94FA604928B24E62003083BA722E3C
+    namespace Game.StarterContent.Blueprints.Blueprint_Effect_Sparks {
+        class Blueprint_Effect_Sparks_C extends UE.Actor {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            ["Sparks Audio"]: UE.AudioComponent;
+            Sparks: UE.ParticleSystemComponent;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Blueprint_Effect_Sparks_C;
+            static Load(InName: string): Blueprint_Effect_Sparks_C;
+        
+            __tid_Blueprint_Effect_Sparks_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 62110038444C84D1EC760AB254B78A07
+    namespace Game.StarterContent.Blueprints.Blueprint_Effect_Steam {
+        class Blueprint_Effect_Steam_C extends UE.Actor {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            ["Steam AUdio"]: UE.AudioComponent;
+            P_Steam_Lit: UE.ParticleSystemComponent;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Blueprint_Effect_Steam_C;
+            static Load(InName: string): Blueprint_Effect_Steam_C;
+        
+            __tid_Blueprint_Effect_Steam_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 819FE165412B370746C9159B51857ADC
+    namespace Game.StarterContent.Blueprints.Blueprint_CeilingLight {
+        class Blueprint_CeilingLight_C extends UE.Actor {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            SM_Lamp_Ceiling: UE.StaticMeshComponent;
+            PointLight1: UE.PointLightComponent;
+            Scene1: UE.SceneComponent;
+            Brightness: number;
+            Color: UE.LinearColor;
+            ["Source Radius"]: number;
+            /*
+             *Construction script, the place to spawn components and do other setup.
+             *@note Name used in CreateBlueprint function
+             */
+            UserConstructionScript() : void;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Blueprint_CeilingLight_C;
+            static Load(InName: string): Blueprint_CeilingLight_C;
+        
+            __tid_Blueprint_CeilingLight_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 6A1AE04E46BB2DCE8E8DA5B318ECB60F
+    namespace Game.StarterContent.Blueprints.Blueprint_WallSconce {
+        class Blueprint_WallSconce_C extends UE.Actor {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            SM_Lamp_Wall: UE.StaticMeshComponent;
+            PointLight2: UE.SpotLightComponent;
+            Scene1: UE.SceneComponent;
+            Brightness: number;
+            Color: UE.LinearColor;
+            ["Inner Cone Angle"]: number;
+            ["Outer Cone Angle"]: number;
+            /*
+             *Construction script, the place to spawn components and do other setup.
+             *@note Name used in CreateBlueprint function
+             */
+            UserConstructionScript() : void;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Blueprint_WallSconce_C;
+            static Load(InName: string): Blueprint_WallSconce_C;
+        
+            __tid_Blueprint_WallSconce_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 681D15DA4BC892AC2A3EBE8F2068216F
+    namespace Game.NewWidgetBlueprint {
+        class NewWidgetBlueprint_C extends UE.UserWidget {
             constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
             UberGraphFrame: UE.PointerToUberGraphFrame;
-            ExecuteUbergraph_ActorComp(EntryPoint: number) : void;
-            ReceiveBeginPlay() : void;
+            NewAnimation: UE.WidgetAnimation;
+            Button_0: UE.Button;
+            CheckBox_0: UE.CheckBox;
+            ComboBoxKey_102: UE.ComboBoxKey;
+            ComboBoxString_45: UE.ComboBoxString;
+            Image_0: UE.Image;
+            MultiLineEditableText_54: UE.MultiLineEditableText;
+            RichTextBlock_51: UE.RichTextBlock;
+            RichTextBlock_63: UE.RichTextBlock;
+            Item: string;
+            BndEvt__NewWidgetBlueprint_Button_0_K2Node_ComponentBoundEvent_0_OnButtonHoverEvent__DelegateSignature() : void;
+            ExecuteUbergraph_NewWidgetBlueprint(EntryPoint: number) : void;
+            GetBrush() : UE.SlateBrush;
+            OnGenerateContentWidget(Item: string) : UE.Widget;
+            OnGenerateItemWidget(Item: string) : UE.Widget;
             static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): ActorComp_C;
-            static Load(InName: string): ActorComp_C;
+            static Find(OrigInName: string, Outer?: Object): NewWidgetBlueprint_C;
+            static Load(InName: string): NewWidgetBlueprint_C;
         
-            __tid_ActorComp_C__: boolean;
+            __tid_NewWidgetBlueprint_C_0__: boolean;
         }
         
     }
 
 // __TYPE_DECL_END
-// __TYPE_DECL_START: 3D8887064975D986FFAD8D8C1691013C
-    namespace Game.Blueprints.TypeScript.Animal {
-        class Animal_C extends UE.Actor {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            DefaultSceneRoot: UE.SceneComponent;
-            Age: number;
-            ExecuteUbergraph_Animal(EntryPoint: number) : void;
-            ReceiveBeginPlay() : void;
-            Speak() : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): Animal_C;
-            static Load(InName: string): Animal_C;
-        
-            __tid_Animal_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 4AD53383471854D25ACC789E40F522F8
-    namespace Game.Blueprints.TypeScript.MyTestActor {
-        class MyTestActor_C extends UE.Actor {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            DefaultSceneRoot: UE.SceneComponent;
-            Test() : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): MyTestActor_C;
-            static Load(InName: string): MyTestActor_C;
-        
-            __tid_MyTestActor_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 751B49C34B94C9023C205093AC121A26
-    namespace Game.Blueprints.TypeScript.MyTestActorComp {
-        class MyTestActorComp_C extends UE.ActorComponent {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            ExecuteUbergraph_MyTestActorComp(EntryPoint: number) : void;
-            ReceiveBeginPlay() : void;
-            ReceiveTick(DeltaSeconds: number) : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): MyTestActorComp_C;
-            static Load(InName: string): MyTestActorComp_C;
-        
-            __tid_MyTestActorComp_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: C39767974302764576B74896F9B835CC
-    namespace Game.Blueprints.TypeScript.MyTestActor_Child {
-        class MyTestActor_Child_C extends UE.Game.Blueprints.TypeScript.MyTestActor.MyTestActor_C {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            ExecuteUbergraph_MyTestActor_Child(EntryPoint: number) : void;
-            ReceiveBeginPlay() : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): MyTestActor_Child_C;
-            static Load(InName: string): MyTestActor_Child_C;
-        
-            __tid_MyTestActor_Child_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 1F73045B46CA362F53B18F84B0D741B9
-    namespace Game.Blueprints.TypeScript.Tiger {
-        class Tiger_C extends UE.Game.Blueprints.TypeScript.Animal.Animal_C {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            Speed: number;
-            ExecuteUbergraph_Tiger(EntryPoint: number) : void;
-            ReceiveBeginPlay() : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): Tiger_C;
-            static Load(InName: string): Tiger_C;
-        
-            __tid_Tiger_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: EB4B850C4D2A235E5BD7ECBC1B6C3E02
-    namespace Game.Blueprints.TypeScript.TsTestActor {
-        class TsTestActor_C extends UE.Actor {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            DefaultSceneRoot: UE.SceneComponent;
-            tickCount: number;
-            actor: UE.Actor;
-            cls: UE.Class;
-            b: boolean;
-            int64_1: bigint;
-            int64_2: bigint;
-            str: string;
-            v: UE.Vector;
-            map: TMap<string, number>;
-            arr: TArray<UE.Object>;
-            set: TSet<string>;
-            fname: string;
-            namearr: TArray<string>;
-            dint: number;
-            e: UE.ETickingGroup;
-            ea: TArray<UE.ETickingGroup>;
-            clsOfWidget: UE.Class;
-            softObject: TSoftObjectPtr<UE.Actor>;
-            softClass: TSoftClassPtr<UE.Actor>;
-            Add(a1: number, b1: number) : number;
-            ExecuteUbergraph_TsTestActor(EntryPoint: number) : void;
-            Fire() : void;
-            FireServer() : void;
-            GetActor() : UE.Actor;
-            GetArray() : TArray<UE.Object>;
-            GetMap() : TMap<string, number>;
-            OnRep_dint() : void;
-            ReceiveBeginPlay() : void;
-            ReceiveTick(DeltaSeconds: number) : void;
-            SetActor(p1: $Nullable<UE.Actor>) : void;
-            SetArray(p: $Ref<TArray<UE.Object>>) : void;
-            TestCppType(p11: number, p21: number) : string;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): TsTestActor_C;
-            static Load(InName: string): TsTestActor_C;
-        
-            __tid_TsTestActor_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 21BFF94D4E16890714578898AA1B1EC6
-    namespace Game.Blueprints.TypeScript.TsTestGameInstance {
-        class TsTestGameInstance_C extends UE.TypeScriptGameInstance {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            ExecuteUbergraph_TsTestGameInstance(EntryPoint: number) : void;
-            ReceiveInit() : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): TsTestGameInstance_C;
-            static Load(InName: string): TsTestGameInstance_C;
-        
-            __tid_TsTestGameInstance_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 553A4B7045B8F391973937B32F7609AF
-    namespace Game.Blueprints.TypeScript.TsTestGameMode {
-        class TsTestGameMode_C extends UE.GameModeBase {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            DefaultSceneRoot: UE.SceneComponent;
-            ExecuteUbergraph_TsTestGameMode(EntryPoint: number) : void;
-            ReceiveBeginPlay() : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): TsTestGameMode_C;
-            static Load(InName: string): TsTestGameMode_C;
-        
-            __tid_TsTestGameMode_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 069B9D4748DB9816259D0E8642A700B0
-    namespace Game.Blueprints.TypeScript.Modules.AnotherActor {
-        class AnotherActor_C extends UE.Actor {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            DefaultSceneRoot: UE.SceneComponent;
-            ExecuteUbergraph_AnotherActor(EntryPoint: number) : void;
-            ReceiveBeginPlay() : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): AnotherActor_C;
-            static Load(InName: string): AnotherActor_C;
-        
-            __tid_AnotherActor_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 33357AC6463C3AB157426D9264E94557
-    namespace Game.StarterContent.MixinSuperTestBase {
-        class MixinSuperTestBase_C extends UE.Actor {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            DefaultSceneRoot: UE.SceneComponent;
-            ExecuteUbergraph_MixinSuperTestBase(EntryPoint: number) : void;
-            Foo() : void;
-            ReceiveBeginPlay() : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): MixinSuperTestBase_C;
-            static Load(InName: string): MixinSuperTestBase_C;
-        
-            __tid_MixinSuperTestBase_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 2BDEF8114014B8B86032D4A518847312
-    namespace Game.StarterContent.MixinSuperTestDerived {
-        class MixinSuperTestDerived_C extends UE.Game.StarterContent.MixinSuperTestBase.MixinSuperTestBase_C {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            Foo() : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): MixinSuperTestDerived_C;
-            static Load(InName: string): MixinSuperTestDerived_C;
-        
-            __tid_MixinSuperTestDerived_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 8C3BD456442ED5244F46E2A37BF5ECB7
-    namespace Game.StarterContent.MixinTest {
-        class MixinTest_C extends UE.Actor {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            DefaultSceneRoot: UE.SceneComponent;
-            ExecuteUbergraph_MixinTest(EntryPoint: number) : void;
-            Log(P: string) : void;
-            ReceiveBeginPlay() : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): MixinTest_C;
-            static Load(InName: string): MixinTest_C;
-        
-            __tid_MixinTest_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: A5C7E431443721484614F0A5183DEBCD
-    namespace Game.StarterContent.TestBlueprint {
-        class TestBlueprint_C extends UE.Actor {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            DefaultSceneRoot: UE.SceneComponent;
-            B1: boolean;
-            I1: number;
-            I2: number;
-            Bar(NewParam: UE.Game.StarterContent.TestStruct.TestStruct) : void;
-            ExecuteUbergraph_TestBlueprint(EntryPoint: number) : void;
-            Foo(P1: boolean, P2: number, P3: number) : void;
-            ReceiveBeginPlay() : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): TestBlueprint_C;
-            static Load(InName: string): TestBlueprint_C;
-        
-            __tid_TestBlueprint_C__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 59ADD20544E242E59B518787A6F8F288
-    namespace Game.StarterContent.TestEnum {
-        enum TestEnum { Blue, Red, Green, TestEnum_MAX, __typeKeyDoNoAccess}
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: C9B8A43E442C8D87E5B77BB284D93163
-    namespace Game.StarterContent.TestStruct {
-        class TestStruct {
+// __TYPE_DECL_START: 56CD371548182F4586DDDAAC8CD7C6BC
+    namespace Game.FirstPersonArms.Animations.FirstPerson_AnimBP {
+        class AnimBlueprintGeneratedConstantData extends UE.AnimBlueprintConstantData {
             constructor();
-            constructor(speed: number, age: number);
-            speed: number;
-            age: number;
+            constructor(__NameProperty_280: string, __BoolProperty_281: boolean, __NameProperty_282: string, __IntProperty_283: number, __NameProperty_284: string, __IntProperty_285: number, __NameProperty_286: string, __IntProperty_287: number, __NameProperty_288: string, __IntProperty_289: number, __FloatProperty_290: number, __StructProperty_291: UE.InputScaleBiasClampConstants, __FloatProperty_292: number, __EnumProperty_293: UE.EAnimSyncMethod, __ByteProperty_294: UE.EAnimGroupRole, __NameProperty_295: string, __NameProperty_296: string, __NameProperty_297: string, __IntProperty_298: number, __StructProperty_299: UE.AnimNodeFunctionRef, __BlendProfile_300: UE.BlendProfile, __CurveFloat_301: UE.CurveFloat, __BoolProperty_302: boolean, __EnumProperty_303: UE.EAlphaBlendOption, __EnumProperty_304: UE.EBlendListTransitionType, __ArrayProperty_305: TArray<number>, AnimBlueprintExtension_PropertyAccess: UE.AnimSubsystem_PropertyAccess, AnimBlueprintExtension_Base: UE.AnimSubsystem_Base, AnimGraphNode_Root: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_13: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_12: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_11: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_10: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_9: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_8: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_7: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SequencePlayer_9: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateResult_9: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SequencePlayer_8: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateResult_8: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SequencePlayer_7: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateResult_7: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SequencePlayer_6: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateResult_6: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SequencePlayer_5: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateResult_5: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateMachine_1: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_Slot: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SaveCachedPose_1: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_6: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_5: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_4: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_3: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_2: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult_1: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_TransitionResult: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SequencePlayer_4: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateResult_4: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SequencePlayer_3: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateResult_3: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SequencePlayer_2: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateResult_2: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SequencePlayer_1: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateResult_1: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SequencePlayer: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateResult: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_StateMachine: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_SaveCachedPose: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_UseCachedPose_1: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_UseCachedPose: UE.AnimNodeExposedValueHandler_PropertyAccess, AnimGraphNode_BlendListByBool: UE.AnimNodeExposedValueHandler_PropertyAccess);
+            __NameProperty_280: string;
+            __BoolProperty_281: boolean;
+            __NameProperty_282: string;
+            __IntProperty_283: number;
+            __NameProperty_284: string;
+            __IntProperty_285: number;
+            __NameProperty_286: string;
+            __IntProperty_287: number;
+            __NameProperty_288: string;
+            __IntProperty_289: number;
+            __FloatProperty_290: number;
+            __StructProperty_291: UE.InputScaleBiasClampConstants;
+            __FloatProperty_292: number;
+            __EnumProperty_293: UE.EAnimSyncMethod;
+            __ByteProperty_294: UE.EAnimGroupRole;
+            __NameProperty_295: string;
+            __NameProperty_296: string;
+            __NameProperty_297: string;
+            __IntProperty_298: number;
+            __StructProperty_299: UE.AnimNodeFunctionRef;
+            __BlendProfile_300: UE.BlendProfile;
+            __CurveFloat_301: UE.CurveFloat;
+            __BoolProperty_302: boolean;
+            __EnumProperty_303: UE.EAlphaBlendOption;
+            __EnumProperty_304: UE.EBlendListTransitionType;
+            __ArrayProperty_305: TArray<number>;
+            AnimBlueprintExtension_PropertyAccess: UE.AnimSubsystem_PropertyAccess;
+            AnimBlueprintExtension_Base: UE.AnimSubsystem_Base;
+            AnimGraphNode_Root: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_13: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_12: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_11: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_10: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_9: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_8: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_7: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SequencePlayer_9: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateResult_9: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SequencePlayer_8: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateResult_8: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SequencePlayer_7: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateResult_7: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SequencePlayer_6: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateResult_6: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SequencePlayer_5: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateResult_5: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateMachine_1: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_Slot: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SaveCachedPose_1: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_6: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_5: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_4: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_3: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_2: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult_1: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_TransitionResult: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SequencePlayer_4: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateResult_4: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SequencePlayer_3: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateResult_3: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SequencePlayer_2: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateResult_2: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SequencePlayer_1: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateResult_1: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SequencePlayer: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateResult: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_StateMachine: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_SaveCachedPose: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_UseCachedPose_1: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_UseCachedPose: UE.AnimNodeExposedValueHandler_PropertyAccess;
+            AnimGraphNode_BlendListByBool: UE.AnimNodeExposedValueHandler_PropertyAccess;
             /**
              * @deprecated use StaticStruct instead.
              */
             static StaticClass(): ScriptStruct;
             static StaticStruct(): ScriptStruct;
-            private __tid_TestStruct__: boolean;
+            __tid_AnimBlueprintGeneratedConstantData_0__: boolean;
         }
         
     }
 
 // __TYPE_DECL_END
-// __TYPE_DECL_START: 2620B05B4D570B271A8AAF934441D4E7
-    namespace Game.StarterContent.TestWidgetBlueprint {
-        class TestWidgetBlueprint_C extends UE.UserWidget {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            Button1: UE.Button;
-            TextBox: UE.MultiLineEditableTextBox;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): TestWidgetBlueprint_C;
-            static Load(InName: string): TestWidgetBlueprint_C;
+// __TYPE_DECL_START: 56CD371548182F4586DDDAAC8CD7C6BC
+    namespace Game.FirstPersonArms.Animations.FirstPerson_AnimBP {
+        class AnimBlueprintGeneratedMutableData extends UE.AnimBlueprintMutableData {
+            constructor();
+            constructor(__BoolProperty: boolean);
+            __BoolProperty: boolean;
+            /**
+             * @deprecated use StaticStruct instead.
+             */
+            static StaticClass(): ScriptStruct;
+            static StaticStruct(): ScriptStruct;
+            __tid_AnimBlueprintGeneratedMutableData_0__: boolean;
+        }
         
-            __tid_TestWidgetBlueprint_C__: boolean;
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 56CD371548182F4586DDDAAC8CD7C6BC
+    namespace Game.FirstPersonArms.Animations.FirstPerson_AnimBP {
+        class FirstPerson_AnimBP_C extends UE.AnimInstance {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            UberGraphFrame: UE.PointerToUberGraphFrame;
+            __AnimBlueprintMutables: UE.Game.FirstPersonArms.Animations.FirstPerson_AnimBP.AnimBlueprintGeneratedMutableData;
+            AnimBlueprintExtension_PropertyAccess: UE.AnimSubsystemInstance;
+            AnimBlueprintExtension_Base: UE.AnimSubsystemInstance;
+            AnimGraphNode_Root: UE.AnimNode_Root;
+            AnimGraphNode_TransitionResult_13: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult_12: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult_11: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult_10: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult_9: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult_8: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult_7: UE.AnimNode_TransitionResult;
+            AnimGraphNode_SequencePlayer_9: UE.AnimNode_SequencePlayer;
+            AnimGraphNode_StateResult_9: UE.AnimNode_StateResult;
+            AnimGraphNode_SequencePlayer_8: UE.AnimNode_SequencePlayer;
+            AnimGraphNode_StateResult_8: UE.AnimNode_StateResult;
+            AnimGraphNode_SequencePlayer_7: UE.AnimNode_SequencePlayer;
+            AnimGraphNode_StateResult_7: UE.AnimNode_StateResult;
+            AnimGraphNode_SequencePlayer_6: UE.AnimNode_SequencePlayer;
+            AnimGraphNode_StateResult_6: UE.AnimNode_StateResult;
+            AnimGraphNode_SequencePlayer_5: UE.AnimNode_SequencePlayer;
+            AnimGraphNode_StateResult_5: UE.AnimNode_StateResult;
+            AnimGraphNode_StateMachine_1: UE.AnimNode_StateMachine;
+            AnimGraphNode_Slot: UE.AnimNode_Slot;
+            AnimGraphNode_SaveCachedPose_1: UE.AnimNode_SaveCachedPose;
+            AnimGraphNode_TransitionResult_6: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult_5: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult_4: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult_3: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult_2: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult_1: UE.AnimNode_TransitionResult;
+            AnimGraphNode_TransitionResult: UE.AnimNode_TransitionResult;
+            AnimGraphNode_SequencePlayer_4: UE.AnimNode_SequencePlayer;
+            AnimGraphNode_StateResult_4: UE.AnimNode_StateResult;
+            AnimGraphNode_SequencePlayer_3: UE.AnimNode_SequencePlayer;
+            AnimGraphNode_StateResult_3: UE.AnimNode_StateResult;
+            AnimGraphNode_SequencePlayer_2: UE.AnimNode_SequencePlayer;
+            AnimGraphNode_StateResult_2: UE.AnimNode_StateResult;
+            AnimGraphNode_SequencePlayer_1: UE.AnimNode_SequencePlayer;
+            AnimGraphNode_StateResult_1: UE.AnimNode_StateResult;
+            AnimGraphNode_SequencePlayer: UE.AnimNode_SequencePlayer;
+            AnimGraphNode_StateResult: UE.AnimNode_StateResult;
+            AnimGraphNode_StateMachine: UE.AnimNode_StateMachine;
+            AnimGraphNode_SaveCachedPose: UE.AnimNode_SaveCachedPose;
+            AnimGraphNode_UseCachedPose_1: UE.AnimNode_UseCachedPose;
+            AnimGraphNode_UseCachedPose: UE.AnimNode_UseCachedPose;
+            AnimGraphNode_BlendListByBool: UE.AnimNode_BlendListByBool;
+            IsMoving: boolean;
+            bIsInAir: boolean;
+            HasRifle: boolean;
+            FirstPersonCharacter: UE.Object;
+            AnimGraph(AnimGraph: $Ref<UE.PoseLink>) : void;
+            /*
+             *Executed when begin play is called on the owning component
+             */
+            BlueprintBeginPlay() : void;
+            /*
+             *Executed when the Animation is updated
+             */
+            BlueprintUpdateAnimation(DeltaTimeX: number) : void;
+            EvaluateGraphExposedInputs_ExecuteUbergraph_FirstPerson_AnimBP_AnimGraphNode_TransitionResult_274EC9B146631F45FDB52BB11F47D731() : void;
+            EvaluateGraphExposedInputs_ExecuteUbergraph_FirstPerson_AnimBP_AnimGraphNode_TransitionResult_53F31B364AE1E94B7AB4B3B7BB0F164E() : void;
+            EvaluateGraphExposedInputs_ExecuteUbergraph_FirstPerson_AnimBP_AnimGraphNode_TransitionResult_B902C16045F47029D8FF9A8AE4529E0E() : void;
+            EvaluateGraphExposedInputs_ExecuteUbergraph_FirstPerson_AnimBP_AnimGraphNode_TransitionResult_D654D16F412EF3EFE1B50B94AB239895() : void;
+            ExecuteUbergraph_FirstPerson_AnimBP(EntryPoint: number) : void;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): FirstPerson_AnimBP_C;
+            static Load(InName: string): FirstPerson_AnimBP_C;
+        
+            __tid_FirstPerson_AnimBP_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: F9C78A6A4764434D4FF9EC9799CFED73
+    namespace Game.HahaUI {
+        class HahaUI_C extends UE.SmartUICoreWidget {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): HahaUI_C;
+            static Load(InName: string): HahaUI_C;
+        
+            __tid_HahaUI_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 6D16DC5F49703DEAFC8CD3AA6779B3C3
+    namespace Game.TestSmartUI {
+        class TestSmartUI_C extends UE.SmartUICoreWidget {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): TestSmartUI_C;
+            static Load(InName: string): TestSmartUI_C;
+        
+            __tid_TestSmartUI_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 5A1FB13848CE5765531673AF78F3A6ED
+    namespace Game.Button {
+        class Button_C extends UE.UserWidget {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            Button_82: UE.Button;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Button_C;
+            static Load(InName: string): Button_C;
+        
+            __tid_Button_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: DB93CF9541BC5B0CE09210A0E8B1CE26
+    namespace Game.XmlUI.LoadingScreen.BPW_LoadingScreen {
+        class BPW_LoadingScreen_C extends UE.UserWidget {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            UberGraphFrame: UE.PointerToUberGraphFrame;
+            BlackBG: UE.Image;
+            Image_0: UE.Image;
+            DoneFadingEvent: $MulticastDelegate<() => void>;
+            DoneFadingEvent__DelegateSignature() : void;
+            ExecuteUbergraph_BPW_LoadingScreen(EntryPoint: number) : void;
+            /*
+             *Ticks this widget.  Override in derived classes, but always call the parent implementation.
+             *
+             *@param  MyGeometry The space allotted for this widget
+             *@param  InDeltaTime  Real time passed since last tick
+             */
+            Tick(MyGeometry: UE.Geometry, InDeltaTime: number) : void;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): BPW_LoadingScreen_C;
+            static Load(InName: string): BPW_LoadingScreen_C;
+        
+            __tid_BPW_LoadingScreen_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: EED5FFDF49AE9FE3F60F449012E3A731
+    namespace Game.NoesisUITest.BP_Testbutton {
+        class BP_Testbutton_C extends UE.NoesisInstance {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): BP_Testbutton_C;
+            static Load(InName: string): BP_Testbutton_C;
+        
+            __tid_BP_Testbutton_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: C1CD57F14A051CB7777C3AA8C42D1702
+    namespace Game.NoesisUITest.NewWidgetBlueprint {
+        class NewWidgetBlueprint_C extends UE.UserWidget {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            UberGraphFrame: UE.PointerToUberGraphFrame;
+            NewVar: boolean;
+            NewEventDispatcher: $MulticastDelegate<() => void>;
+            ExecuteUbergraph_NewWidgetBlueprint(EntryPoint: number) : void;
+            NewEventDispatcher__DelegateSignature() : void;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): NewWidgetBlueprint_C;
+            static Load(InName: string): NewWidgetBlueprint_C;
+        
+            __tid_NewWidgetBlueprint_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 603CC69949C47B5F0D4272B52F58A9BD
+    namespace Game.NoesisUITest.PyActorTest {
+        class PyActorTest_C extends UE.PyActor {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            Cube: UE.StaticMeshComponent;
+            DefaultSceneRoot: UE.SceneComponent;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): PyActorTest_C;
+            static Load(InName: string): PyActorTest_C;
+        
+            __tid_PyActorTest_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 76EAC1B94FE9628717F5B88D3CC03F95
+    namespace Game.NoesisUITest.PyHudTest {
+        class PyHudTest_C extends UE.PyHUD {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            DefaultSceneRoot: UE.SceneComponent;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): PyHudTest_C;
+            static Load(InName: string): PyHudTest_C;
+        
+            __tid_PyHudTest_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 0AE1B8F340A3CE7B4A6CE09125E1B3DC
+    namespace Game.NoesisUITest.PythonTest {
+        class PythonTest_C extends UE.PythonComponent {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): PythonTest_C;
+            static Load(InName: string): PythonTest_C;
+        
+            __tid_PythonTest_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 98D9BF9D48ADF2D718E6AF850C6809FD
+    namespace Game.NoesisUITest.View {
+        class View_C extends UE.NoesisInstance {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): View_C;
+            static Load(InName: string): View_C;
+        
+            __tid_View_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: AAEF31384354077A8BFCB7A6FFE787E9
+    namespace Game.Blueprints.NewUserWidget {
+        class NewUserWidget_C extends UE.UserWidget {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            UberGraphFrame: UE.PointerToUberGraphFrame;
+            Button_44: UE.Button;
+            /*
+             *Called when this entry is released from the owning table and no longer represents any list item
+             */
+            BP_OnEntryReleased() : void;
+            /*
+             *Called when the expansion state of the item represented by this entry changes. Tree view entries only.
+             */
+            BP_OnItemExpansionChanged(bIsExpanded: boolean) : void;
+            /*
+             *Called when the selection state of the item represented by this entry changes.
+             */
+            BP_OnItemSelectionChanged(bIsSelected: boolean) : void;
+            ExecuteUbergraph_NewUserWidget(EntryPoint: number) : void;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): NewUserWidget_C;
+            static Load(InName: string): NewUserWidget_C;
+        
+            __tid_NewUserWidget_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 25204BEC4A882F9E3D6CBF881C935329
+    namespace Game.Blueprints.Text {
+        class Text_C extends UE.UserWidget {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            EditableText_66: UE.EditableText;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Text_C;
+            static Load(InName: string): Text_C;
+        
+            __tid_Text_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 8C4E8532411E956420FCD29FBF1C8AC3
+    namespace Game.Blueprints.Text2 {
+        class Text2_C extends UE.UserWidget {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            UberGraphFrame: UE.PointerToUberGraphFrame;
+            EditableText_51: UE.EditableText;
+            /*
+             *Called when this entry is released from the owning table and no longer represents any list item
+             */
+            BP_OnEntryReleased() : void;
+            /*
+             *Called when the expansion state of the item represented by this entry changes. Tree view entries only.
+             */
+            BP_OnItemExpansionChanged(bIsExpanded: boolean) : void;
+            /*
+             *Called when the selection state of the item represented by this entry changes.
+             */
+            BP_OnItemSelectionChanged(bIsSelected: boolean) : void;
+            ExecuteUbergraph_Text2(EntryPoint: number) : void;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Text2_C;
+            static Load(InName: string): Text2_C;
+        
+            __tid_Text2_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 862A26E84A42F13FB193AC87521ABCE8
+    namespace Game.StarterContent.Blueprints.Blueprint_Effect_Explosion {
+        class Blueprint_Effect_Explosion_C extends UE.Actor {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            ["Explosion Audio"]: UE.AudioComponent;
+            P_Explosion: UE.ParticleSystemComponent;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Blueprint_Effect_Explosion_C;
+            static Load(InName: string): Blueprint_Effect_Explosion_C;
+        
+            __tid_Blueprint_Effect_Explosion_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 34B105414117D7F5DF9F1B9534DCA89C
+    namespace Game.StarterContent.Blueprints.BP_LightStudio {
+        class BP_LightStudio_C extends UE.Actor {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            SkyLight1: UE.SkyLightComponent;
+            ExponentialHeightFog1: UE.ExponentialHeightFogComponent;
+            PrevisArrow: UE.StaticMeshComponent;
+            Skybox: UE.StaticMeshComponent;
+            Scene1: UE.SceneComponent;
+            GlobalBrightness: number;
+            Use_HDRI: boolean;
+            UseSunLight: boolean;
+            SunBrightness: number;
+            SunTint: UE.LinearColor;
+            StationaryLightForSun: boolean;
+            SunDirectionalLight: UE.DirectionalLightComponent;
+            UseAtmosphere: boolean;
+            AtmosphereBrightness: number;
+            AtmosphereTint: UE.LinearColor;
+            PrevisArrowMaterial: UE.MaterialInstanceDynamic;
+            LightColor: UE.LinearColor;
+            SunColorCurve: UE.CurveLinearColor;
+            OverrideSunColor: boolean;
+            AtmosphereDensityMultiplier: number;
+            AtmosphereAltitude: number;
+            DisableSunDisk: boolean;
+            UseFog: boolean;
+            FogBrightness: number;
+            FogTint: UE.LinearColor;
+            FogAltitude: number;
+            FogMaxOpacity: number;
+            FogHeightFalloff: number;
+            FogDensity: number;
+            FogBrightnessCurve: UE.CurveFloat;
+            FogStartDistance: number;
+            DisableGroundScattering: boolean;
+            AtmosphereDistanceScale: number;
+            SkyboxMaterial: UE.MaterialInstanceDynamic;
+            HDRI_Brightness: number;
+            HDRI_Contrast: number;
+            HDRI_Tint: UE.LinearColor;
+            HDRI_Cubemap: UE.Texture;
+            HDRI_Rotation: number;
+            AtmosphereOpacityHorizon: number;
+            AtmosphereOpacityZenith: number;
+            HighDensityAtmosphere: boolean;
+            AtmosphericFog: UE.AtmosphericFogComponent;
+            UseSkylight: boolean;
+            Shadowdistance: number;
+            LightShaftBloom: boolean;
+            LightShaftOcclusion: boolean;
+            OcclusionMaskDarkness: number;
+            BloomScale: number;
+            BloomThreshold: number;
+            BloomTint: UE.Color;
+            AtmosphereFogMultiplier: number;
+            AtmosphereDensityHeight: number;
+            AtmosphereMaxScatteringOrder: number;
+            AtmosphereAltitudeSampleNumber: number;
+            LightFunctionMaterial: UE.MaterialInterface;
+            MIC_Black: UE.MaterialInstance;
+            MIC_HDRI: UE.MaterialInstance;
+            AtmosphereDensity() : void;
+            CalculateSunColor() : void;
+            NormalizedSunAngle(Angle: $Ref<number>) : void;
+            SunMobility() : void;
+            /*
+             *Construction script, the place to spawn components and do other setup.
+             *@note Name used in CreateBlueprint function
+             */
+            UserConstructionScript() : void;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): BP_LightStudio_C;
+            static Load(InName: string): BP_LightStudio_C;
+        
+            __tid_BP_LightStudio_C_0__: boolean;
         }
         
     }

@@ -5,6 +5,7 @@
     "experimentalDecorators": true,
     "jsx": "react",
     "sourceMap": true,
+    "baseUrl": ".",
     "paths": {
       "@assets/*": ["Main/assets/*"]
     },
@@ -15,8 +16,9 @@
     "outDir": "../JavaScript"
   },
   "include": [
-    "react-umg/**/*",
+    "reactUMG/**/*",
     "Main/**/*",
-    "Template/**/*"
+    "Template/**/*",
+    "Typing/globals.d.ts"
   ],
 }

@@ -34,8 +34,17 @@ var global = global || (function () { return this; }());
     
     let findModule = global.__tgjsFindModule;
     global.__tgjsFindModule = undefined;
+
+    let readImageAsTexture = global.__tgjsReadImageFileAsTexture2D;
+    global.__tgjsReadImageFileAsTexture2D = undefined;
+
+    let readFileContent = global.__tgjsReadFileContent;
+    global.__tgjsReadFileContent = undefined;
     
     let tmpModuleStorage = [];
+
+    // save css style classes
+    let styleClassesCache = Object.create(null);
     
     function addModule(m) {
         for (var i = 0; i < tmpModuleStorage.length; i++) {
@@ -45,6 +54,84 @@ var global = global || (function () { return this; }());
             }
         }
         return tmpModuleStorage.push(m) - 1;
+    }
+
+    function getCssStyleForClass(className) {
+        if (styleClassesCache[className]) {
+            return styleClassesCache[className];
+        }
+
+        return undefined;
+    }
+
+    function registerStyleClass(className, content) {
+        if (styleClassesCache[className]) {
+            console.warn(`style class ${className} already registered, will override it`);
+            return;
+        }
+
+        styleClassesCache[className] = content;
+    }
+
+    // extract the style class from the CSS file
+    function extractStyleClassFromFile(filePath) {
+        let cssContent = readFileContent(filePath);
+        // Remove comments and extra white space
+        cssContent = cssContent.replace(/\/\*[\s\S]*?\*\//g, '')
+                         .replace(/\s+/g, ' ')
+                         .trim();
+
+        // Match each CSS rule block
+        // fixme@Caleb196x: 无法支持带下划线的名称
+        const ruleRegex = /\.([a-zA-Z0-9_-]+)\s*{([^}]*)}/g;
+        let match;
+
+        while ((match = ruleRegex.exec(cssContent)) !== null) {
+            const className = match[1];
+            let styleContent = match[2].trim();
+
+            // Ensure the style content is surrounded by curly braces
+            if (!styleContent.startsWith('{')) {
+                styleContent = '{' + styleContent + '}';
+            }
+
+            // Store to cache
+            registerStyleClass(className, styleContent);
+        }
+
+        // Handle @media queries
+        const mediaQueryRegex = /@media\s+([^{]+)\s*{([^}]*(?:{[^}]*}[^}]*)*)}/g;
+        let mediaMatch;
+        
+        while ((mediaMatch = mediaQueryRegex.exec(cssContent)) !== null) {
+            const mediaCondition = mediaMatch[1].trim().replace(/\s+/g, '_');
+            const mediaKey = `media__${mediaCondition}`;
+            const mediaContent = mediaMatch[2].trim();
+            
+            // Process rules inside the media query
+            const nestedRuleRegex = /\.([a-zA-Z0-9_-]+)\s*{([^}]*)}/g;
+            let nestedMatch;
+            
+            // Create an object to hold all the class styles for this media query
+            const mediaStyles = {};
+            
+            while ((nestedMatch = nestedRuleRegex.exec(mediaContent)) !== null) {
+                const className = nestedMatch[1];
+                let styleContent = nestedMatch[2].trim();
+                
+                // Ensure the style content is properly formatted
+                if (!styleContent.startsWith('{')) {
+                    styleContent = '{' + styleContent + '}';
+                }
+                
+                mediaStyles[className] = styleContent;
+            }
+            
+            // Register the media query with all its styles
+            registerStyleClass(mediaKey, mediaStyles);
+        }
+
+        console.log(styleClassesCache);
     }
     
     function getModuleBySID(id) {
@@ -179,13 +266,26 @@ var global = global || (function () { return this; }());
                     } else {
                         m.exports = packageConfigure;
                     }
-                } else {
+                } else if (fullPath.endsWith('.png') || fullPath.endsWith('.jpg') || fullPath.endsWith('.jpeg')) {
+                    // support import image
+                    console.log("import image: " + fullPath + "debug path: " + debugPath);
+                    // todo@Caleb196x: 导入性能优化x10
+                    // todo@Caleb196x: 通过hash判断文件内容是否发生改变
+                    let texture = readImageAsTexture(fullPath); 
+                    console.log(texture);
+                    m.exports = {'default': texture};
+                } else if (fullPath.endsWith('.css') || fullPath.endsWith('.scss')) {
+                    // support import css
+                    extractStyleClassFromFile(fullPath);
+                }
+                else {
                     let r = executeModule(fullPath, script, debugPath, sid, isESM, bytecode);
                     if (isESM) {
                         m.exports = r;
                     }
                 }
             } catch(e) {
+                console.log("read file:  " + fullPath + " with exception " + e);
                 localModuleCache[moduleName] = undefined;
                 moduleCache[key] = undefined;
                 throw e;
@@ -247,4 +347,6 @@ var global = global || (function () { return this; }());
     puerts.getModuleByUrl = getModuleByUrl;
     
     puerts.generateEmptyCode = generateEmptyCode;
+
+    global.getCssStyleForClass = getCssStyleForClass;
 }(global));
