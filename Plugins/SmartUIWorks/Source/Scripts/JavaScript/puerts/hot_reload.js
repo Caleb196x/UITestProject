@@ -75,11 +75,12 @@ var global = global || (function () { return this; }());
                 scriptId = parsedScript.get(win_url)
             }
         }
-        
+         
         if (scriptId) {
             if (typeof source === "string") {
                 let orgSourceInfo = await sendCommand("Debugger.getScriptSource", {scriptId:"" + scriptId});
                 source = ("(function (exports, require, module, __filename, __dirname) { " + source + "\n});");
+                
                 if (orgSourceInfo.scriptSource == source) {
                     console.log(`source not changed, skip ${url}`);
                     return;
@@ -88,7 +89,7 @@ var global = global || (function () { return this; }());
                 puerts.emit('HMR.prepare', moduleName, m, url);
                 let res = await sendCommand("Debugger.setScriptSource", {scriptId:"" + scriptId,scriptSource:source});
                 puerts.emit('HMR.finish', moduleName, m, url);
-                puerts.forceReload(url);
+                // puerts.forceReload(url);
             }
         } else {
             console.warn(`can not find scriptId for ${url}`)

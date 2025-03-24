@@ -6,8 +6,21 @@
   "author": "Caleb196x",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "react": "^17.0.2",
-    "react-reconciler": "^0.24.0"
+    "e": "^0.2.33",
+    "react": "^18.0.0",
+    "react-reconciler": "^0.28.0"
   },
-  "devDependencies": {}
+  "babelMacros": {
+    "twin": {
+      "preset": "styled-components",
+      "styled": {
+        "import": "default",
+        "from": "styled-components"
+      },
+      "css": {
+        "import": "css",
+        "from": "styled-components"
+      }
+    }
+  }
 }
