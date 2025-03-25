@@ -6,11 +6,12 @@ declare module "reactUMG" {
     type TSet<T> = UE.TSet<T>;
     type TMap<TKey, TValue> = UE.TMap<TKey, TValue>;
 
+    // This type definition creates a recursive partial type, which means that it makes all properties of a given type optional, and if any of those properties are objects or arrays, it applies the same transformation to their properties as well.
     type RecursivePartial<T> = {
         [P in keyof T]?:
-        T[P] extends (infer U)[] ? RecursivePartial<U>[] :
-        T[P] extends object ? RecursivePartial<T[P]> :
-        T[P];
+        T[P] extends (infer U)[] ? RecursivePartial<U>[] : // If the property is an array, apply RecursivePartial to the array's element type.
+        T[P] extends object ? RecursivePartial<T[P]> : // If the property is an object, apply RecursivePartial to the object type.
+        T[P]; // Otherwise, keep the property type as is.
     };
 
     interface PanelSlot {
