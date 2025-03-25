@@ -64,7 +64,7 @@ export class MainComponent extends React.Component<Props, State> {
                     <TextBlock ref={this.textblock_ref} Text='Username: '/>
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
                 </div>
-                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                <div style={{display: 'stack', flexDirection: 'column', justifyContent: 'space-between',
                     top: '200px', left: '400px', width: '200px', height: '100px',
                 }}>
                     <Button OnClicked={() => this.handleLogin()}>
