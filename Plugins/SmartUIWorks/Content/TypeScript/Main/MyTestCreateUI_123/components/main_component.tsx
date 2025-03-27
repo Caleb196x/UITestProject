@@ -73,7 +73,7 @@ export class MainComponent extends React.Component<Props, State> {
                                 placeholder='输入内容...' aria-label='用户名' required/>
                     <button style={this.buttonStyle} onClick={()=>this.handleLogin()}>测试原生按钮</button>
                 </HorizontalBox>
-                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', objectFit: 'contain', justifyContent: 'center'}}>
                     <select style={{alignSelf: 'flex-start'}} defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
                         <option value={"A"}>a</option>
                         <option value={"B"}>b</option>

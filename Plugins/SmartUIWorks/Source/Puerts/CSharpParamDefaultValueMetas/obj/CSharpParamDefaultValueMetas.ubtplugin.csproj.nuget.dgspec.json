@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "F:\\AI_UI\\UITestProject\\Plugins\\SmartUIWorks\\Source\\Puerts\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj": {}
+    "D:\\WorkSpace\\UITestProject\\Plugins\\SmartUIWorks\\Source\\Puerts\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj": {}
   },
   "projects": {
-    "F:\\AI_UI\\UITestProject\\Plugins\\SmartUIWorks\\Source\\Puerts\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj": {
+    "D:\\WorkSpace\\UITestProject\\Plugins\\SmartUIWorks\\Source\\Puerts\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\AI_UI\\UITestProject\\Plugins\\SmartUIWorks\\Source\\Puerts\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj",
+        "projectUniqueName": "D:\\WorkSpace\\UITestProject\\Plugins\\SmartUIWorks\\Source\\Puerts\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj",
         "projectName": "CSharpParamDefaultValueMetas",
-        "projectPath": "F:\\AI_UI\\UITestProject\\Plugins\\SmartUIWorks\\Source\\Puerts\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj",
-        "packagesPath": "C:\\Users\\liumi\\.nuget\\packages\\",
-        "outputPath": "F:\\AI_UI\\UITestProject\\Plugins\\SmartUIWorks\\Source\\Puerts\\CSharpParamDefaultValueMetas\\obj\\",
+        "projectPath": "D:\\WorkSpace\\UITestProject\\Plugins\\SmartUIWorks\\Source\\Puerts\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "D:\\WorkSpace\\UITestProject\\Plugins\\SmartUIWorks\\Source\\Puerts\\CSharpParamDefaultValueMetas\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "E:\\Software\\Microsoft\\VisualStudio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\liumi\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -39,11 +35,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -61,8 +52,7 @@
             "net47",
             "net471",
             "net472",
-            "net48",
-            "net481"
+            "net48"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -71,7 +61,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "D:\\WorkSpace\\tongtestunrealengine\\Engine\\Binaries\\ThirdParty\\DotNet\\6.0.302\\windows\\sdk\\6.0.302\\RuntimeIdentifierGraph.json"
         }
       }
     }
