@@ -64,8 +64,8 @@ export class MainComponent extends React.Component<Props, State> {
                     <TextBlock ref={this.textblock_ref} Text='Username: '/>
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
                 </div>
-                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                    top: '200px', left: '400px', width: '200px', height: '100px',
+                <div style={{display: 'stack', flexDirection: 'column', justifyContent: 'space-between',
+                    top: '200px', left: '400px', width: '200px', height: '100px', objectFit: 'contain'
                 }}>
                     <Button OnClicked={() => this.handleLogin()}>
                     {'Login'}
@@ -76,9 +76,11 @@ export class MainComponent extends React.Component<Props, State> {
                     <input type='text' value={this.state.username} onChange={(e)=>this.setState({username: e.target.value})} 
                                 placeholder='输入内容...' aria-label='用户名' required/>
                     <button style={this.buttonStyle} onClick={()=>this.handleLogin()}>测试原生按钮</button>
+                    
                 </div>
-                <div style={{display: 'flex', flexDirection: 'row', verticalAlign: 'center', alignItems: 'center', justifyContent: 'center',
-                    offsetAnchor: 'top center', top: '250px'
+                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+                    offsetAnchor: 'top center', top: '250px', transform: 'rotate3d(1, 1, 1, 45deg)', positionX: 100, positionY: 100,
+                    objectFit: 'contain', visibility: 'visible', gridRow: '1 / 3', gridColumn: '1 / 3', disable: true
                 }}>
                     <select style={{alignSelf: 'flex-end'}} defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
                         <option value={"A"}>a</option>
@@ -96,7 +98,7 @@ export class MainComponent extends React.Component<Props, State> {
                     <button style={{alignSelf: 'start'}} onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>
 
                     <div style={{overflow: 'scroll', scrollbarWidth: 'auto', scrollPadding: '5px', alignSelf: 'start',
-                        width: '100px', height: '30px',
+                        width: '100px', height: '30px', anchor: 'top left', 
                     }}>
                         <text style={{width: '100%', height: '100%'}}>scroll-1</text>
                         <text style={{width: '100%', height: '100%'}}>scroll-2</text>

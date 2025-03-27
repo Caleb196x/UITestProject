@@ -49,6 +49,12 @@ declare module "SmartGameUI" {
         width?: number;
         height?: number;
         color?: string;
+        column?: number;
+        row?: number;
+        columnSpan?: number;
+        rowSpan?: number;
+        autoSize?: boolean;
+        zIndex?: number;
     }
 
     export interface CommonProps {
@@ -67,6 +73,9 @@ declare module "SmartGameUI" {
         visibilityBinding?: () => VisibilityType;
     }
 
+    /**
+     * Panel widgets
+     */
     export interface PanelProps extends CommonProps {
         children?: React.ReactNode;
         
@@ -77,5 +86,22 @@ declare module "SmartGameUI" {
 
     class Overlay extends React.Component<OverlayProps> {
         nativePtr: UE.Overlay;
+    }
+
+    interface ScaleBoxProp extends PanelProps {
+        stretch?: 'contain' | 'cover' | 'fill' | 'scale-y' | 'scale-x' | 'custom';
+        scale?: number;
+    }
+
+    class ScaleBox extends React.Component<ScaleBoxProp> {
+        nativePtr: UE.ScaleBox;
+    }
+
+    interface UniformGridProp extends PanelProps {
+        cellSize?: Vector2D;
+        cellPadding?: RecursivePartial<Margin>;
+    }
+
+    class UniformGrid extends React.Component<UniformGridProp> {
     }
 }
