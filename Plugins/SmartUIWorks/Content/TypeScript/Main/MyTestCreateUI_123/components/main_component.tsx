@@ -73,18 +73,18 @@ export class MainComponent extends React.Component<Props, State> {
                                 placeholder='输入内容...' aria-label='用户名' required/>
                     <button style={this.buttonStyle} onClick={()=>this.handleLogin()}>测试原生按钮</button>
                 </HorizontalBox>
-                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', objectFit: 'contain', justifyContent: 'center'}}>
                     <select style={{alignSelf: 'flex-start'}} defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
                         <option value={"A"}>a</option>
                         <option value={"B"}>b</option>
                         <option value={"C"}>c</option>
-                        <option value={"D"}>d</option>
+                        <option value={"D"}>🎮 d</option>
                     </select>
 
                     <img src={face} style={{width: '100%', height: '100%'}}/>
 
                     <progress style={{alignSelf: 'stretch'}} value={this.state.progressVal} max={100}>
-                    进度条
+                        进度条
                     </progress>
                     <button style={{alignSelf: 'end'}} onClick={()=>{this.setState({progressVal: Math.min(this.state.progressVal + 5, 100)})}}>增加进度</button>
                     <button style={{alignSelf: 'satrt'}} onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>

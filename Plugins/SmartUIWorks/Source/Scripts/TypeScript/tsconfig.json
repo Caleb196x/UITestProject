@@ -16,6 +16,7 @@
     "outDir": "../JavaScript"
   },
   "include": [
+    "SmartGameUI/**/*",
     "reactUMG/**/*",
     "Main/**/*",
     "Template/**/*",

@@ -114,7 +114,7 @@ export class MainComponent extends React.Component<Props, State> {
                         <text style={{width: '100%', height: '100%'}}>scroll-3</text>
                         <text style={{width: '100%', height: '100%'}}>scroll-4</text>
                         <text style={{width: '100%', height: '100%'}}>scroll-5</text>
-                        <text style={{width: '100%', height: '100%'}}>scroll-6</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-6 🎮</text>
                     </div>
                 </div>
         </canvas>

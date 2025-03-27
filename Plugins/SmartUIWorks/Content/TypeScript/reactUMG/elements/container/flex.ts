@@ -35,8 +35,8 @@ export class FlexWrapper extends ComponentWrapper {
 
             }
         } else if (display === 'block') {
-            widget = new UE.VerticalBox();
-            this.containerType = UMGContainerType.VerticalBox;
+            widget = new UE.StackBox();
+            this.containerType = UMGContainerType.StackBox;
         }
 
         return widget;

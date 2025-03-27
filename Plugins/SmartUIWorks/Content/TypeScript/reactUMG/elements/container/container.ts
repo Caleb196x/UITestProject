@@ -12,7 +12,8 @@ export enum UMGContainerType {
     Flex,
     HorizontalBox,
     VerticalBox,
-    WrapBox
+    WrapBox, 
+    StackBox
 }
 
 export class ContainerWrapper extends ComponentWrapper {
