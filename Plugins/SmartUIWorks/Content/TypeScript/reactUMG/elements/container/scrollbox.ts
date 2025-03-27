@@ -43,7 +43,6 @@ export class ScrollBoxWrapper extends ComponentWrapper {
 
         const scrollPadding = this.containerStyle?.scrollPadding || '0px';
         scrollBox.SetScrollbarPadding(convertMargin(scrollPadding, this.containerStyle));
-        scrollBox.SetAlwaysShowScrollbar(true);
     }
 
     

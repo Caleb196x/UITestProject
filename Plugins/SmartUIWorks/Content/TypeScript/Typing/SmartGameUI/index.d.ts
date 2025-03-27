@@ -328,4 +328,24 @@ declare module "SmartGameUI" {
     class ExpandableArea extends React.Component<ExpandableAreaProp> {
     }
     
+    interface ScrollBoxProp extends PanelProps {
+        orientation?: 'horizontal' | 'vertical' | undefined;
+        barThickness?: number | undefined;
+        barPadding?: RecursivePartial<Margin> | undefined;
+        alwaysShowBars?: boolean | undefined;
+        alwaysShowBarTrack?: boolean | undefined;
+        visibility?: CssType.Property.Visibility | undefined;
+        allowDragging?: boolean | undefined;
+        allowOverscroll?: boolean | undefined;
+        navigationDestination?: 'into-view' | 'center' | 'top-left' | 'bottom-right' | undefined;
+        barHorizontalImage?: ImageStyle | undefined;
+        barVerticalImage?: ImageStyle | undefined;
+        normalThumbImage?: ImageStyle | undefined;
+        hoveredThumbImage?: ImageStyle | undefined;
+        draggedThumbImage?: ImageStyle | undefined;
+        verticalTopSlotImage?: ImageStyle | undefined;
+        verticalBottomSlotImage?: ImageStyle | undefined;
+        horizontalLeftSlotImage?: ImageStyle | undefined;
+        horizontalRightSlotImage?: ImageStyle | undefined;
+    }
 }

@@ -36,20 +36,15 @@ export class ContainerWrapper extends ComponentWrapper {
         const overflowY = this.containerStyle?.overflowY || 'visible';
         const flexWrap = this.containerStyle?.flexWrap || 'nowrap';
 
-        // todo@Caleb196x: 处理flex-flow参数
-
         let widget: UE.Widget;
         // Convert to appropriate UMG container based on style
-        if (overflow === 'scroll' || overflow === 'auto' ||
-            overflowX === 'scroll' || overflowX === 'auto' ||
-            overflowY === 'scroll' || overflowY === 'auto'
-        ) {
-
+        if (overflow === 'scroll' || overflowY === 'scroll' || overflowX === 'scroll' 
+            || overflowX === 'auto' || overflow === 'auto'  || overflowY === 'auto') 
+        {
             let scrollBoxWrapper = new ScrollBoxWrapper(this.typeName, this.props);
             widget = scrollBoxWrapper.convertToWidget();
             this.containerType = UMGContainerType.ScrollBox;
             this.commonWrapper = scrollBoxWrapper;
-
         } else if (display === 'grid') {
 
             // grid panel
@@ -75,6 +70,7 @@ export class ContainerWrapper extends ComponentWrapper {
     }
 
     override appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any): void {
+        // 
         this.commonWrapper.appendChildItem(parentItem, childItem, childItemTypeName, childProps);
     }
 
