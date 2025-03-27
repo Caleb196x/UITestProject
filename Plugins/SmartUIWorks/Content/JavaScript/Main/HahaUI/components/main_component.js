@@ -84,7 +84,7 @@ class MainComponent extends React.Component {
                     React.createElement("text", { style: { width: '100%', height: '100%' } }, "scroll-3"),
                     React.createElement("text", { style: { width: '100%', height: '100%' } }, "scroll-4"),
                     React.createElement("text", { style: { width: '100%', height: '100%' } }, "scroll-5"),
-                    React.createElement("text", { style: { width: '100%', height: '100%' } }, "scroll-6"))));
+                    React.createElement("text", { style: { width: '100%', height: '100%' } }, "scroll-6 \uD83C\uDFAE"))));
     }
 }
 exports.MainComponent = MainComponent;

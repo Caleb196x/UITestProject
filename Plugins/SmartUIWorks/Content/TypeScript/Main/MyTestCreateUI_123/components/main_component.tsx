@@ -78,13 +78,13 @@ export class MainComponent extends React.Component<Props, State> {
                         <option value={"A"}>a</option>
                         <option value={"B"}>b</option>
                         <option value={"C"}>c</option>
-                        <option value={"D"}>d</option>
+                        <option value={"D"}>🎮 d</option>
                     </select>
 
                     <img src={face} style={{width: '100%', height: '100%'}}/>
 
                     <progress style={{alignSelf: 'stretch'}} value={this.state.progressVal} max={100}>
-                    进度条
+                        进度条
                     </progress>
                     <button style={{alignSelf: 'end'}} onClick={()=>{this.setState({progressVal: Math.min(this.state.progressVal + 5, 100)})}}>增加进度</button>
                     <button style={{alignSelf: 'satrt'}} onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>

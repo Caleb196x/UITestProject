@@ -77,7 +77,7 @@ export class MainComponent extends React.Component<Props, State> {
                                 placeholder='输入内容...' aria-label='用户名' required/>
                     <button style={this.buttonStyle} onClick={()=>this.handleLogin()}>测试原生按钮</button>
                 </div>
-                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+                <div style={{display: 'flex', flexDirection: 'row', verticalAlign: 'center', alignItems: 'center', justifyContent: 'center',
                     offsetAnchor: 'top center', top: '250px'
                 }}>
                     <select style={{alignSelf: 'flex-end'}} defaultValue={"C"} onChange={(e)=>{console.log("onChange: ", e.target)}}>
@@ -112,7 +112,7 @@ export class MainComponent extends React.Component<Props, State> {
                         <text style={{width: '100%', height: '100%'}}>scroll-3</text>
                         <text style={{width: '100%', height: '100%'}}>scroll-4</text>
                         <text style={{width: '100%', height: '100%'}}>scroll-5</text>
-                        <text style={{width: '100%', height: '100%'}}>scroll-6</text>
+                        <text style={{width: '100%', height: '100%'}}>scroll-6 🎮</text>
                     </div>
                 </div>
         </canvas>
