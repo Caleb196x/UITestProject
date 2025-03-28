@@ -70,6 +70,9 @@ export class ContainerWrapper extends ComponentWrapper {
     }
 
     override appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any): void {
+        // 1. 设置父容器的clip属性
+        // 2. 根据width, height添加size box并设置大小
+        // 3. 根据objectFit添加scale box并设置缩放
         // 
         this.commonWrapper.appendChildItem(parentItem, childItem, childItemTypeName, childProps);
     }
