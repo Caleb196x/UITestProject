@@ -140,3 +140,30 @@ export function parseAspectRatio(aspectRatio: string) {
 
     return 1.0;
 }
+
+export function parseBackgroundImage(backgroundImage: string) : any {
+
+}
+
+export function parseBackgroundColor(backgroundColor: string) : any {
+
+}
+
+export function parseScale(scale: string) : UE.Vector2D {
+    if (!scale || scale === 'none') {
+        return new UE.Vector2D(1, 1);
+    }
+
+    const scaleValues = scale.split(' ').map(Number);
+    if (scaleValues.length === 1) {
+        return new UE.Vector2D(scaleValues[0], scaleValues[0]);
+    } else if (scaleValues.length === 2) {
+        return new UE.Vector2D(scaleValues[0], scaleValues[1]);
+    }
+
+    return new UE.Vector2D(1, 1);
+}
+
+export function parseBackground(background: any) {
+
+}
