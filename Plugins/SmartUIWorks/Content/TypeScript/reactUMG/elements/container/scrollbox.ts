@@ -42,6 +42,11 @@ export class ScrollBoxWrapper extends ComponentWrapper {
 
         const scrollPadding = this.containerStyle?.scrollPadding || '0px';
         scrollBox.SetScrollbarPadding(convertMargin(scrollPadding, this.containerStyle));
+
+        const onScroll = this.containerStyle?.onScroll;
+        if (onScroll && typeof onScroll === 'function') {
+            scrollBox.OnUserScrolled.Add((CurrentOffset: number)=> {onScroll(CurrentOffset)});
+        }
     }
 
     private setupAlignment(Slot: UE.PanelSlot, childStyle: any) {
@@ -135,7 +140,6 @@ export class ScrollBoxWrapper extends ComponentWrapper {
         this.containerStyle = mergeClassStyleAndInlineStyle(this.props);
         const overflow = this.containerStyle?.overflow;
         const flexDirection = this.containerStyle?.flexDirection || 'column';
-        
         let outsideBox = null;
         outsideBox = new UE.HorizontalBox();
         if (overflow === 'hidden' || overflow === 'clip') {
@@ -148,6 +152,7 @@ export class ScrollBoxWrapper extends ComponentWrapper {
 
         const scrollBox = new UE.ScrollBox();
         this.setupScrollBox(scrollBox);
+
         outsideBox.AddChildToHorizontalBox(scrollBox);
         return outsideBox;
     }
