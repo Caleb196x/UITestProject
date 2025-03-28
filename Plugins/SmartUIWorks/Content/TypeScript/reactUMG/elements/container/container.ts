@@ -3,7 +3,7 @@ import { ComponentWrapper } from "../common_wrapper";
 import { convertLengthUnitToSlateUnit, 
     mergeClassStyleAndInlineStyle, 
     parseAspectRatio, parseBackground, 
-    parseBackgroundColor, parseScale,
+    parseBackgroundColor, parseScale, parseColor,
     parseBackgroundImage } from '../common_utils';
 import { WrapBoxWrapper } from './wrapbox';
 import { GridPanelWrapper } from './gridpanel';
@@ -154,18 +154,36 @@ export class ContainerWrapper extends ComponentWrapper {
         const background = Props?.background;
 
         const parsedBackground = parseBackground(background);
+        // 将background转换为image, repeat, color, position等内容
 
+        const borderWidget = new UE.Border();
         const backgroundImage = Props?.image;
+        // 转换成brush image
         const parsedBackgroundImage = parseBackgroundImage(backgroundImage);
+        const backgroundRepeat = Props?.backgroundRepeat;
+        // 转换成image中的tiling模式
+        borderWidget.SetBrush(parsedBackgroundImage);
 
         const backgroundColor = Props?.color;
         const parsedBackgroundColor = parseBackgroundColor(backgroundColor);
+        // 转换成bursh color
+        borderWidget.SetBrushColor(parsedBackgroundColor);
 
-        const scale = Props?.scale;
+        const backgroundPosition = Props?.backgroundPosition;
+        // 转换成alignment和padding
+
     
-        const borderWidget = new UE.Border();
-        borderWidget.SetDesiredSizeScale( parseScale(scale));
         
+        const scale = Props?.scale;
+        borderWidget.SetDesiredSizeScale(parseScale(scale));
+        
+        // color
+        const contentColor = Props?.color;
+        if (contentColor) {
+            const color = parseColor(contentColor);
+            borderWidget.SetContentColorAndOpacity(new UE.LinearColor(color.X, color.Y, color.Z, color.W));
+        }
+
         borderWidget.AddChild(Item);
 
         return borderWidget;
@@ -186,15 +204,6 @@ export class ContainerWrapper extends ComponentWrapper {
         
         if (usingBackground) {
             return this.setupBackground(Item, Props);
-        }
-
-        const border = Props?.border;
-        const borderColor = border?.color;
-
-        const usingBorder = borderColor || border;
-
-        if (usingBorder) {
-            return this.setupBorder(Item, Props);
         }
 
         return Item;

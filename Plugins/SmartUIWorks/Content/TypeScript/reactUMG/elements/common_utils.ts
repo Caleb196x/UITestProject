@@ -141,6 +141,11 @@ export function parseAspectRatio(aspectRatio: string) {
     return 1.0;
 }
 
+export function parseColor(color: string) : UE.Vector4D {
+
+    return new UE.Vector4D(0, 0, 0, 0);
+}
+
 export function parseBackgroundImage(backgroundImage: string) : any {
 
 }
