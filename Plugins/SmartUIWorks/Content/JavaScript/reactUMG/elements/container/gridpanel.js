@@ -59,7 +59,7 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
         const gridTemplateColumns = this.containerStyle?.gridTemplateColumns;
         const gridTemplateRows = this.containerStyle?.gridTemplateRows;
         // todo@Caleb196x: 目前只处理gridTemplateColumns和gridTemplateRows两个参数
-        // Parse gridTemplateColumns and gridTemplateRows
+        // 指出的单位有fr, repeat(3, 1fr)
         if (gridTemplateColumns) {
             const columnDefinitions = this.parseGridTemplate(gridTemplateColumns);
             for (let i = 0; i < columnDefinitions.length; i++) {
@@ -166,23 +166,37 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
         }
         else {
             const alignSelf = childProps.style?.alignSelf;
-            const justifySelf = childProps.style?.justifySelf;
             if (alignSelf) {
-                hAlign = alignSelf;
+                vAlign = alignSelf;
             }
+            else {
+                vAlign = this.containerStyle?.alignItems || 'stretch';
+            }
+            const justifySelf = childProps.style?.justifySelf;
             if (justifySelf) {
-                vAlign = justifySelf;
+                hAlign = justifySelf;
+            }
+            else {
+                hAlign = this.containerStyle?.justifyContent || 'stretch';
             }
         }
         const hAlignActionMap = {
             'start': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
             'end': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
+            'left': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
+            'right': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
+            'flex-start': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
+            'flex-end': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
             'center': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Center),
             'stretch': () => GridSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Fill)
         };
         const vAlignActionMap = {
             'start': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
             'end': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
+            'left': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
+            'right': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
+            'flex-start': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
+            'flex-end': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
             'center': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Center),
             'stretch': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Fill)
         };
@@ -190,7 +204,6 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
         vAlignActionMap[vAlign]();
     }
     initGridPanelSlot(gridPanel, Slot, childProps) {
-        // todo@Caleb196x: 处理网格布局中的子元素位置
         this.setupGridItemLoc(Slot, childProps);
         this.setupGridAlignment(Slot, childProps);
         const margin = this.containerStyle?.margin;
@@ -199,7 +212,6 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
     convertToWidget() {
         this.containerStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(this.props);
         const gridPanel = new UE.GridPanel();
-        // todo@Caleb196x: Configure grid columns based on gridTemplateColumns
         this.setupGridRowAndColumns(gridPanel);
         return gridPanel;
     }

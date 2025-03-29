@@ -6,6 +6,13 @@ exports.expandPaddingValues = expandPaddingValues;
 exports.convertMargin = convertMargin;
 exports.convertGap = convertGap;
 exports.parseAspectRatio = parseAspectRatio;
+exports.parseScale = parseScale;
+exports.loadTextureFromImagePath = loadTextureFromImagePath;
+exports.parseColor = parseColor;
+exports.parseBackgroundImage = parseBackgroundImage;
+exports.parseBackgroundColor = parseBackgroundColor;
+exports.parseBackgroundPosition = parseBackgroundPosition;
+exports.parseBackgroundProps = parseBackgroundProps;
 const css_converter_1 = require("../css_converter");
 const UE = require("ue");
 /**
@@ -135,5 +142,85 @@ function parseAspectRatio(aspectRatio) {
         }
     }
     return 1.0;
+}
+function parseScale(scale) {
+    if (!scale || scale === 'none') {
+        return new UE.Vector2D(1, 1);
+    }
+    const scaleValues = scale.split(' ').map(Number);
+    if (scaleValues.length === 1) {
+        return new UE.Vector2D(scaleValues[0], scaleValues[0]);
+    }
+    else if (scaleValues.length === 2) {
+        return new UE.Vector2D(scaleValues[0], scaleValues[1]);
+    }
+    return new UE.Vector2D(1, 1);
+}
+function loadTextureFromImagePath(imagePath) {
+    return new UE.Texture2D();
+}
+function parseColor(color) {
+    return new UE.Vector4d(0, 0, 0, 0);
+}
+function parseBackgroundImage(backgroundImage) {
+    let brush = new UE.SlateBrush();
+    if (typeof backgroundImage !== 'string') {
+        brush.ResourceObject = backgroundImage;
+        return brush;
+    }
+    let imagePath = backgroundImage;
+    // Handle template literal with imported texture
+    const templateMatch = backgroundImage.match(/`url\(\${(.*?)}\)`/);
+    if (templateMatch && templateMatch[1]) {
+        const textureName = templateMatch[1].trim();
+        // The texture is already imported and passed directly
+        // brush.ResourceObject = backgroundImage;
+        return brush;
+    }
+    // Handle url() format if present
+    const urlMatch = backgroundImage.match(/url\((.*?)\)/);
+    if (urlMatch && urlMatch[1]) {
+        imagePath = urlMatch[1].trim();
+        // Remove quotes if present
+        imagePath = imagePath.replace(/['"]/g, '');
+    }
+    // If not url() format, use the path directly
+    else {
+        imagePath = backgroundImage.trim();
+        imagePath = imagePath.replace(/['"]/g, ''); // Still remove quotes if any
+    }
+    // Basic path validation
+    if (!imagePath || imagePath.length === 0) {
+        return null;
+    }
+    // Check for invalid characters in path
+    const invalidChars = /[<>:"|?*]/;
+    if (invalidChars.test(imagePath)) {
+        console.warn(`Invalid characters in image path: ${imagePath}`);
+        return null;
+    }
+    // Check file extension
+    const validExtensions = ['.png', '.jpg', '.jpeg', '.bmp', '.tga'];
+    const hasValidExtension = validExtensions.some(ext => imagePath.toLowerCase().endsWith(ext));
+    if (!hasValidExtension) {
+        console.warn(`Invalid image file extension: ${imagePath}`);
+        return null;
+    }
+    // Check if file exists
+    const texture = loadTextureFromImagePath(imagePath);
+    if (!texture) {
+        console.warn(`Failed to load texture from image path: ${imagePath}`);
+    }
+    brush.ResourceObject = texture;
+    return brush;
+}
+function parseBackgroundColor(backgroundColor) {
+}
+function parseBackgroundPosition(backgroundPosition) {
+}
+function parseBackgroundProps(props) {
+    // image转换成brush image
+    // repeat转换成image中的tiling模式
+    // position转换成alignment和padding
 }
 //# sourceMappingURL=common_utils.js.map

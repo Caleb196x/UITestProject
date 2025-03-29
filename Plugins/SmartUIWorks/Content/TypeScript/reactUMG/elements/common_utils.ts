@@ -141,19 +141,6 @@ export function parseAspectRatio(aspectRatio: string) {
     return 1.0;
 }
 
-export function parseColor(color: string) : UE.Vector4D {
-
-    return new UE.Vector4D(0, 0, 0, 0);
-}
-
-export function parseBackgroundImage(backgroundImage: string) : any {
-
-}
-
-export function parseBackgroundColor(backgroundColor: string) : any {
-
-}
-
 export function parseScale(scale: string) : UE.Vector2D {
     if (!scale || scale === 'none') {
         return new UE.Vector2D(1, 1);
@@ -169,6 +156,246 @@ export function parseScale(scale: string) : UE.Vector2D {
     return new UE.Vector2D(1, 1);
 }
 
-export function parseBackground(background: any) {
+export function loadTextureFromImagePath(imagePath: string) : UE.Texture2D | undefined {
+    // todo@Caleb196x: 定制化导入函数，传入参数为相对于Content/JavaScript的绝对路径名，提高导入性能
+    const texture = UE.KismetRenderingLibrary.ImportFileAsTexture2D(null, imagePath);
+    if (texture) {
+        return texture;
+    } else {
+        console.warn(`Failed to load texture from image path: ${imagePath}`);
+    }
+    return undefined;
+}
+
+export function parseBackgroundImage(backgroundImage: string) : UE.SlateBrush | undefined {
+    let brush = new UE.SlateBrush();
+    if (typeof backgroundImage !== 'string') {
+        brush.ResourceObject = backgroundImage as UE.Texture2D;
+        return brush;
+    }
+
+    let imagePath = backgroundImage;
+
+    // Handle template literal with imported texture
+    const templateMatch = backgroundImage.match(/`url\(\${(.*?)}\)`/);
+    if (templateMatch && templateMatch[1]) {
+        const textureName = templateMatch[1].trim();
+        imagePath = textureName;
+    }
+
+    // Handle url() format if present
+    const urlMatch = backgroundImage.match(/url\((.*?)\)/);
+    if (urlMatch && urlMatch[1]) {
+        imagePath = urlMatch[1].trim();
+        // Remove quotes if present
+        imagePath = imagePath.replace(/['"]/g, '');
+    }
+    // If not url() format, use the path directly
+    else {
+        imagePath = backgroundImage.trim();
+        imagePath = imagePath.replace(/['"]/g, ''); // Still remove quotes if any
+    }
+
+    // Basic path validation
+    if (!imagePath || imagePath.length === 0) {
+        return null;
+    }
+
+    // Check for invalid characters in path
+    const invalidChars = /[<>:"|?*]/;
+    if (invalidChars.test(imagePath)) {
+        console.warn(`Invalid characters in image path: ${imagePath}`);
+        return null;
+    }
+
+    // Check file extension
+    const validExtensions = ['.png', '.jpg', '.jpeg', '.bmp', '.tga'];
+    const hasValidExtension = validExtensions.some(ext => 
+        imagePath.toLowerCase().endsWith(ext)
+    );
+    
+    if (!hasValidExtension) {
+        console.warn(`Invalid image file extension: ${imagePath}`);
+        return null;
+    }
+
+    // Check if file exists
+    const texture = loadTextureFromImagePath(imagePath);
+    if (!texture) {
+        console.warn(`Failed to load texture from image path: ${imagePath}`);
+    } else {
+        brush.ResourceObject = texture;
+    }
+
+    return brush;
+}
+
+export function parseBackgroundColor(backgroundColor: string) : UE.LinearColor {
+    const color = parseColor(backgroundColor);
+    return new UE.LinearColor(color.r / 255.0, color.g / 255.0, color.b / 255.0, color.a);
+}
+
+export function parseBackgroundPosition(backgroundPosition: string) : any {
 
 }
+
+function parseBackgroundRepeat(backgroundRepeat: string) : any {
+
+}
+
+function parseBackgroundName(background: string) : any {
+
+}
+
+export function parseBackgroundProps(props: any): any {
+    // image转换成brush image
+    // repeat转换成image中的tiling模式
+    // position转换成alignment和padding
+}
+
+type RGBA = { r: number; g: number; b: number; a: number };
+
+// 预定义颜色名称到 RGBA 的映射表（部分示例）
+const namedColors: Record<string, RGBA> = {
+  red: { r: 255, g: 0, b: 0, a: 1 },
+  green: { r: 0, g: 128, b: 0, a: 1 },
+  blue: { r: 0, g: 0, b: 255, a: 1 },
+  transparent: { r: 0, g: 0, b: 0, a: 0 },
+  // 可扩展更多预定义颜色...
+};
+
+/**
+ * 将 CSS 颜色值转换为标准化 RGBA 对象
+ * @param color 支持所有 CSS 颜色格式的字符串
+ * @returns 标准化 RGBA 对象
+ */
+export function parseColor(color: string): RGBA {
+  const trimmed = color.trim().toLowerCase();
+
+  // 1. 处理预定义颜色名称
+  if (namedColors[trimmed]) {
+    return { ...namedColors[trimmed] };
+  }
+
+  // 2. 处理十六进制格式 (#RGB, #RRGGBB, #RRGGBBAA)
+  if (trimmed.startsWith('#')) {
+    return parseHex(trimmed);
+  }
+
+  // 3. 处理 rgb/rgba 格式
+  if (trimmed.startsWith('rgb')) {
+    return parseRGBFunction(trimmed);
+  }
+
+  // 4. 处理 hsl/hsla 格式
+  if (trimmed.startsWith('hsl')) {
+    return parseHSLFunction(trimmed);
+  }
+
+  // 5. 处理特殊值
+  if (trimmed === 'currentcolor') {
+    throw new Error('currentColor cannot be converted to static RGBA');
+  }
+
+  throw new Error(`Invalid color format: ${color}`);
+}
+
+// 解析十六进制颜色 (#rgb, #rrggbb, #rrggbbaa)
+function parseHex(hex: string): RGBA {
+  const hexClean = hex.replace(/^#/, '');
+  
+  // 扩展简写格式
+  const expanded = hexClean.length === 3 || hexClean.length === 4
+    ? hexClean.split('').map(c => c + c).join('')
+    : hexClean;
+
+  const parseChannel = (start: number, end: number) => 
+    parseInt(expanded.slice(start, end), 16) || 0;
+
+  return {
+    r: parseChannel(0, 2),
+    g: parseChannel(2, 4),
+    b: parseChannel(4, 6),
+    a: expanded.length >= 8 
+      ? parseChannel(6, 8) / 255 
+      : 1
+  };
+}
+
+// 解析 rgb/rgba 函数
+function parseRGBFunction(rgbStr: string): RGBA {
+  const match = rgbStr.match(/rgba?\(([^)]+)\)/);
+  if (!match) throw new Error('Invalid RGB format');
+
+  const components = match[1].split(/[,/]\s*/).map(parseComponent);
+  
+  return {
+    r: parseRGBComponent(components[0]),
+    g: parseRGBComponent(components[1]),
+    b: parseRGBComponent(components[2]),
+    a: components[3] !== undefined ? clampAlpha(components[3]) : 1
+  };
+}
+
+// 解析 HSL/HSLA 函数
+function parseHSLFunction(hslStr: string): RGBA {
+  const match = hslStr.match(/hsla?\(([^)]+)\)/);
+  if (!match) throw new Error('Invalid HSL format');
+
+  const components = match[1].split(/[,/]\s*/).map(parseComponent);
+  const [h, s, l, a = 1] = components;
+  
+  const rgb = hslToRgb(
+    clampHue(h),
+    clampPercentage(s),
+    clampPercentage(l)
+  );
+  
+  return {
+    r: Math.round(rgb[0] * 255),
+    g: Math.round(rgb[1] * 255),
+    b: Math.round(rgb[2] * 255),
+    a: clampAlpha(a)
+  };
+}
+
+// HSL 到 RGB 的转换算法
+function hslToRgb(h: number, s: number, l: number): [number, number, number] {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l - c / 2;
+
+  let r, g, b;
+  
+  if (h < 60) [r, g, b] = [c, x, 0];
+  else if (h < 120) [r, g, b] = [x, c, 0];
+  else if (h < 180) [r, g, b] = [0, c, x];
+  else if (h < 240) [r, g, b] = [0, x, c];
+  else if (h < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+
+  return [
+    (r + m),
+    (g + m),
+    (b + m)
+  ];
+}
+
+// 辅助函数
+const parseComponent = (s: string) => parseFloat(s.replace('%', ''));
+const clamp = (num: number, min: number, max: number) => Math.min(max, Math.max(min, num));
+const clampHue = (h: number) => ((h % 360) + 360) % 360;
+const clampPercentage = (n: number) => clamp(n / 100, 0, 1);
+const clampAlpha = (a: number) => clamp(a, 0, 1);
+
+const parseRGBComponent = (value: number) => {
+  return value > 1 && value <= 100  // 百分比格式
+    ? Math.round((value / 100) * 255)
+    : clamp(value, 0, 255);
+};
+
+// 使用示例
+console.log(parseColor('#f00'));             // { r: 255, g: 0, b: 0, a: 1 }
+console.log(parseColor('rgba(255, 50%, 0, 0.5)')); // { r: 255, g: 128, b: 0, a: 0.5 }
+console.log(parseColor('hsl(180, 50%, 50%)')); // { r: 64, g: 191, b: 191, a: 1 }
+console.log(parseColor('transparent'));       // { r: 0, g: 0, b: 0, a: 0 }

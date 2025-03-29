@@ -15,33 +15,38 @@ class WrapBoxWrapper extends common_wrapper_1.ComponentWrapper {
         this.containerType = container_1.UMGContainerType.WrapBox;
     }
     initWrapBoxSlot(wrapBox, Slot, childProps) {
-        const gap = this.containerStyle?.gap;
-        wrapBox.SetInnerSlotPadding((0, common_utils_1.convertGap)(gap, this.containerStyle));
-        const justifyContentActionMap = {
-            'flex-start': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Left,
-            'flex-end': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Right,
-            'center': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Center,
-            'stretch': () => wrapBox.HorizontalAlignment = UE.EHorizontalAlignment.HAlign_Fill
-        };
-        // WrapBox中定义的justifyContent决定了子元素的对齐方式
-        const justifyContent = this.containerStyle?.justifyContent;
-        if (justifyContent) {
-            justifyContent.split(' ')
-                .filter(value => justifyContentActionMap[value])
-                .forEach(value => justifyContentActionMap[value]());
+        const margin = childProps?.margin;
+        if (margin) {
+            Slot.SetPadding((0, common_utils_1.convertMargin)(margin, this.containerStyle));
         }
-        const margin = this.containerStyle?.margin;
-        Slot.SetPadding((0, common_utils_1.convertMargin)(margin, this.containerStyle));
     }
     convertToWidget() {
         this.containerStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(this.props);
         const flexDirection = this.containerStyle?.flexDirection || 'row';
-        const flexWrap = this.containerStyle?.flexWrap || 'nowrap';
+        const gap = this.containerStyle?.gap;
         const wrapBox = new UE.WrapBox();
         this.containerType = container_1.UMGContainerType.WrapBox;
         wrapBox.Orientation =
             (flexDirection === 'column' || flexDirection === 'column-reverse')
                 ? UE.EOrientation.Orient_Vertical : UE.EOrientation.Orient_Horizontal;
+        wrapBox.SetInnerSlotPadding((0, common_utils_1.convertGap)(gap, this.containerStyle));
+        const justifyItemsActionMap = {
+            'flex-start': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
+            'flex-end': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
+            'start': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
+            'end': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
+            'left': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
+            'right': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
+            'center': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Center),
+            'stretch': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Fill)
+        };
+        // WrapBox中定义的justifyItems决定了子元素的对齐方式
+        const justifyItems = this.containerStyle?.justifyItems;
+        if (justifyItems) {
+            justifyItems.split(' ')
+                .filter(value => justifyItemsActionMap[value])
+                .forEach(value => justifyItemsActionMap[value]());
+        }
         return wrapBox;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {

@@ -97,7 +97,8 @@ export class MainComponent extends React.Component<Props, State> {
                     <button style={{alignSelf: 'end'}} onClick={()=>{this.setState({progressVal: Math.min(this.state.progressVal + 5, 100)})}}>增加进度</button>
                     <button style={{alignSelf: 'start'}} onClick={()=>{this.setState({progressVal: Math.max(this.state.progressVal - 5, 0)})}}>减少进度</button>
 
-                    <div style={{overflow: 'scroll', scrollbarWidth: 'auto', scrollPadding: '5px', alignSelf: 'start',
+                    <div style={{overflow: 'scroll', backgroundImage: `url(${face})`,
+                        scrollbarWidth: 'auto', scrollPadding: '5px', alignSelf: 'start',
                         width: '100px', height: '30px', positionAnchor: 'top left',  objectFit: 'contain', flexFlow: 'row wrap'
                     }}>
                         <text style={{width: '100%', height: '100%'}}>scroll-1</text>

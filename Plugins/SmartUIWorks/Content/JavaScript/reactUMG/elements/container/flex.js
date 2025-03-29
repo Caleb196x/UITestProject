@@ -7,6 +7,7 @@ const container_1 = require("./container");
 const common_utils_1 = require("../common_utils");
 class FlexWrapper extends common_wrapper_1.ComponentWrapper {
     containerStyle;
+    flexDirection;
     containerType;
     constructor(type, props) {
         super();
@@ -16,62 +17,67 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
     }
     convertToWidget() {
         this.containerStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(this.props);
-        const display = this.containerStyle?.display || 'flex';
-        const flexDirection = this.containerStyle?.flexDirection || 'row';
-        // todo@Caleb196x: 处理flex-flow参数
-        let widget;
-        // Convert to appropriate UMG container based on style
-        if (display === 'flex') {
-            if (flexDirection === 'row' || flexDirection === 'row-reverse') {
-                widget = new UE.HorizontalBox();
-                this.containerType = container_1.UMGContainerType.HorizontalBox;
-            }
-            else if (flexDirection === 'column' || flexDirection === 'column-reverse') {
-                widget = new UE.VerticalBox();
-                this.containerType = container_1.UMGContainerType.VerticalBox;
+        let flexDirection = this.containerStyle?.flexDirection;
+        const flexFlow = this.containerStyle?.flexFlow;
+        if (flexFlow) {
+            const flexFlowArray = flexFlow.split(' ');
+            if (flexFlowArray.length === 2) {
+                flexDirection = flexFlowArray[0];
             }
         }
-        else if (display === 'block') {
+        else if (!flexDirection) {
+            flexDirection = 'row'; // 默认值
+        }
+        this.flexDirection = flexDirection;
+        const reverse = flexDirection === 'row-reverse' || flexDirection === 'column-reverse';
+        let widget;
+        // Convert to appropriate UMG container based on style
+        if (flexDirection === 'row' || flexDirection === 'row-reverse') {
+            widget = new UE.HorizontalBox();
+            this.containerType = container_1.UMGContainerType.HorizontalBox;
+        }
+        else if (flexDirection === 'column' || flexDirection === 'column-reverse') {
             widget = new UE.VerticalBox();
             this.containerType = container_1.UMGContainerType.VerticalBox;
+        }
+        if (reverse) {
+            widget.FlowDirectionPreference = UE.EFlowDirectionPreference.RightToLeft;
         }
         return widget;
     }
     setupAlignment(Slot, childStyle) {
         const style = this.containerStyle || {};
-        const justifyContent = childStyle?.justifyContent || style?.justifyContent || 'flex-start';
-        const alignItems = childStyle?.alignItems || style?.alignItems || 'stretch';
-        const display = style?.display;
-        let rowReverse = display === 'row-reverse';
+        const justifyContent = style?.justifyContent || 'flex-start';
+        const alignItems = style?.alignItems || 'stretch';
+        let rowReverse = this.flexDirection === 'row-reverse';
         const flexValue = childStyle?.flex || 0;
-        const alignSelf = childStyle?.alignSelf || 'stretch';
-        const justifySelf = childStyle?.justifySelf || 'stretch';
+        const alignSelf = childStyle?.alignSelf;
+        const justifySelf = childStyle?.justifySelf;
         // Set horizontal alignment based on justifyContent
-        const hStartSetHorizontalAlignmentFunc = (horizontalBoxSlot) => {
+        const hStartHorizontalAlignmentFunc = (horizontalBoxSlot) => {
             horizontalBoxSlot.SetHorizontalAlignment(rowReverse ? UE.EHorizontalAlignment.HAlign_Right : UE.EHorizontalAlignment.HAlign_Left);
         };
-        const hEndSetHorizontalAlignmentFunc = (horizontalBoxSlot) => {
+        const hEndHorizontalAlignmentFunc = (horizontalBoxSlot) => {
             horizontalBoxSlot.SetHorizontalAlignment(rowReverse ? UE.EHorizontalAlignment.HAlign_Left : UE.EHorizontalAlignment.HAlign_Right);
         };
-        const hCenterSetHorizontalAlignmentFunc = (horizontalBoxSlot) => {
+        const hCenterHorizontalAlignmentFunc = (horizontalBoxSlot) => {
             horizontalBoxSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Center);
         };
-        const hStretchSetHorizontalAlignmentFunc = (horizontalBoxSlot) => {
+        const hStretchHorizontalAlignmentFunc = (horizontalBoxSlot) => {
             horizontalBoxSlot.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Fill);
         };
         const hSpaceBetweenSetAlginFunc = (horizontalBoxSlot) => {
             horizontalBoxSlot.SetSize(new UE.SlateChildSize(flexValue, UE.ESlateSizeRule.Fill));
         };
-        const hJustifySelfActionMap = {
-            'flex-start': hStartSetHorizontalAlignmentFunc,
-            'flex-end': hEndSetHorizontalAlignmentFunc,
-            'left': hStartSetHorizontalAlignmentFunc,
-            'right': hEndSetHorizontalAlignmentFunc,
-            'start': hStartSetHorizontalAlignmentFunc,
-            'end': hEndSetHorizontalAlignmentFunc,
-            'center': hCenterSetHorizontalAlignmentFunc,
-            'stretch': hStretchSetHorizontalAlignmentFunc,
-            'space-between': hSpaceBetweenSetAlginFunc
+        const horizontalAlignmentActionMap = {
+            'flex-start': hStartHorizontalAlignmentFunc,
+            'flex-end': hEndHorizontalAlignmentFunc,
+            'left': hStartHorizontalAlignmentFunc,
+            'right': hEndHorizontalAlignmentFunc,
+            'start': hStartHorizontalAlignmentFunc,
+            'end': hEndHorizontalAlignmentFunc,
+            'center': hCenterHorizontalAlignmentFunc,
+            'stretch': hStretchHorizontalAlignmentFunc,
         };
         const hStartSetVerticalAlignmentFunc = (horizontalBoxSlot) => {
             horizontalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top);
@@ -98,27 +104,27 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
         const vSpaceBetweenSetAlginFunc = (verticalBoxSlot) => {
             verticalBoxSlot.SetSize(new UE.SlateChildSize(flexValue, UE.ESlateSizeRule.Fill));
         };
-        const vStartSetVerticalAlignmentFunc = (verticalBoxSlot) => {
+        const vStartVerticalAlignmentFunc = (verticalBoxSlot) => {
             verticalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top);
         };
-        const vEndSetVerticalAlignmentFunc = (verticalBoxSlot) => {
+        const vEndVerticalAlignmentFunc = (verticalBoxSlot) => {
             verticalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom);
         };
-        const vCenterSetVerticalAlignmentFunc = (verticalBoxSlot) => {
+        const vCenterVerticalAlignmentFunc = (verticalBoxSlot) => {
             verticalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Center);
         };
-        const vStretchSetVerticalAlignmentFunc = (verticalBoxSlot) => {
+        const vStretchVerticalAlignmentFunc = (verticalBoxSlot) => {
             verticalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Fill);
         };
-        const vJustifySelfActionMap = {
-            'flex-start': vStartSetVerticalAlignmentFunc,
-            'flex-end': vEndSetVerticalAlignmentFunc,
-            'start': vStartSetVerticalAlignmentFunc,
-            'end': vEndSetVerticalAlignmentFunc,
-            'left': vStartSetVerticalAlignmentFunc,
-            'right': vEndSetVerticalAlignmentFunc,
-            'center': vCenterSetVerticalAlignmentFunc,
-            'stretch': vStretchSetVerticalAlignmentFunc,
+        const verticalAlignmentActionMap = {
+            'flex-start': vStartVerticalAlignmentFunc,
+            'flex-end': vEndVerticalAlignmentFunc,
+            'start': vStartVerticalAlignmentFunc,
+            'end': vEndVerticalAlignmentFunc,
+            'left': vStartVerticalAlignmentFunc,
+            'right': vEndVerticalAlignmentFunc,
+            'center': vCenterVerticalAlignmentFunc,
+            'stretch': vStretchVerticalAlignmentFunc,
             'space-between': vSpaceBetweenSetAlginFunc
         };
         const vStartSetHorizontalAlignmentFunc = (verticalBoxSlot) => {
@@ -145,16 +151,18 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
         };
         if (this.containerType === container_1.UMGContainerType.HorizontalBox) {
             const horizontalBoxSlot = Slot;
-            if (justifyContent == 'space-between') {
+            if (justifyContent?.includes('space-between')) {
                 hSpaceBetweenSetAlginFunc(horizontalBoxSlot);
-            }
-            const hJustifySelfValue = justifySelf?.split(' ').find(v => hJustifySelfActionMap[v]);
-            if (hJustifySelfValue) {
-                hJustifySelfActionMap[hJustifySelfValue](horizontalBoxSlot);
             }
             const hAlignSelfValue = alignSelf?.split(' ').find(v => hAlignSelfActionMap[v]);
             if (hAlignSelfValue) {
                 hAlignSelfActionMap[hAlignSelfValue](horizontalBoxSlot);
+            }
+            else {
+                const hAlignItems = alignItems?.split(' ').find(v => verticalAlignmentActionMap[v]);
+                if (hAlignItems) {
+                    verticalAlignmentActionMap[hAlignItems](horizontalBoxSlot);
+                }
             }
         }
         else if (this.containerType === container_1.UMGContainerType.VerticalBox) {
@@ -162,27 +170,23 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
             if (justifyContent == 'space-between') {
                 vSpaceBetweenSetAlginFunc(verticalBoxSlot);
             }
-            const vJustifySelfValue = justifySelf?.split(' ').find(v => vJustifySelfActionMap[v]);
-            if (vJustifySelfValue) {
-                vJustifySelfActionMap[vJustifySelfValue](verticalBoxSlot);
-            }
-            const vAlignSelfValue = alignSelf?.split(' ').find(v => vAlignSelfActionMap[v]);
+            const vAlignSelfValue = justifySelf?.split(' ').find(v => vAlignSelfActionMap[v]);
             if (vAlignSelfValue) {
                 vAlignSelfActionMap[vAlignSelfValue](verticalBoxSlot);
+            }
+            else {
+                const vAlignItems = alignItems?.split(' ').find(v => horizontalAlignmentActionMap[v]);
+                if (vAlignItems) {
+                    horizontalAlignmentActionMap[vAlignItems](verticalBoxSlot);
+                }
             }
         }
     }
     initSlot(Slot, childProps) {
         const childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(childProps);
         this.setupAlignment(Slot, childStyle);
-        let gapPadding = (0, common_utils_1.convertGap)(this.containerStyle?.gap, this.containerStyle);
-        // todo@Caleb196x: 只有父元素为border，SizeBox, ScaleBox, BackgroundBlur这些只能容纳一个子元素的容器时，padding才有意义，
         // 对于容器来说，读取margin值
         let margin = (0, common_utils_1.convertMargin)(childStyle.margin, this.containerStyle);
-        margin.Left += gapPadding.X;
-        margin.Right += gapPadding.X;
-        margin.Top += gapPadding.Y;
-        margin.Bottom += gapPadding.Y;
         Slot.SetPadding(margin);
     }
     appendChildItem(parentItem, childItem, childItemTypeName, childProps) {
@@ -195,6 +199,11 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
             const verticalBox = parentItem;
             let verticalBoxSlot = verticalBox.AddChildToVerticalBox(childItem);
             this.initSlot(verticalBoxSlot, childProps);
+        }
+        else if (this.containerType === container_1.UMGContainerType.StackBox) {
+            const stackBox = parentItem;
+            let stackBoxSlot = stackBox.AddChildToStackBox(childItem);
+            this.initSlot(stackBoxSlot, childProps);
         }
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {

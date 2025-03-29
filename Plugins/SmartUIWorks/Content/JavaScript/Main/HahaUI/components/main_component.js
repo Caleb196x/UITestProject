@@ -50,8 +50,8 @@ class MainComponent extends React.Component {
                 } },
                 React.createElement(reactUMG_1.TextBlock, { ref: this.textblock_ref, Text: 'Username: ' }),
                 React.createElement(reactUMG_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
-            React.createElement("div", { style: { display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                    top: '200px', left: '400px', width: '200px', height: '100px',
+            React.createElement("div", { style: { display: 'stack', flexDirection: 'column', justifyContent: 'space-between',
+                    top: '200px', left: '400px', width: '200px', height: '100px', objectFit: 'contain'
                 } },
                 React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'),
                 React.createElement(status_bar_compoennt_1.StatusBar, { name: 'Healthy: ', initialPercent: 60 })),
@@ -59,7 +59,8 @@ class MainComponent extends React.Component {
                 React.createElement("input", { type: 'text', value: this.state.username, onChange: (e) => this.setState({ username: e.target.value }), placeholder: '\u8F93\u5165\u5185\u5BB9...', "aria-label": '\u7528\u6237\u540D', required: true }),
                 React.createElement("button", { style: this.buttonStyle, onClick: () => this.handleLogin() }, "\u6D4B\u8BD5\u539F\u751F\u6309\u94AE")),
             React.createElement("div", { style: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-                    offsetAnchor: 'top center', top: '250px'
+                    offsetAnchor: 'top center', top: '250px', transform: 'rotate3d(1, 1, 1, 45deg)', positionX: 100, positionY: 100,
+                    objectFit: 'contain', visibility: 'visible', gridRow: '1 / 3', gridColumn: '1 / 3', disable: true
                 } },
                 React.createElement("select", { style: { alignSelf: 'flex-end' }, defaultValue: "C", onChange: (e) => { console.log("onChange: ", e.target); } },
                     React.createElement("option", { value: "A" }, "a"),
@@ -70,8 +71,9 @@ class MainComponent extends React.Component {
                 React.createElement("progress", { style: { alignSelf: 'stretch' }, value: this.state.progressVal, max: 100 }, "\u8FDB\u5EA6\u6761"),
                 React.createElement("button", { style: { alignSelf: 'end' }, onClick: () => { this.setState({ progressVal: Math.min(this.state.progressVal + 5, 100) }); } }, "\u589E\u52A0\u8FDB\u5EA6"),
                 React.createElement("button", { style: { alignSelf: 'start' }, onClick: () => { this.setState({ progressVal: Math.max(this.state.progressVal - 5, 0) }); } }, "\u51CF\u5C11\u8FDB\u5EA6"),
-                React.createElement("div", { style: { overflow: 'scroll', scrollbarWidth: 'auto', scrollPadding: '5px', alignSelf: 'start',
-                        width: '100px', height: '30px',
+                React.createElement("div", { style: { overflow: 'scroll', backgroundImage: `url(${face_png_1.default})`,
+                        scrollbarWidth: 'auto', scrollPadding: '5px', alignSelf: 'start',
+                        width: '100px', height: '30px', positionAnchor: 'top left', objectFit: 'contain', flexFlow: 'row wrap'
                     } },
                     React.createElement("text", { style: { width: '100%', height: '100%' } }, "scroll-1"),
                     React.createElement("text", { style: { width: '100%', height: '100%' } }, "scroll-2"),

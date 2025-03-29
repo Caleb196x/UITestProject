@@ -54,7 +54,7 @@ class MainComponent extends React.Component {
             React.createElement(reactUMG_1.HorizontalBox, null,
                 React.createElement("input", { type: 'text', value: this.state.username, onChange: (e) => this.setState({ username: e.target.value }), placeholder: '\u8F93\u5165\u5185\u5BB9...', "aria-label": '\u7528\u6237\u540D', required: true }),
                 React.createElement("button", { style: this.buttonStyle, onClick: () => this.handleLogin() }, "\u6D4B\u8BD5\u539F\u751F\u6309\u94AE")),
-            React.createElement("div", { style: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' } },
+            React.createElement("div", { onScroll: (e) => { console.log("onScroll: ", e.target); }, style: { display: 'flex', flexDirection: 'row', alignItems: 'center', objectFit: 'contain', justifyContent: 'center' } },
                 React.createElement("select", { style: { alignSelf: 'flex-start' }, defaultValue: "C", onChange: (e) => { console.log("onChange: ", e.target); } },
                     React.createElement("option", { value: "A" }, "a"),
                     React.createElement("option", { value: "B" }, "b"),
