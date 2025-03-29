@@ -2,7 +2,7 @@ import * as UE from 'ue';
 import { ComponentWrapper } from "../common_wrapper";
 import { convertLengthUnitToSlateUnit, 
     mergeClassStyleAndInlineStyle, 
-    parseAspectRatio, parseBackground, 
+    parseAspectRatio, parseBackgroundProps, 
     parseBackgroundColor, parseScale, parseColor,
     parseBackgroundImage } from '../common_utils';
 import { WrapBoxWrapper } from './wrapbox';
@@ -153,27 +153,16 @@ export class ContainerWrapper extends ComponentWrapper {
     private setupBackground(Item: UE.Widget, Props?: any): UE.Widget {
         const background = Props?.background;
 
-        const parsedBackground = parseBackground(background);
+        const parsedBackground = parseBackgroundProps(Props);
         // 将background转换为image, repeat, color, position等内容
 
         const borderWidget = new UE.Border();
-        const backgroundImage = Props?.image;
-        // 转换成brush image
-        const parsedBackgroundImage = parseBackgroundImage(backgroundImage);
-        const backgroundRepeat = Props?.backgroundRepeat;
-        // 转换成image中的tiling模式
-        borderWidget.SetBrush(parsedBackgroundImage);
+        borderWidget.SetBrush(parsedBackground.image);
+        borderWidget.SetBrushColor(parsedBackground.color);
+        borderWidget.SetVerticalAlignment(parsedBackground.vAlign);
+        borderWidget.SetHorizontalAlignment(parsedBackground.hAlign);
+        borderWidget.SetPadding(parsedBackground.padding);
 
-        const backgroundColor = Props?.color;
-        const parsedBackgroundColor = parseBackgroundColor(backgroundColor);
-        // 转换成bursh color
-        borderWidget.SetBrushColor(parsedBackgroundColor);
-
-        const backgroundPosition = Props?.backgroundPosition;
-        // 转换成alignment和padding
-
-    
-        
         const scale = Props?.scale;
         borderWidget.SetDesiredSizeScale(parseScale(scale));
         
