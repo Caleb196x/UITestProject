@@ -1,5 +1,8 @@
 import { convertCssToStyles } from '../css_converter';
 import * as UE from 'ue';
+import { parseColor } from './property/color_parser';
+import { parseBackgroundPosition } from './property/background_position';
+
 /**
  * Converts CSS length values to SU (Slate Units) for Unreal Engine UMG
  * Supported units: px, %, em, rem (relative to parent font size)
@@ -235,167 +238,150 @@ export function parseBackgroundColor(backgroundColor: string) : UE.LinearColor {
     return new UE.LinearColor(color.r / 255.0, color.g / 255.0, color.b / 255.0, color.a);
 }
 
-export function parseBackgroundPosition(backgroundPosition: string) : any {
+function parseBackgroundRepeat(backgroundRepeat: string, image: UE.SlateBrush) : UE.SlateBrush {
+    if (!image) {
+        return image;
+    }
 
+    if (backgroundRepeat === 'no-repeat') {
+        image.Tiling = UE.ESlateBrushTileType.NoTile;
+    } else if (backgroundRepeat === 'repeat') {
+        image.Tiling = UE.ESlateBrushTileType.Both;
+    } else if (backgroundRepeat === 'repeat-x') {
+        image.Tiling = UE.ESlateBrushTileType.Horizontal;
+    } else if (backgroundRepeat === 'repeat-y') {
+        image.Tiling = UE.ESlateBrushTileType.Vertical;
+    }
+
+    return image;
 }
 
-function parseBackgroundRepeat(backgroundRepeat: string) : any {
+function parseBackgroundLayer(layer) {
+    const REPEAT_KEYWORDS = {
+        'repeat-x': 1, 'repeat-y': 1, 'repeat': 1,
+        'space': 1, 'round': 1, 'no-repeat': 1
+    };
+      
+    const ATTACHMENT_KEYWORDS = {
+    'scroll': 1, 'fixed': 1, 'local': 1
+    };
+    
+    const POSITION_KEYWORDS = new Set([
+    'left', 'right', 'top', 'bottom', 'center'
+    ]);
 
+    const state = {
+      color: 'transparent',
+      image: 'none',
+      position: '0% 0%',
+      size: 'auto',
+      repeat: 'repeat',
+      attachment: 'scroll'
+    };
+  
+    // 提取颜色（按规范应出现在最后）
+    const colorMatch = layer.match(/(?:^| )(#[\w\d]+|rgb?a?$[^)]+$|hsl$[^)]+$|\b\w+\b)(?=\s*$)/);
+    if (colorMatch) {
+      state.color = colorMatch[1];
+      layer = layer.slice(0, colorMatch.index).trim();
+    }
+  
+    // 拆分 token（处理带空格的图片）
+    const tokens = [];
+    const regex = /(url$[^)]+$|[\w-]+$[^)]+$|$$.*?$$|'.*?'|".*?"|\S+)/g;
+    let match;
+    while ((match = regex.exec(layer)) !== null) {
+      tokens.push(match[1]);
+    }
+  
+    // 解析其他属性
+    let positionBuffer = [];
+    let hasSlash = false;
+  
+    tokens.forEach(token => {
+      if (token.startsWith('url(') || token.match(/^[\w-]+\(/)) {
+        state.image = token;
+      } else if (token === '/') {
+        hasSlash = true;
+      } else if (hasSlash) {
+        state.size = token;
+        hasSlash = false;
+      } else if (token in REPEAT_KEYWORDS) {
+        state.repeat = token;
+      } else if (token in ATTACHMENT_KEYWORDS) {
+        state.attachment = token;
+      } else if (POSITION_KEYWORDS.has(token) || token.match(/^[\d%.]+$/)) {
+        positionBuffer.push(token);
+      }
+    });
+  
+    // 处理位置/尺寸
+    if (positionBuffer.length > 0) {
+      const slashIndex = positionBuffer.indexOf('/');
+      if (slashIndex > -1) {
+        state.position = positionBuffer.slice(0, slashIndex).join(' ');
+        state.size = positionBuffer.slice(slashIndex + 1).join(' ');
+      } else {
+        state.position = positionBuffer.join(' ');
+      }
+    }
+  
+    return state;
 }
 
-function parseBackgroundName(background: string) : any {
+function parseBackground(background: string) : any {
+    // 1. 提取background中定义的background-color值
+    // 2. 提取出background中定义的background-position值
+    // 3. 提取出background中定义的background-repeat值
+    // 4. 提取出background中定义的background-image值
+    const { 
+        color, 
+        image, 
+        position, 
+        size, 
+        repeat, 
+        attachment 
+    } = parseBackgroundLayer(background);
 
+    let result = {};
+    result['color'] = parseBackgroundColor(color);
+    result['image'] = parseBackgroundImage(image);
+    result['position'] = parseBackgroundPosition(position);
+    result['repeat'] = parseBackgroundRepeat(repeat, result['image']);
+
+    return result;
 }
 
 export function parseBackgroundProps(props: any): any {
     // image转换成brush image
     // repeat转换成image中的tiling模式
     // position转换成alignment和padding
+
+    let result = {};
+    const background = props?.background;
+    if (background) {
+        result = parseBackground(background);
+    }
+
+    const backgroundImage = props?.backgroundImage;
+    if (backgroundImage) {
+        result['image'] = parseBackgroundImage(backgroundImage);
+    }
+
+    const backgroundRepeat = props?.backgroundRepeat;
+    if (backgroundRepeat) {
+        result['image'] = parseBackgroundRepeat(backgroundRepeat, result['image']);
+    }
+
+    const backgroundPosition = props?.backgroundPosition;
+    if (backgroundPosition) {
+        result['alignment'] = parseBackgroundPosition(backgroundPosition);
+    }
+
+    const backgroundColor = props?.backgroundColor;
+    if (backgroundColor) {
+        result['color'] = parseBackgroundColor(backgroundColor);
+    }
+
+    return result;
 }
-
-type RGBA = { r: number; g: number; b: number; a: number };
-
-// 预定义颜色名称到 RGBA 的映射表（部分示例）
-const namedColors: Record<string, RGBA> = {
-  red: { r: 255, g: 0, b: 0, a: 1 },
-  green: { r: 0, g: 128, b: 0, a: 1 },
-  blue: { r: 0, g: 0, b: 255, a: 1 },
-  transparent: { r: 0, g: 0, b: 0, a: 0 },
-  // 可扩展更多预定义颜色...
-};
-
-/**
- * 将 CSS 颜色值转换为标准化 RGBA 对象
- * @param color 支持所有 CSS 颜色格式的字符串
- * @returns 标准化 RGBA 对象
- */
-export function parseColor(color: string): RGBA {
-  const trimmed = color.trim().toLowerCase();
-
-  // 1. 处理预定义颜色名称
-  if (namedColors[trimmed]) {
-    return { ...namedColors[trimmed] };
-  }
-
-  // 2. 处理十六进制格式 (#RGB, #RRGGBB, #RRGGBBAA)
-  if (trimmed.startsWith('#')) {
-    return parseHex(trimmed);
-  }
-
-  // 3. 处理 rgb/rgba 格式
-  if (trimmed.startsWith('rgb')) {
-    return parseRGBFunction(trimmed);
-  }
-
-  // 4. 处理 hsl/hsla 格式
-  if (trimmed.startsWith('hsl')) {
-    return parseHSLFunction(trimmed);
-  }
-
-  // 5. 处理特殊值
-  if (trimmed === 'currentcolor') {
-    throw new Error('currentColor cannot be converted to static RGBA');
-  }
-
-  throw new Error(`Invalid color format: ${color}`);
-}
-
-// 解析十六进制颜色 (#rgb, #rrggbb, #rrggbbaa)
-function parseHex(hex: string): RGBA {
-  const hexClean = hex.replace(/^#/, '');
-  
-  // 扩展简写格式
-  const expanded = hexClean.length === 3 || hexClean.length === 4
-    ? hexClean.split('').map(c => c + c).join('')
-    : hexClean;
-
-  const parseChannel = (start: number, end: number) => 
-    parseInt(expanded.slice(start, end), 16) || 0;
-
-  return {
-    r: parseChannel(0, 2),
-    g: parseChannel(2, 4),
-    b: parseChannel(4, 6),
-    a: expanded.length >= 8 
-      ? parseChannel(6, 8) / 255 
-      : 1
-  };
-}
-
-// 解析 rgb/rgba 函数
-function parseRGBFunction(rgbStr: string): RGBA {
-  const match = rgbStr.match(/rgba?\(([^)]+)\)/);
-  if (!match) throw new Error('Invalid RGB format');
-
-  const components = match[1].split(/[,/]\s*/).map(parseComponent);
-  
-  return {
-    r: parseRGBComponent(components[0]),
-    g: parseRGBComponent(components[1]),
-    b: parseRGBComponent(components[2]),
-    a: components[3] !== undefined ? clampAlpha(components[3]) : 1
-  };
-}
-
-// 解析 HSL/HSLA 函数
-function parseHSLFunction(hslStr: string): RGBA {
-  const match = hslStr.match(/hsla?\(([^)]+)\)/);
-  if (!match) throw new Error('Invalid HSL format');
-
-  const components = match[1].split(/[,/]\s*/).map(parseComponent);
-  const [h, s, l, a = 1] = components;
-  
-  const rgb = hslToRgb(
-    clampHue(h),
-    clampPercentage(s),
-    clampPercentage(l)
-  );
-  
-  return {
-    r: Math.round(rgb[0] * 255),
-    g: Math.round(rgb[1] * 255),
-    b: Math.round(rgb[2] * 255),
-    a: clampAlpha(a)
-  };
-}
-
-// HSL 到 RGB 的转换算法
-function hslToRgb(h: number, s: number, l: number): [number, number, number] {
-  const c = (1 - Math.abs(2 * l - 1)) * s;
-  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-  const m = l - c / 2;
-
-  let r, g, b;
-  
-  if (h < 60) [r, g, b] = [c, x, 0];
-  else if (h < 120) [r, g, b] = [x, c, 0];
-  else if (h < 180) [r, g, b] = [0, c, x];
-  else if (h < 240) [r, g, b] = [0, x, c];
-  else if (h < 300) [r, g, b] = [x, 0, c];
-  else [r, g, b] = [c, 0, x];
-
-  return [
-    (r + m),
-    (g + m),
-    (b + m)
-  ];
-}
-
-// 辅助函数
-const parseComponent = (s: string) => parseFloat(s.replace('%', ''));
-const clamp = (num: number, min: number, max: number) => Math.min(max, Math.max(min, num));
-const clampHue = (h: number) => ((h % 360) + 360) % 360;
-const clampPercentage = (n: number) => clamp(n / 100, 0, 1);
-const clampAlpha = (a: number) => clamp(a, 0, 1);
-
-const parseRGBComponent = (value: number) => {
-  return value > 1 && value <= 100  // 百分比格式
-    ? Math.round((value / 100) * 255)
-    : clamp(value, 0, 255);
-};
-
-// 使用示例
-console.log(parseColor('#f00'));             // { r: 255, g: 0, b: 0, a: 1 }
-console.log(parseColor('rgba(255, 50%, 0, 0.5)')); // { r: 255, g: 128, b: 0, a: 0.5 }
-console.log(parseColor('hsl(180, 50%, 50%)')); // { r: 64, g: 191, b: 191, a: 1 }
-console.log(parseColor('transparent'));       // { r: 0, g: 0, b: 0, a: 0 }

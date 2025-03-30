@@ -3,8 +3,9 @@ import { ComponentWrapper } from "../common_wrapper";
 import { convertLengthUnitToSlateUnit, 
     mergeClassStyleAndInlineStyle, 
     parseAspectRatio, parseBackgroundProps, 
-    parseBackgroundColor, parseScale, parseColor,
+    parseBackgroundColor, parseScale,
     parseBackgroundImage } from '../common_utils';
+import { parseColor } from '../property/color_parser';
 import { WrapBoxWrapper } from './wrapbox';
 import { GridPanelWrapper } from './gridpanel';
 import { ScrollBoxWrapper } from './scrollbox';
@@ -87,12 +88,18 @@ export class ContainerWrapper extends ComponentWrapper {
         const width = Props?.width || 'auto';
         const height = Props?.height || 'auto';
 
-        if (width !== 'auto' && height !== 'auto') {
+        if (width === 'auto' && height === 'auto') {
             return Item;
         } else {
             const sizeBox = new UE.SizeBox();
-            sizeBox.SetWidthOverride(convertLengthUnitToSlateUnit(width, this.containerStyle));
-            sizeBox.SetHeightOverride(convertLengthUnitToSlateUnit(height, this.containerStyle));
+            if (width !== 'auto') {
+                sizeBox.SetWidthOverride(convertLengthUnitToSlateUnit(width, this.containerStyle));
+            }
+
+            if (height !== 'auto') {
+                sizeBox.SetHeightOverride(convertLengthUnitToSlateUnit(height, this.containerStyle));
+            }
+            
             const maxWidth = this.containerStyle?.maxWidth;
             if (maxWidth) {
                 sizeBox.SetMaxDesiredWidth(convertLengthUnitToSlateUnit(maxWidth, this.containerStyle));
@@ -151,7 +158,6 @@ export class ContainerWrapper extends ComponentWrapper {
     }
 
     private setupBackground(Item: UE.Widget, Props?: any): UE.Widget {
-        const background = Props?.background;
 
         const parsedBackground = parseBackgroundProps(Props);
         // 将background转换为image, repeat, color, position等内容
@@ -159,9 +165,9 @@ export class ContainerWrapper extends ComponentWrapper {
         const borderWidget = new UE.Border();
         borderWidget.SetBrush(parsedBackground.image);
         borderWidget.SetBrushColor(parsedBackground.color);
-        borderWidget.SetVerticalAlignment(parsedBackground.vAlign);
-        borderWidget.SetHorizontalAlignment(parsedBackground.hAlign);
-        borderWidget.SetPadding(parsedBackground.padding);
+        borderWidget.SetVerticalAlignment(parsedBackground.alignment.vertical);
+        borderWidget.SetHorizontalAlignment(parsedBackground.alignment.horizontal);
+        borderWidget.SetPadding(parsedBackground.alignment.padding);
 
         const scale = Props?.scale;
         borderWidget.SetDesiredSizeScale(parseScale(scale));
@@ -170,7 +176,9 @@ export class ContainerWrapper extends ComponentWrapper {
         const contentColor = Props?.color;
         if (contentColor) {
             const color = parseColor(contentColor);
-            borderWidget.SetContentColorAndOpacity(new UE.LinearColor(color.X, color.Y, color.Z, color.W));
+            borderWidget.SetContentColorAndOpacity(
+                new UE.LinearColor(color.r / 255.0, color.g / 255.0, color.b / 255.0, color.a)
+            );
         }
 
         borderWidget.AddChild(Item);
@@ -188,8 +196,9 @@ export class ContainerWrapper extends ComponentWrapper {
         const background = Props?.background;
         const backgroundColor = background?.color;
         const backgroundImage = background?.image;
+        const backgroundPosition = background?.position;
 
-        const usingBackground = backgroundColor || backgroundImage || background;
+        const usingBackground = backgroundColor || backgroundImage || backgroundPosition || background;
         
         if (usingBackground) {
             return this.setupBackground(Item, Props);
