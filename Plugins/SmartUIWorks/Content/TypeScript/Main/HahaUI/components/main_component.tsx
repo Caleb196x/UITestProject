@@ -57,10 +57,11 @@ export class MainComponent extends React.Component<Props, State> {
       
     
     render() {
-        return  <canvas>
+        return  <div>
                     <div style={{display: 'flex', 
                         flexDirection: 'row', justifyContent: 'space-between', 
                         top: '100px', left: '100px', width: '200px', height: '50px',
+                        backgroundColor: 'red'
                     }}>
                         <TextBlock ref={this.textblock_ref} Text='Username: '/>
                         <EditableText 
@@ -118,8 +119,8 @@ export class MainComponent extends React.Component<Props, State> {
                             减少进度
                         </button>
 
-                        <div style={{overflow: 'scroll', 
-                            backgroundImage: `url(${face})`,
+                        <div style={{overflow: 'scroll',
+                            backgroundImage: 'url(./assets/face.png)',
                             scrollbarWidth: 'auto', scrollPadding: '5px', 
                             alignSelf: 'start', width: '100px', height: '30px', 
                             positionAnchor: 'top left',  
@@ -141,7 +142,6 @@ export class MainComponent extends React.Component<Props, State> {
                             <text style={{width: '100%', height: '100%'}}>scroll-6 🎮</text>
                         </div>
                     </div>
-        </canvas>
-
+        </div>
     }
 }

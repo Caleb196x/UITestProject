@@ -323,28 +323,28 @@ function parseBackground(background) {
     result['repeat'] = parseBackgroundRepeat(repeat, result['image']);
     return result;
 }
-function parseBackgroundProps(props) {
+function parseBackgroundProps(style) {
     // image转换成brush image
     // repeat转换成image中的tiling模式
     // position转换成alignment和padding
     let result = {};
-    const background = props?.background;
+    const background = style?.background;
     if (background) {
         result = parseBackground(background);
     }
-    const backgroundImage = props?.backgroundImage;
+    const backgroundImage = style?.backgroundImage;
     if (backgroundImage) {
         result['image'] = parseBackgroundImage(backgroundImage);
     }
-    const backgroundRepeat = props?.backgroundRepeat;
+    const backgroundRepeat = style?.backgroundRepeat;
     if (backgroundRepeat) {
         result['image'] = parseBackgroundRepeat(backgroundRepeat, result['image']);
     }
-    const backgroundPosition = props?.backgroundPosition;
+    const backgroundPosition = style?.backgroundPosition;
     if (backgroundPosition) {
         result['alignment'] = (0, background_position_1.parseBackgroundPosition)(backgroundPosition);
     }
-    const backgroundColor = props?.backgroundColor;
+    const backgroundColor = style?.backgroundColor;
     if (backgroundColor) {
         result['color'] = parseBackgroundColor(backgroundColor);
     }

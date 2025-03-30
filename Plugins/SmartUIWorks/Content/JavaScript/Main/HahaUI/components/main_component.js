@@ -44,10 +44,11 @@ class MainComponent extends React.Component {
         cursor: 'pointer'
     };
     render() {
-        return React.createElement("canvas", null,
+        return React.createElement("div", null,
             React.createElement("div", { style: { display: 'flex',
                     flexDirection: 'row', justifyContent: 'space-between',
                     top: '100px', left: '100px', width: '200px', height: '50px',
+                    backgroundColor: 'red'
                 } },
                 React.createElement(reactUMG_1.TextBlock, { ref: this.textblock_ref, Text: 'Username: ' }),
                 React.createElement(reactUMG_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
@@ -82,7 +83,7 @@ class MainComponent extends React.Component {
                 React.createElement("button", { style: { objectFit: 'contain', alignSelf: 'end' }, onClick: () => { this.setState({ progressVal: Math.min(this.state.progressVal + 5, 100) }); } }, "\u589E\u52A0\u8FDB\u5EA6"),
                 React.createElement("button", { style: { objectFit: 'contain', alignSelf: 'start' }, onClick: () => { this.setState({ progressVal: Math.max(this.state.progressVal - 5, 0) }); } }, "\u51CF\u5C11\u8FDB\u5EA6"),
                 React.createElement("div", { style: { overflow: 'scroll',
-                        backgroundImage: `url(${face_png_1.default})`,
+                        backgroundImage: 'url(./assets/face.png)',
                         scrollbarWidth: 'auto', scrollPadding: '5px',
                         alignSelf: 'start', width: '100px', height: '30px',
                         positionAnchor: 'top left',

@@ -72,7 +72,7 @@ export class ContainerWrapper extends ComponentWrapper {
             this.commonWrapper = flexWrapper;
         }
 
-        widget = this.setupBorderAndBackground(widget, this.props);
+        // widget = this.setupBorderAndBackground(widget, this.props);
 
         return widget;
     }
@@ -85,39 +85,40 @@ export class ContainerWrapper extends ComponentWrapper {
     }
 
     private setupChildSize(Item: UE.Widget, Props?: any): UE.Widget {
-        const width = Props?.width || 'auto';
-        const height = Props?.height || 'auto';
+        const childStyle = mergeClassStyleAndInlineStyle(Props);
+        const width = childStyle?.width || 'auto';
+        const height = childStyle?.height || 'auto';
 
         if (width === 'auto' && height === 'auto') {
             return Item;
         } else {
             const sizeBox = new UE.SizeBox();
             if (width !== 'auto') {
-                sizeBox.SetWidthOverride(convertLengthUnitToSlateUnit(width, this.containerStyle));
+                sizeBox.SetWidthOverride(convertLengthUnitToSlateUnit(width, childStyle));
             }
 
             if (height !== 'auto') {
-                sizeBox.SetHeightOverride(convertLengthUnitToSlateUnit(height, this.containerStyle));
+                sizeBox.SetHeightOverride(convertLengthUnitToSlateUnit(height, childStyle));
             }
-            
+
             const maxWidth = this.containerStyle?.maxWidth;
             if (maxWidth) {
-                sizeBox.SetMaxDesiredWidth(convertLengthUnitToSlateUnit(maxWidth, this.containerStyle));
+                sizeBox.SetMaxDesiredWidth(convertLengthUnitToSlateUnit(maxWidth, childStyle));
             }
             
             const maxHeight = this.containerStyle?.maxHeight;
             if (maxHeight) {
-                sizeBox.SetMaxDesiredHeight(convertLengthUnitToSlateUnit(maxHeight, this.containerStyle));
+                sizeBox.SetMaxDesiredHeight(convertLengthUnitToSlateUnit(maxHeight, childStyle));
             }
 
             const minWidth = this.containerStyle?.minWidth;
             if (minWidth) {
-                sizeBox.SetMinDesiredWidth(convertLengthUnitToSlateUnit(minWidth, this.containerStyle));
+                sizeBox.SetMinDesiredWidth(convertLengthUnitToSlateUnit(minWidth, childStyle));
             }
 
             const minHeight = this.containerStyle?.minHeight;
             if (minHeight) {
-                sizeBox.SetMinDesiredHeight(convertLengthUnitToSlateUnit(minHeight, this.containerStyle));
+                sizeBox.SetMinDesiredHeight(convertLengthUnitToSlateUnit(minHeight, childStyle));
             }
 
             const aspectRatio = this.containerStyle?.aspectRatio;
@@ -132,7 +133,8 @@ export class ContainerWrapper extends ComponentWrapper {
     }
 
     private setupChildScale(Item: UE.Widget, Props?: any): UE.Widget {
-        const objectFit = Props?.objectFit;
+        const childStyle = mergeClassStyleAndInlineStyle(Props);
+        const objectFit = childStyle?.objectFit;
         if (objectFit) {
             const scaleBox = new UE.ScaleBox();
             if (objectFit === 'contain') {
@@ -145,7 +147,7 @@ export class ContainerWrapper extends ComponentWrapper {
                 scaleBox.SetStretch(UE.EStretch.None);
             } else if (objectFit === 'scale-down') {
                 scaleBox.SetStretch(UE.EStretch.UserSpecifiedWithClipping);
-                const scale = Props?.scale;
+                const scale = childStyle?.scale;
                 if (scale) {
                     scaleBox.SetUserSpecifiedScale(parseFloat(scale));
                 }
@@ -157,23 +159,30 @@ export class ContainerWrapper extends ComponentWrapper {
         }
     }
 
-    private setupBackground(Item: UE.Widget, Props?: any): UE.Widget {
+    private setupBackground(Item: UE.Widget, style?: any): UE.Widget {
 
-        const parsedBackground = parseBackgroundProps(Props);
+        const parsedBackground = parseBackgroundProps(style);
         // 将background转换为image, repeat, color, position等内容
 
         const borderWidget = new UE.Border();
-        borderWidget.SetBrush(parsedBackground.image);
-        borderWidget.SetBrushColor(parsedBackground.color);
-        borderWidget.SetVerticalAlignment(parsedBackground.alignment.vertical);
-        borderWidget.SetHorizontalAlignment(parsedBackground.alignment.horizontal);
-        borderWidget.SetPadding(parsedBackground.alignment.padding);
+        if (parsedBackground?.image) {
+            borderWidget.SetBrush(parsedBackground.image);
+        }
+        if (parsedBackground?.color) {
+            borderWidget.SetBrushColor(parsedBackground.color);
+        }
 
-        const scale = Props?.scale;
+        if (parsedBackground?.alignment) {
+            borderWidget.SetVerticalAlignment(parsedBackground.alignment?.vertical);
+            borderWidget.SetHorizontalAlignment(parsedBackground.alignment?.horizontal);
+            borderWidget.SetPadding(parsedBackground.alignment?.padding);
+        }
+
+        const scale = style?.scale;
         borderWidget.SetDesiredSizeScale(parseScale(scale));
         
         // color
-        const contentColor = Props?.color;
+        const contentColor = style?.color;
         if (contentColor) {
             const color = parseColor(contentColor);
             borderWidget.SetContentColorAndOpacity(
@@ -193,15 +202,16 @@ export class ContainerWrapper extends ComponentWrapper {
     }
 
     private setupBorderAndBackground(Item: UE.Widget, Props?: any): UE.Widget {
-        const background = Props?.background;
-        const backgroundColor = background?.color;
-        const backgroundImage = background?.image;
-        const backgroundPosition = background?.position;
+        const style = mergeClassStyleAndInlineStyle(Props);
+        const background = style?.background;
+        const backgroundColor = style?.backgroundColor;
+        const backgroundImage = style?.backgroundImage;
+        const backgroundPosition = style?.backgroundPosition;
 
         const usingBackground = backgroundColor || backgroundImage || backgroundPosition || background;
         
         if (usingBackground) {
-            return this.setupBackground(Item, Props);
+            return this.setupBackground(Item, style);
         }
 
         return Item;
