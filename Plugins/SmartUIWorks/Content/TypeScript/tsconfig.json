@@ -13,9 +13,11 @@
       "Typing",
       "./node_modules/@types"
     ],
-    "outDir": "../JavaScript"
+    "outDir": "../JavaScript",
+    "types": ["jest"]
   },
   "include": [
+    "__tests__/**/*",
     "reactUMG/**/*",
     "SmartGameUI/**/*",
     "Main/**/*",
