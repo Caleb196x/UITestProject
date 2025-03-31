@@ -13,8 +13,7 @@
       "Typing",
       "./node_modules/@types"
     ],
-    "outDir": "../JavaScript",
-    "types": ["jest"]
+    "outDir": "../JavaScript"
   },
   "include": [
     "__tests__/**/*",

@@ -79,9 +79,9 @@ export function expandPaddingValues(paddingValues: number[]): number[] {
     return paddingValues;
 }
 
-export function convertMargin(margin: string, style: any): UE.Margin {
+export function convertMargin(margin: string, style: any): UE.Margin | undefined {
     if (!margin) {
-        return new UE.Margin(0, 0, 0, 0);
+        return undefined;
     }
 
     const marginValues = margin.split(' ').map(v => {
@@ -280,7 +280,7 @@ function parseBackgroundLayer(layer) {
     };
   
     // 提取颜色（按规范应出现在最后）
-    const colorMatch = layer.match(/(?:^| )(#[\w\d]+|rgb?a?$[^)]+$|hsl$[^)]+$|\b\w+\b)(?=\s*$)/);
+    const colorMatch = layer.match(/(?:^|\s)(#[0-9a-fA-F]{3,8}|rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+(?:\s*,\s*\d*\.?\d+)?\s*\)|hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(?:,\s*\d*\.?\d+)?\s*\)|\b[a-zA-Z]+\b)(?=\s*$)/);
     if (colorMatch) {
       state.color = colorMatch[1];
       layer = layer.slice(0, colorMatch.index).trim();
@@ -288,7 +288,7 @@ function parseBackgroundLayer(layer) {
   
     // 拆分 token（处理带空格的图片）
     const tokens = [];
-    const regex = /(url$[^)]+$|[\w-]+$[^)]+$|$$.*?$$|'.*?'|".*?"|\S+)/g;
+    const regex = /(url\([^)]+\))/g;
     let match;
     while ((match = regex.exec(layer)) !== null) {
       tokens.push(match[1]);

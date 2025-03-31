@@ -127,7 +127,10 @@ export class ContainerWrapper extends ComponentWrapper {
                 sizeBox.SetMinAspectRatio(parseAspectRatio(aspectRatio));
             }
 
-            sizeBox.AddChild(Item);
+            const Slot = sizeBox.AddChild(Item);
+            if (Slot) {
+                
+            }
             return sizeBox;
         }
     }
@@ -223,6 +226,7 @@ export class ContainerWrapper extends ComponentWrapper {
         // 3. 根据objectFit添加scale box并设置缩放
         // 4. 添加background
         this.setupVisibility(parentItem);
+        // fixme@Caleb196x: 在将childItem添加到sizebox后，需要设置childItem相对于sizebox的alignment？
         childItem = this.setupChildSize(childItem, childProps);
         childItem = this.setupChildScale(childItem, childProps);
         childItem = this.setupBorderAndBackground(childItem, childProps);
