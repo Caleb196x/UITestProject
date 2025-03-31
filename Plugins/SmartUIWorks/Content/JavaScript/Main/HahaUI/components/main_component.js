@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainComponent = void 0;
 const React = require("react");
 require("./style.css");
-const flex_style_test_1 = require("./tests/flex_style.test");
+const color_test_1 = require("./tests/color.test");
 class MainComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -15,7 +15,7 @@ class MainComponent extends React.Component {
     }
     // 渲染方法
     render() {
-        return React.createElement(flex_style_test_1.FlexStyleTest, null);
+        return React.createElement(color_test_1.ColorTest, null);
     }
 }
 exports.MainComponent = MainComponent;
