@@ -69,7 +69,7 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
         const hSpaceBetweenSetAlginFunc = (horizontalBoxSlot) => {
             horizontalBoxSlot.SetSize(new UE.SlateChildSize(flexValue, UE.ESlateSizeRule.Fill));
         };
-        const horizontalAlignmentActionMap = {
+        const hJustifySelfActionMap = {
             'flex-start': hStartHorizontalAlignmentFunc,
             'flex-end': hEndHorizontalAlignmentFunc,
             'left': hStartHorizontalAlignmentFunc,
@@ -116,7 +116,7 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
         const vStretchVerticalAlignmentFunc = (verticalBoxSlot) => {
             verticalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Fill);
         };
-        const verticalAlignmentActionMap = {
+        const vJustifySelfActionMap = {
             'flex-start': vStartVerticalAlignmentFunc,
             'flex-end': vEndVerticalAlignmentFunc,
             'start': vStartVerticalAlignmentFunc,
@@ -159,9 +159,19 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
                 hAlignSelfActionMap[hAlignSelfValue](horizontalBoxSlot);
             }
             else {
-                const hAlignItems = alignItems?.split(' ').find(v => verticalAlignmentActionMap[v]);
+                const hAlignItems = alignItems?.split(' ').find(v => hAlignSelfActionMap[v]);
                 if (hAlignItems) {
-                    verticalAlignmentActionMap[hAlignItems](horizontalBoxSlot);
+                    hAlignSelfActionMap[hAlignItems](horizontalBoxSlot);
+                }
+            }
+            const hJustifySelfValue = justifySelf?.split(' ').find(v => hJustifySelfActionMap[v]);
+            if (hJustifySelfValue) {
+                hJustifySelfActionMap[hJustifySelfValue](horizontalBoxSlot);
+            }
+            else {
+                const hJustifyItems = justifyContent?.split(' ').find(v => hJustifySelfActionMap[v]);
+                if (hJustifyItems) {
+                    hJustifySelfActionMap[hJustifyItems](horizontalBoxSlot);
                 }
             }
         }
@@ -170,14 +180,24 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
             if (justifyContent == 'space-between') {
                 vSpaceBetweenSetAlginFunc(verticalBoxSlot);
             }
-            const vAlignSelfValue = justifySelf?.split(' ').find(v => vAlignSelfActionMap[v]);
+            const vAlignSelfValue = alignSelf?.split(' ').find(v => vAlignSelfActionMap[v]);
             if (vAlignSelfValue) {
                 vAlignSelfActionMap[vAlignSelfValue](verticalBoxSlot);
             }
             else {
-                const vAlignItems = alignItems?.split(' ').find(v => horizontalAlignmentActionMap[v]);
+                const vAlignItems = alignItems?.split(' ').find(v => vAlignSelfActionMap[v]);
                 if (vAlignItems) {
-                    horizontalAlignmentActionMap[vAlignItems](verticalBoxSlot);
+                    vAlignSelfActionMap[vAlignItems](verticalBoxSlot);
+                }
+            }
+            const vJustifySelfValue = justifySelf?.split(' ').find(v => vJustifySelfActionMap[v]);
+            if (vJustifySelfValue) {
+                vJustifySelfActionMap[vJustifySelfValue](verticalBoxSlot);
+            }
+            else {
+                const vJustifyItems = justifyContent?.split(' ').find(v => vJustifySelfActionMap[v]);
+                if (vJustifyItems) {
+                    vJustifySelfActionMap[vJustifyItems](verticalBoxSlot);
                 }
             }
         }
@@ -186,8 +206,14 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
         const childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(childProps);
         this.setupAlignment(Slot, childStyle);
         // 对于容器来说，读取margin值
-        let margin = (0, common_utils_1.convertMargin)(childStyle.margin, this.containerStyle);
-        Slot.SetPadding(margin);
+        let margin = (0, common_utils_1.convertMargin)(childStyle?.margin, this.containerStyle);
+        if (margin) {
+            Slot.SetPadding(margin);
+        }
+        let padding = (0, common_utils_1.convertMargin)(childStyle?.padding, this.containerStyle);
+        if (padding) {
+            Slot.SetPadding(padding);
+        }
     }
     appendChildItem(parentItem, childItem, childItemTypeName, childProps) {
         if (this.containerType === container_1.UMGContainerType.HorizontalBox) {

@@ -91,7 +91,7 @@ function expandPaddingValues(paddingValues) {
 }
 function convertMargin(margin, style) {
     if (!margin) {
-        return new UE.Margin(0, 0, 0, 0);
+        return undefined;
     }
     const marginValues = margin.split(' ').map(v => {
         // todo@Caleb196x: 处理margin的单位
@@ -261,14 +261,14 @@ function parseBackgroundLayer(layer) {
         attachment: 'scroll'
     };
     // 提取颜色（按规范应出现在最后）
-    const colorMatch = layer.match(/(?:^| )(#[\w\d]+|rgb?a?$[^)]+$|hsl$[^)]+$|\b\w+\b)(?=\s*$)/);
+    const colorMatch = layer.match(/(?:^|\s)(#[0-9a-fA-F]{3,8}|rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+(?:\s*,\s*\d*\.?\d+)?\s*\)|hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(?:,\s*\d*\.?\d+)?\s*\)|\b[a-zA-Z]+\b)(?=\s*$)/);
     if (colorMatch) {
         state.color = colorMatch[1];
         layer = layer.slice(0, colorMatch.index).trim();
     }
     // 拆分 token（处理带空格的图片）
     const tokens = [];
-    const regex = /(url$[^)]+$|[\w-]+$[^)]+$|$$.*?$$|'.*?'|".*?"|\S+)/g;
+    const regex = /(url\([^)]+\))/g;
     let match;
     while ((match = regex.exec(layer)) !== null) {
         tokens.push(match[1]);

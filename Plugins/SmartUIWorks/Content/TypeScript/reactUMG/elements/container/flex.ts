@@ -77,7 +77,7 @@ export class FlexWrapper extends ComponentWrapper {
             horizontalBoxSlot.SetSize(new UE.SlateChildSize(flexValue, UE.ESlateSizeRule.Fill));
         };
 
-        const horizontalAlignmentActionMap = {
+        const hJustifySelfActionMap = {
             'flex-start': hStartHorizontalAlignmentFunc,
             'flex-end': hEndHorizontalAlignmentFunc,
             'left': hStartHorizontalAlignmentFunc,
@@ -135,7 +135,7 @@ export class FlexWrapper extends ComponentWrapper {
             verticalBoxSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Fill);
         };
 
-        const verticalAlignmentActionMap = {
+        const vJustifySelfActionMap = {
             'flex-start': vStartVerticalAlignmentFunc,
             'flex-end': vEndVerticalAlignmentFunc,
             'start': vStartVerticalAlignmentFunc,
@@ -185,9 +185,19 @@ export class FlexWrapper extends ComponentWrapper {
             if (hAlignSelfValue) {
                 hAlignSelfActionMap[hAlignSelfValue](horizontalBoxSlot);
             } else {
-                const hAlignItems = alignItems?.split(' ').find(v => verticalAlignmentActionMap[v]);
+                const hAlignItems = alignItems?.split(' ').find(v => hAlignSelfActionMap[v]);
                 if (hAlignItems) {
-                    verticalAlignmentActionMap[hAlignItems](horizontalBoxSlot);
+                    hAlignSelfActionMap[hAlignItems](horizontalBoxSlot);
+                }
+            }
+
+            const hJustifySelfValue = justifySelf?.split(' ').find(v => hJustifySelfActionMap[v]);
+            if (hJustifySelfValue) {
+                hJustifySelfActionMap[hJustifySelfValue](horizontalBoxSlot);
+            } else {
+                const hJustifyItems = justifyContent?.split(' ').find(v => hJustifySelfActionMap[v]);
+                if (hJustifyItems) {
+                    hJustifySelfActionMap[hJustifyItems](horizontalBoxSlot);
                 }
             }
 
@@ -198,13 +208,23 @@ export class FlexWrapper extends ComponentWrapper {
                 vSpaceBetweenSetAlginFunc(verticalBoxSlot);
             }
 
-            const vAlignSelfValue = justifySelf?.split(' ').find(v => vAlignSelfActionMap[v]);
+            const vAlignSelfValue = alignSelf?.split(' ').find(v => vAlignSelfActionMap[v]);
             if (vAlignSelfValue) {
                 vAlignSelfActionMap[vAlignSelfValue](verticalBoxSlot);
             } else {
-                const vAlignItems = alignItems?.split(' ').find(v => horizontalAlignmentActionMap[v]);
+                const vAlignItems = alignItems?.split(' ').find(v => vAlignSelfActionMap[v]);
                 if (vAlignItems) {
-                    horizontalAlignmentActionMap[vAlignItems](verticalBoxSlot);
+                    vAlignSelfActionMap[vAlignItems](verticalBoxSlot);
+                }
+            }
+
+            const vJustifySelfValue = justifySelf?.split(' ').find(v => vJustifySelfActionMap[v]);
+            if (vJustifySelfValue) {
+                vJustifySelfActionMap[vJustifySelfValue](verticalBoxSlot);
+            } else {
+                const vJustifyItems = justifyContent?.split(' ').find(v => vJustifySelfActionMap[v]);
+                if (vJustifyItems) {
+                    vJustifySelfActionMap[vJustifyItems](verticalBoxSlot);
                 }
             }
         }
@@ -215,8 +235,15 @@ export class FlexWrapper extends ComponentWrapper {
         this.setupAlignment(Slot, childStyle);
 
         // 对于容器来说，读取margin值
-        let margin = convertMargin(childStyle.margin, this.containerStyle); 
-        (Slot as any).SetPadding(margin);
+        let margin = convertMargin(childStyle?.margin, this.containerStyle);
+        if (margin) {
+            (Slot as any).SetPadding(margin);
+        }
+        
+        let padding = convertMargin(childStyle?.padding, this.containerStyle);
+        if (padding) {
+            (Slot as any).SetPadding(padding);
+        }
     }
 
     override appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any): void {

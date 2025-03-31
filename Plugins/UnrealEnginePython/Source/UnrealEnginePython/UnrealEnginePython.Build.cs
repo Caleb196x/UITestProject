@@ -8,7 +8,7 @@ public class UnrealEnginePython : ModuleRules
 {
 
     // leave this string as empty for triggering auto-discovery of python installations...
-    private string pythonHome = "E:/Software/Python";
+    private string pythonHome = "C:\\Users\\Admin\\AppData\\Local\\Programs\\Python\\Python312";
     // E:/Software/Python
     // otherwise specify the path of your python installation
     //private string pythonHome = "C:/Program Files/Python36";
@@ -20,6 +20,7 @@ public class UnrealEnginePython : ModuleRules
     private string[] windowsKnownPaths =
     {
        // "C:/Program Files/Python37",
+       "C:\\Users\\Admin\\AppData\\Local\\Programs\\Python\\Python312",
         "E:/Software/Python",
         "C:/Program Files/Python36",
         "C:/Program Files/Python35",
