@@ -195,7 +195,7 @@ export class ContainerWrapper extends ComponentWrapper {
 
         borderWidget.AddChild(Item);
 
-        return borderWidget;
+        return borderWidget; 
     }
 
     private setupBorder(Item: UE.Widget, Props?: any): UE.Widget {

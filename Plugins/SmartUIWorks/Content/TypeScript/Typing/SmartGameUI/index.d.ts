@@ -75,6 +75,9 @@ declare module "SmartGameUI" {
         volatil?: boolean | undefined;
         pixelSnapping?: boolean | undefined;
         style?: Style;
+        clickMethod?: 'down-up' | 'down' | 'up' | 'precise-click' | undefined;
+        touchMethod?: 'down-up' | 'down' | 'precise-tap' | undefined;
+        pressMethod?: 'down-up' | 'press' | 'release' | undefined;
         toolTipBinding?: () => string;
         titleBinding?: () => string;
         disableBinding?: () => boolean;
@@ -178,7 +181,7 @@ declare module "SmartGameUI" {
         tintColor?: CssType.Property.Color | undefined;
         burshColor?: CssType.Property.Color | undefined;
         drawType?: 'box' | 'border' | 'image' | 'rounded-box' | 'none' | undefined;
-        tiling?: 'no-tiling' | 'horizontal' | 'vertical' | 'both' | undefined;
+        tiling?: CssType.Property.BackgroundRepeat | undefined;
         outline?: OutlineSetting | undefined;
         margin?: RecursivePartial<Margin> | undefined;
     }
@@ -196,14 +199,14 @@ declare module "SmartGameUI" {
     interface RadialSliderProp extends CommonProps {
         value?: number | undefined;
         defaultValue?: number | undefined;
-        handleStartAngle?: number | undefined;
-        handleEndAngle?: number | undefined;
+        startPointAngle?: number | undefined;
+        endPointAngle?: number | undefined;
         angularOffset?: number | undefined;
         barColor?: CssType.Property.Color | undefined;
         progressColor?: CssType.Property.Color | undefined;
         backgroundColor?: CssType.Property.Color | undefined;
         stepSize?: number | undefined;
-        showSliderHandle?: boolean | undefined;
+        showSliderThumb?: boolean | undefined;
         showSliderHand?: boolean | undefined;
         locked?: boolean | undefined;
         useMouseStep?: boolean | undefined;
@@ -211,8 +214,8 @@ declare module "SmartGameUI" {
         barThickness?: number | undefined;
         normalBarImageStyle?: ImageStyle | undefined;
         hoverBarImageStyle?: ImageStyle | undefined;
-        normalHandleImageStyle?: ImageStyle | undefined;
-        hoverHandleImageStyle?: ImageStyle | undefined;
+        normalThumbImageStyle?: ImageStyle | undefined;
+        hoveredThumbImageStyle?: ImageStyle | undefined;
     }
 
     class RadialSlider extends React.Component<RadialSliderProp> {
@@ -263,6 +266,7 @@ declare module "SmartGameUI" {
         inactiveFillImage?: ImageStyle | undefined;
         textPadding?: RecursivePartial<Margin> | undefined;
         textAlign?: 'left' | 'center' | 'right' | undefined;
+        // todo@Caleb196x: 添加字体样式
         foregroundColor?: CssType.Property.Color | undefined;
         insetPadding?: RecursivePartial<Margin> | undefined;
 
@@ -348,4 +352,210 @@ declare module "SmartGameUI" {
         horizontalLeftSlotImage?: ImageStyle | undefined;
         horizontalRightSlotImage?: ImageStyle | undefined;
     }
+
+    class ScrollBox extends React.Component<ScrollBoxProp> {
+    }
+
+    interface ButtonProp extends CommonProps {
+        text?: string | undefined;
+        textColor?: CssType.Property.Color | undefined;
+        backgroundColor?: CssType.Property.Color | undefined;
+
+        backgroundImageStyle?: ImageStyle | undefined;
+        hoveredImageStyle?: ImageStyle | undefined;
+        pressedImageStyle?: ImageStyle | undefined;
+        disabledImageStyle?: ImageStyle | undefined;
+
+        normalPadding?: CssType.Property.Padding | undefined;
+        pressedPadding?: CssType.Property.Padding | undefined;
+
+        pressedSound?: any | undefined;
+        hoveredSound?: any | undefined;
+        // event
+        onClick?: () => void;
+        onPressed?: () => void;
+        onReleased?: () => void;
+        onHovered?: () => void;
+        onUnhovered?: () => void;
+    }
+
+    class Button extends React.Component<ButtonProp> {
+
+    }
+
+    type comboBoxItemSelectionType = 'key-press' | 'navigation' | 'mouse-click' | 'direct' | 'default';
+    interface ComboBoxStyle {
+        rowPadding?: CssType.Property.Padding | undefined;
+        pressedSound?: any | undefined;
+        selectionChangeSound?: any | undefined;
+
+        background?: ImageStyle | undefined;
+        hoveredBackground?: ImageStyle | undefined;
+        pressedBackground?: ImageStyle | undefined;
+        disabledBackground?: ImageStyle | undefined;
+
+        downArrowImage?: ImageStyle | undefined;
+        downArrowPadding?: CssType.Property.Padding | undefined;
+        downArrowAlign?: CssType.Property.AlignSelf | undefined;
+    }
+
+    interface ComboBoxItemStyle {
+        textColor?: CssType.Property.Color | undefined;
+        selectedTextColor?: CssType.Property.Color | undefined;
+
+        focusedBackground?: ImageStyle | undefined;
+        activeBackground?: ImageStyle | undefined;
+        activeHoveredBackground?: ImageStyle | undefined;
+        inactiveBackground?: ImageStyle | undefined;
+        inactiveHoveredBackground?: ImageStyle | undefined;
+
+        menuRowBackground?: ImageStyle | undefined;
+        evenMenuRowBackground?: ImageStyle | undefined;
+        oddMenuRowBackground?: ImageStyle | undefined;
+    }
+
+    interface comboBoxScollBarStyle {
+        thickness?: number | undefined;
+        horizontalBackground?: ImageStyle | undefined;
+        verticalBackground?: ImageStyle | undefined;
+        normalThumb?: ImageStyle | undefined;
+        hoveredThumb?: ImageStyle | undefined;
+        draggedThumb?: ImageStyle | undefined;
+    }
+
+    interface ComboBoxProp extends CommonProps {
+        options?: string[] | undefined;
+        selectedOption?: string | undefined;
+        textColor?: CssType.Property.Color | undefined;
+        contentPadding?: CssType.Property.Padding | undefined;
+        maxListHeight?: number | undefined;
+        hasDownArrow?: boolean | undefined;
+        enableGamepadNavigation?: boolean | undefined;
+
+        comboBoxStyle?: ComboBoxStyle | undefined;
+        itemStyle?: ComboBoxItemStyle | undefined;
+        scrollBarStyle?: comboBoxScollBarStyle | undefined;
+        
+        // events
+        onOpened?: () => void;
+        onSelectionChanged?: (item: string, selectionType: comboBoxItemSelectionType) => void;
+    }
+
+    class ComboBox extends React.Component<ComboBoxProp> {
+        native: UE.ComboBoxString;
+    }
+
+    interface CheckboxProp extends CommonProps {
+        checked?: boolean | undefined;
+        type?: 'checkbox' | 'toggle' | 'default' | undefined;
+        padding?: CssType.Property.Padding | undefined;
+        color?: CssType.Property.Color | undefined;
+        uncheckedBackground?: ImageStyle | undefined;
+        uncheckedHoveredBackground?: ImageStyle | undefined;
+        uncheckedPressedBackground?: ImageStyle | undefined;
+        checkedBackground?: ImageStyle | undefined;
+        checkedHoveredBackground?: ImageStyle | undefined;
+        checkedPressedBackground?: ImageStyle | undefined;
+        undeterminedBackground?: ImageStyle | undefined;
+        undeterminedHoveredBackground?: ImageStyle | undefined;
+        undeterminedPressedBackground?: ImageStyle | undefined;
+        normalBackground?: ImageStyle | undefined;
+        normalHoveredBackground?: ImageStyle | undefined;
+        normalPressedBackground?: ImageStyle | undefined;
+
+        checkSound?: any | undefined;
+        uncheckSound?: any | undefined;
+        hoveredSound?: any | undefined;
+
+        // events
+        onCheckStateChanged?: (InChecked: boolean) => void;
+    }
+
+    class Checkbox extends React.Component<CheckboxProp> {
+        native: UE.CheckBox;
+    }
+
+    /**
+     * ProgressBar components
+     */
+    type ProgressBarType = 'left-to-right' | 'right-to-left' 
+                            | 'top-to-bottom' | 'bottom-to-top' | 'fill-from-center'
+                            | 'fill-from-center-x' | 'fill-from-center-y' | 'default';
+    interface ProgressBarProp extends CommonProps {
+        precent?: number | undefined;
+        barType?: ProgressBarType | undefined;
+        isMarquee?: boolean | undefined;
+        enableFillAnimation?: boolean | undefined;
+        fillColor?: CssType.Property.Color | undefined;
+
+        background?: ImageStyle | undefined;
+        fillBackground?: ImageStyle | undefined;
+        marqueeBackground?: ImageStyle | undefined;
+    }
+
+    class ProgressBar extends React.Component<ProgressBarProp> {
+        native: UE.ProgressBar;
+    }
+
+    /**
+     * ListView components
+     */
+    interface ListViewProp extends PanelProps {
+
+    }
+    class ListView extends React.Component<ListViewProp> {}
+
+    interface ListViewItemProp extends PanelProps {
+
+    }
+
+    class ListViewItem extends React.Component<ListViewItemProp> {}
+
+
+    /**
+     * TreeView components
+     */
+    interface TreeViewProp extends PanelProps {
+
+    }
+    class TreeView extends React.Component<TreeViewProp> {}
+
+    interface TreeViewItemProp extends PanelProps {
+
+    }
+    class TreeViewItem extends React.Component<TreeViewItemProp> {}
+    
+
+    /**
+     * TileView components
+     */
+    interface TileViewProp extends PanelProps {
+
+    }
+    class TileView extends React.Component<TileViewProp> {}
+
+    interface TileViewItemProp extends PanelProps {
+
+    }
+
+    class TileViewItem extends React.Component<TileViewItemProp> {}
+
+    /**
+     * Animation components
+     */
+    interface SpineProp extends CommonProps {
+
+    }
+
+    class Spine extends React.Component<SpineProp> {}
+
+    interface RiveProp extends CommonProps {
+
+    }
+
+    class Rive extends React.Component<RiveProp> {}
+
+    /**
+     * Audio components
+     */
 }
