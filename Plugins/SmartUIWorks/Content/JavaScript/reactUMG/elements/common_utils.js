@@ -167,7 +167,7 @@ function loadTextureFromImagePath(imagePath) {
     }
     return undefined;
 }
-function parseBackgroundImage(backgroundImage) {
+function parseBackgroundImage(backgroundImage, backgroundSize) {
     let brush = new UE.SlateBrush();
     if (typeof backgroundImage !== 'string') {
         brush.ResourceObject = backgroundImage;
@@ -318,7 +318,7 @@ function parseBackground(background) {
     const { color, image, position, size, repeat, attachment } = parseBackgroundLayer(background);
     let result = {};
     result['color'] = parseBackgroundColor(color);
-    result['image'] = parseBackgroundImage(image);
+    result['image'] = parseBackgroundImage(image, size);
     result['position'] = (0, background_position_1.parseBackgroundPosition)(position);
     result['repeat'] = parseBackgroundRepeat(repeat, result['image']);
     return result;
@@ -333,8 +333,9 @@ function parseBackgroundProps(style) {
         result = parseBackground(background);
     }
     const backgroundImage = style?.backgroundImage;
+    const backgroundSize = style?.backgroundSize;
     if (backgroundImage) {
-        result['image'] = parseBackgroundImage(backgroundImage);
+        result['image'] = parseBackgroundImage(backgroundImage, backgroundSize);
     }
     const backgroundRepeat = style?.backgroundRepeat;
     if (backgroundRepeat) {

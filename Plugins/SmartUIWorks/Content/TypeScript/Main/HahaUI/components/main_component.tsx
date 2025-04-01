@@ -4,6 +4,7 @@ import './style.css';
 import face from '@assets/face.png';
 import { FlexStyleTest } from './tests/flex_style.test';
 import { ColorTest } from './tests/color.test';
+import { BackgroundPositionTest } from './tests/bg_position_img.test';
 
 interface State {
     username: string;
@@ -22,6 +23,6 @@ export class MainComponent extends React.Component<Props, State> {
     }
       // 渲染方法
       render() {
-        return <ColorTest />
+        return <BackgroundPositionTest />
     }
 }
