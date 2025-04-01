@@ -271,9 +271,9 @@ var global = global || (function () { return this; }());
                     console.log("import image: " + fullPath + "debug path: " + debugPath);
                     // todo@Caleb196x: 导入性能优化x10
                     // todo@Caleb196x: 通过hash判断文件内容是否发生改变
-                    let texture = readImageAsTexture(fullPath); 
-                    console.log(texture);
-                    m.exports = {'default': texture};
+                    // let texture = readImageAsTexture(fullPath); 
+                    console.log(fullPath);
+                    m.exports = {'default': fullPath};
                 } else if (fullPath.endsWith('.css') || fullPath.endsWith('.scss')) {
                     // support import css
                     extractStyleClassFromFile(fullPath);

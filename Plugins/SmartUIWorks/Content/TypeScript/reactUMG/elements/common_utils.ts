@@ -170,7 +170,7 @@ export function loadTextureFromImagePath(imagePath: string) : UE.Texture2D | und
     return undefined;
 }
 
-export function parseBackgroundImage(backgroundImage: string) : UE.SlateBrush | undefined {
+export function parseBackgroundImage(backgroundImage: string, backgroundSize: string) : UE.SlateBrush | undefined {
     let brush = new UE.SlateBrush();
     if (typeof backgroundImage !== 'string') {
         brush.ResourceObject = backgroundImage as UE.Texture2D;
@@ -345,7 +345,7 @@ function parseBackground(background: string) : any {
 
     let result = {};
     result['color'] = parseBackgroundColor(color);
-    result['image'] = parseBackgroundImage(image);
+    result['image'] = parseBackgroundImage(image, size);
     result['position'] = parseBackgroundPosition(position);
     result['repeat'] = parseBackgroundRepeat(repeat, result['image']);
 
@@ -364,8 +364,9 @@ export function parseBackgroundProps(style: any): any {
     }
 
     const backgroundImage = style?.backgroundImage;
+    const backgroundSize = style?.backgroundSize;
     if (backgroundImage) {
-        result['image'] = parseBackgroundImage(backgroundImage);
+        result['image'] = parseBackgroundImage(backgroundImage, backgroundSize);
     }
 
     const backgroundRepeat = style?.backgroundRepeat;

@@ -2,15 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BackgroundPositionTest = void 0;
 const React = require("react");
+// import face from '@assets/face.png' // fixme@Caleb196x: 这种路径写法在require中无法加载
+const face_png_1 = require("../../../assets/face.png");
 class BackgroundPositionTest extends React.Component {
     constructor(props) {
         super(props);
     }
     render() {
         return (React.createElement("div", { style: { display: 'flex', flexDirection: 'column', width: '600px', height: '600px', backgroundColor: 'red' } },
-            React.createElement("span", null, "top left Position Test"),
-            React.createElement("div", { style: { backgroundPosition: 'top left', color: 'rgba(87, 161, 3, 0.7)' } },
-                React.createElement("span", null, "top left Position Test")),
+            React.createElement("div", { style: { backgroundImage: `url(${face_png_1.default})`, backgroundColor: '#45a0a0', backgroundPosition: 'top left', color: 'rgba(87, 161, 3, 0.7)' } },
+                React.createElement("span", null, "top left Position Test rgb(143, 3, 3)")),
             React.createElement("div", { style: { backgroundPosition: 'top center', color: 'rgba(3, 27, 161, 0.7)' } },
                 React.createElement("span", null, "top center Position Test")),
             React.createElement("div", { style: { backgroundPosition: 'top right', color: 'rgba(203, 18, 11, 0.7)' } },
@@ -30,4 +31,4 @@ class BackgroundPositionTest extends React.Component {
     }
 }
 exports.BackgroundPositionTest = BackgroundPositionTest;
-//# sourceMappingURL=background_position.test.js.map
+//# sourceMappingURL=bg_position_img.test.js.map
