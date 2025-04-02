@@ -4,6 +4,8 @@ import { mergeClassStyleAndInlineStyle, convertMargin } from '../common_utils';
 
 export class GridPanelWrapper extends ComponentWrapper {
     private containerStyle: any;
+    private totalRows: number = 0;
+
     constructor(type: string, props: any) {
         super();
         this.typeName = type;
@@ -87,6 +89,8 @@ export class GridPanelWrapper extends ComponentWrapper {
 
         if (gridTemplateRows) {
             const rowDefinitions = this.parseGridTemplate(gridTemplateRows);
+            this.totalRows = rowDefinitions.length;
+
             for (let i = 0; i < rowDefinitions.length; i++) {
                 const rowDef = rowDefinitions[i];
                 if (rowDef.type === 'fr') {
@@ -104,7 +108,7 @@ export class GridPanelWrapper extends ComponentWrapper {
         }
     }
 
-    private parseGridColumnOrRow(value: string, totalRows: number) {
+    private parseGridColumnOrRow(value: string) {
         let start: number = 0;
         let span: number = 0;
     
@@ -129,8 +133,10 @@ export class GridPanelWrapper extends ComponentWrapper {
             const [left, right] = parts;
     
             // 解析起始行
+            let span_left = false;
             if (left.startsWith("span")) {
                 span = parseInt(left.replace("span", "").trim(), 10);
+                span_left = true;
             } else {
                 start = left === "auto" ? 0 : parseInt(left, 10) - 1;
             }
@@ -139,8 +145,14 @@ export class GridPanelWrapper extends ComponentWrapper {
             if (right.startsWith("span")) {
                 span = parseInt(right.replace("span", "").trim(), 10);
             } else {
-                const end = right === "-1" ? totalRows + 1 : parseInt(right, 10);
-                span = end - start;
+                const num = parseInt(right, 10);
+                const end = right !== "-1" ? num < this.totalRows ? num : this.totalRows : this.totalRows;
+                
+                if (span_left) {
+                    start = end - span;
+                } else {
+                    span = end - start;
+                }
             }
         }
     
@@ -157,7 +169,7 @@ export class GridPanelWrapper extends ComponentWrapper {
         let rowStart = 0, rowSpan = 1;
 
         if (gridColumn) {
-            const [start, span] = this.parseGridColumnOrRow(gridColumn);
+            const {start, span} = this.parseGridColumnOrRow(gridColumn);
             columnStart = start;
             columnSpan = span;
         } else {
@@ -174,7 +186,7 @@ export class GridPanelWrapper extends ComponentWrapper {
         }
 
         if (gridRow) {
-            const [start, span] = this.parseGridColumnOrRow(gridRow);
+            const {start, span} = this.parseGridColumnOrRow(gridRow);
             rowStart = start;
             rowSpan = span;
         } else {
@@ -246,7 +258,7 @@ export class GridPanelWrapper extends ComponentWrapper {
         vAlignActionMap[vAlign]();
     }
 
-    private initGridPanelSlot(gridPanel: UE.GridPanel, Slot: UE.GridSlot, childProps: any) {
+    private initGridPanelSlot(Slot: UE.GridSlot, childProps: any) {
         this.setupGridItemLoc(Slot, childProps);
         this.setupGridAlignment(Slot, childProps);
         const margin = this.containerStyle?.margin;
@@ -267,6 +279,6 @@ export class GridPanelWrapper extends ComponentWrapper {
     override appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any): void {
         const gridPanel = parentItem as UE.GridPanel;
         let gridSlot = gridPanel.AddChildToGrid(childItem);
-        this.initGridPanelSlot(gridPanel, gridSlot, childProps);
-    }   
+        this.initGridPanelSlot(gridSlot, childProps);
+    }
 }

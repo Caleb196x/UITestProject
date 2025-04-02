@@ -6,6 +6,7 @@ const common_wrapper_1 = require("../common_wrapper");
 const common_utils_1 = require("../common_utils");
 class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
     containerStyle;
+    totalRows = 0;
     constructor(type, props) {
         super();
         this.typeName = type;
@@ -80,6 +81,7 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
         }
         if (gridTemplateRows) {
             const rowDefinitions = this.parseGridTemplate(gridTemplateRows);
+            this.totalRows = rowDefinitions.length;
             for (let i = 0; i < rowDefinitions.length; i++) {
                 const rowDef = rowDefinitions[i];
                 if (rowDef.type === 'fr') {
@@ -99,16 +101,51 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
         }
     }
     parseGridColumnOrRow(value) {
-        const values = value.split('/').map(v => v.trim());
-        if (values.length === 2) {
-            let start = parseInt(values[0]);
-            let end = parseInt(values[1]);
-            if (end < start) {
-                return [start, 0];
-            }
-            return [start, end - start];
+        let start = 0;
+        let span = 0;
+        // 处理 "auto"（默认从 1 开始，占 1 行）
+        if (value === "auto") {
+            return { start, span };
         }
-        return [0, 1];
+        const parts = value.split("/").map(part => part.trim());
+        // 处理单个数字格式，例如 "2"
+        if (parts.length === 1) {
+            if (parts[0].startsWith("span")) {
+                span = parseInt(parts[0].replace("span", "").trim(), 10);
+            }
+            else {
+                start = parseInt(parts[0], 10) - 1; // parts[0] 从 1 开始，所以需要减 1
+                span = 1;
+            }
+        }
+        // 处理 "2 / 4" 或 "2 / span 2"
+        else if (parts.length === 2) {
+            const [left, right] = parts;
+            // 解析起始行
+            let span_left = false;
+            if (left.startsWith("span")) {
+                span = parseInt(left.replace("span", "").trim(), 10);
+                span_left = true;
+            }
+            else {
+                start = left === "auto" ? 0 : parseInt(left, 10) - 1;
+            }
+            // 解析终止行或者 span
+            if (right.startsWith("span")) {
+                span = parseInt(right.replace("span", "").trim(), 10);
+            }
+            else {
+                const num = parseInt(right, 10);
+                const end = right !== "-1" ? num < this.totalRows ? num : this.totalRows : this.totalRows;
+                if (span_left) {
+                    start = end - span;
+                }
+                else {
+                    span = end - start;
+                }
+            }
+        }
+        return { start, span };
     }
     setupGridItemLoc(GridSlot, childProps) {
         // 优先解析gridColumn和gridRow
@@ -118,7 +155,7 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
         let columnStart = 0, columnSpan = 1;
         let rowStart = 0, rowSpan = 1;
         if (gridColumn) {
-            const [start, span] = this.parseGridColumnOrRow(gridColumn);
+            const { start, span } = this.parseGridColumnOrRow(gridColumn);
             columnStart = start;
             columnSpan = span;
         }
@@ -136,7 +173,7 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
             columnStart = start;
         }
         if (gridRow) {
-            const [start, span] = this.parseGridColumnOrRow(gridRow);
+            const { start, span } = this.parseGridColumnOrRow(gridRow);
             rowStart = start;
             rowSpan = span;
         }
@@ -195,8 +232,8 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
         const vAlignActionMap = {
             'start': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
             'end': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
-            'left': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
-            'right': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
+            'top': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
+            'bottom': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
             'flex-start': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
             'flex-end': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
             'center': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Center),
@@ -205,7 +242,7 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
         hAlignActionMap[hAlign]();
         vAlignActionMap[vAlign]();
     }
-    initGridPanelSlot(gridPanel, Slot, childProps) {
+    initGridPanelSlot(Slot, childProps) {
         this.setupGridItemLoc(Slot, childProps);
         this.setupGridAlignment(Slot, childProps);
         const margin = this.containerStyle?.margin;
@@ -223,7 +260,7 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
     appendChildItem(parentItem, childItem, childItemTypeName, childProps) {
         const gridPanel = parentItem;
         let gridSlot = gridPanel.AddChildToGrid(childItem);
-        this.initGridPanelSlot(gridPanel, gridSlot, childProps);
+        this.initGridPanelSlot(gridSlot, childProps);
     }
 }
 exports.GridPanelWrapper = GridPanelWrapper;
