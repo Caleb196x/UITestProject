@@ -4,7 +4,7 @@ import { convertLengthUnitToSlateUnit,
     mergeClassStyleAndInlineStyle, 
     parseAspectRatio, parseBackgroundProps, 
     parseBackgroundColor, parseScale,
-    parseBackgroundImage } from '../common_utils';
+    parseBackgroundImage, parseChildAlignment } from '../common_utils';
 import { parseColor } from '../property/color_parser';
 import { WrapBoxWrapper } from './wrapbox';
 import { GridPanelWrapper } from './gridpanel';
@@ -23,13 +23,14 @@ export enum UMGContainerType {
 
 export class ContainerWrapper extends ComponentWrapper {
     private containerStyle: any;
-    private containerType: UMGContainerType;
     private commonWrapper: ComponentWrapper;
+    private originWidget: UE.Widget;
+    private extraBoxSlot: UE.PanelSlot;
+
     constructor(type: string, props: any) {
         super();
         this.typeName = type;
         this.props = props;
-        this.containerType = UMGContainerType.HorizontalBox;
     }
 
     override convertToWidget(): UE.Widget { 
@@ -47,7 +48,6 @@ export class ContainerWrapper extends ComponentWrapper {
 
             let scrollBoxWrapper = new ScrollBoxWrapper(this.typeName, this.props);
             widget = scrollBoxWrapper.convertToWidget();
-            this.containerType = UMGContainerType.ScrollBox;
             this.commonWrapper = scrollBoxWrapper;
 
         } else if (display === 'grid') {
@@ -55,24 +55,24 @@ export class ContainerWrapper extends ComponentWrapper {
             // grid panel
             let gridPanelWrapper = new GridPanelWrapper(this.typeName, this.props);
             widget = gridPanelWrapper.convertToWidget();
-            this.containerType = UMGContainerType.GridPanel;
             this.commonWrapper = gridPanelWrapper;
 
         } else if (flexWrap === 'wrap' || flexWrap === 'wrap-reverse') {
 
             let wrapBoxWrapper = new WrapBoxWrapper(this.typeName, this.props);
             widget = wrapBoxWrapper.convertToWidget();
-            this.containerType = UMGContainerType.WrapBox;
             this.commonWrapper = wrapBoxWrapper;
 
         } else {
             let flexWrapper = new FlexWrapper(this.typeName, this.props);
             widget = flexWrapper.convertToWidget();
-            this.containerType = UMGContainerType.HorizontalBox;
             this.commonWrapper = flexWrapper;
         }
 
-        // widget = this.setupBorderAndBackground(widget, this.props);
+        this.originWidget = widget;
+        widget = this.setupBoxSize(widget, this.props);
+        widget = this.setupBoxScale(widget, this.props);
+        widget = this.setupBorderAndBackground(widget, this.props);
 
         return widget;
     }
@@ -84,7 +84,7 @@ export class ContainerWrapper extends ComponentWrapper {
         }
     }
 
-    private setupChildSize(Item: UE.Widget, Props?: any): UE.Widget {
+    private setupBoxSize(Item: UE.Widget, Props?: any, childProps?: any): UE.Widget {
         const childStyle = mergeClassStyleAndInlineStyle(Props);
         const width = childStyle?.width || 'auto';
         const height = childStyle?.height || 'auto';
@@ -127,15 +127,13 @@ export class ContainerWrapper extends ComponentWrapper {
                 sizeBox.SetMinAspectRatio(parseAspectRatio(aspectRatio));
             }
 
-            const Slot = sizeBox.AddChild(Item);
-            if (Slot) {
-                
-            }
+            this.extraBoxSlot = sizeBox.AddChild(Item) as UE.SizeBoxSlot;
+
             return sizeBox;
         }
     }
 
-    private setupChildScale(Item: UE.Widget, Props?: any): UE.Widget {
+    private setupBoxScale(Item: UE.Widget, Props?: any): UE.Widget {
         const childStyle = mergeClassStyleAndInlineStyle(Props);
         const objectFit = childStyle?.objectFit;
         if (objectFit) {
@@ -155,7 +153,8 @@ export class ContainerWrapper extends ComponentWrapper {
                     scaleBox.SetUserSpecifiedScale(parseFloat(scale));
                 }
             }
-            scaleBox.AddChild(Item);
+            
+            this.extraBoxSlot = scaleBox.AddChild(Item) as UE.ScaleBoxSlot;
             return scaleBox;
         } else {
             return Item;
@@ -193,14 +192,14 @@ export class ContainerWrapper extends ComponentWrapper {
             );
         }
 
-        borderWidget.AddChild(Item);
+        this.extraBoxSlot = borderWidget.AddChild(Item) as UE.BorderSlot;
 
         return borderWidget; 
     }
 
     private setupBorder(Item: UE.Widget, Props?: any): UE.Widget {
         const borderWidget = new UE.Border();
-        borderWidget.AddChild(Item);
+        this.extraBoxSlot = borderWidget.AddChild(Item) as UE.BorderSlot;
         return borderWidget;
     }
 
@@ -220,17 +219,34 @@ export class ContainerWrapper extends ComponentWrapper {
         return Item;
     }
 
+    private setupChildAlignment(props?: any) {
+        if (props && this.extraBoxSlot ) {
+            const Style = mergeClassStyleAndInlineStyle(props);
+            const childAlignment = parseChildAlignment(Style);
+            if (this.extraBoxSlot instanceof UE.SizeBoxSlot) {
+                (this.extraBoxSlot as UE.SizeBoxSlot).SetHorizontalAlignment(childAlignment.horizontal);
+                (this.extraBoxSlot as UE.SizeBoxSlot).SetVerticalAlignment(childAlignment.vertical);
+                (this.extraBoxSlot as UE.SizeBoxSlot).SetPadding(childAlignment.padding);
+            } else if (this.extraBoxSlot instanceof UE.ScaleBoxSlot) {
+                (this.extraBoxSlot as UE.ScaleBoxSlot).SetHorizontalAlignment(childAlignment.horizontal);
+                (this.extraBoxSlot as UE.ScaleBoxSlot).SetVerticalAlignment(childAlignment.vertical);
+                (this.extraBoxSlot as UE.ScaleBoxSlot).SetPadding(childAlignment.padding);
+            } else if (this.extraBoxSlot instanceof UE.BorderSlot) {
+                (this.extraBoxSlot as UE.BorderSlot).SetHorizontalAlignment(childAlignment.horizontal);
+                (this.extraBoxSlot as UE.BorderSlot).SetVerticalAlignment(childAlignment.vertical);
+                (this.extraBoxSlot as UE.BorderSlot).SetPadding(childAlignment.padding);
+            }
+        }
+    }
+
     override appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any): void {
         // 1. 设置父容器的clip属性
         // 2. 根据width, height添加size box并设置大小
         // 3. 根据objectFit添加scale box并设置缩放
         // 4. 添加background
         this.setupVisibility(parentItem);
-        // fixme@Caleb196x: 在将childItem添加到sizebox后，需要设置childItem相对于sizebox的alignment？
-        childItem = this.setupChildSize(childItem, childProps);
-        childItem = this.setupChildScale(childItem, childProps);
-        childItem = this.setupBorderAndBackground(childItem, childProps);
-        this.commonWrapper.appendChildItem(parentItem, childItem, childItemTypeName, childProps);
+        this.setupChildAlignment(childProps);
+        this.commonWrapper.appendChildItem(this.originWidget, childItem, childItemTypeName, childProps);
     }
 
     override updateWidgetProperty(widget: UE.Widget, oldProps : any, newProps: any, updateProps: Record<string, any>) : boolean {

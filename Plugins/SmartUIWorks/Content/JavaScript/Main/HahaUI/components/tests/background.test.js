@@ -47,4 +47,4 @@ class BackgroundPositionTest extends React.Component {
     }
 }
 exports.BackgroundPositionTest = BackgroundPositionTest;
-//# sourceMappingURL=bg_position_img.test.js.map
+//# sourceMappingURL=background.test.js.map
