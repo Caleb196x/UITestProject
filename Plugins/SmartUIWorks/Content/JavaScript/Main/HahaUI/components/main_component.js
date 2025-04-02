@@ -15,7 +15,7 @@ class MainComponent extends React.Component {
     }
     // 渲染方法
     render() {
-        return React.createElement(bg_position_img_test_1.BackgroundPositionTest, null);
+        return React.createElement(bg_position_img_test_1.BackgroundPositionTest, null); // fixme@Caleb196x: 替换为FlexStyleTest后无法重新加载
     }
 }
 exports.MainComponent = MainComponent;

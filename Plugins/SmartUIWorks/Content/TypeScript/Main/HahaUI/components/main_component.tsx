@@ -23,6 +23,6 @@ export class MainComponent extends React.Component<Props, State> {
     }
       // 渲染方法
       render() {
-        return <BackgroundPositionTest />
+        return <BackgroundPositionTest />  // fixme@Caleb196x: 替换为FlexStyleTest后无法重新加载
     }
 }

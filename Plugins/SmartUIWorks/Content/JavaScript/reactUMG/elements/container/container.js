@@ -21,13 +21,13 @@ var UMGContainerType;
 })(UMGContainerType || (exports.UMGContainerType = UMGContainerType = {}));
 class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
     containerStyle;
-    containerType;
     commonWrapper;
+    originWidget;
+    extraBoxSlot;
     constructor(type, props) {
         super();
         this.typeName = type;
         this.props = props;
-        this.containerType = UMGContainerType.HorizontalBox;
     }
     convertToWidget() {
         this.containerStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(this.props);
@@ -41,29 +41,28 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
         if (overflow !== 'visible' || overflowX !== 'visible' || overflowY !== 'visible') {
             let scrollBoxWrapper = new scrollbox_1.ScrollBoxWrapper(this.typeName, this.props);
             widget = scrollBoxWrapper.convertToWidget();
-            this.containerType = UMGContainerType.ScrollBox;
             this.commonWrapper = scrollBoxWrapper;
         }
         else if (display === 'grid') {
             // grid panel
             let gridPanelWrapper = new gridpanel_1.GridPanelWrapper(this.typeName, this.props);
             widget = gridPanelWrapper.convertToWidget();
-            this.containerType = UMGContainerType.GridPanel;
             this.commonWrapper = gridPanelWrapper;
         }
         else if (flexWrap === 'wrap' || flexWrap === 'wrap-reverse') {
             let wrapBoxWrapper = new wrapbox_1.WrapBoxWrapper(this.typeName, this.props);
             widget = wrapBoxWrapper.convertToWidget();
-            this.containerType = UMGContainerType.WrapBox;
             this.commonWrapper = wrapBoxWrapper;
         }
         else {
             let flexWrapper = new flex_1.FlexWrapper(this.typeName, this.props);
             widget = flexWrapper.convertToWidget();
-            this.containerType = UMGContainerType.HorizontalBox;
             this.commonWrapper = flexWrapper;
         }
-        // widget = this.setupBorderAndBackground(widget, this.props);
+        this.originWidget = widget;
+        widget = this.setupBoxSize(widget, this.props);
+        widget = this.setupBoxScale(widget, this.props);
+        widget = this.setupBorderAndBackground(widget, this.props);
         return widget;
     }
     setupVisibility(parentItem) {
@@ -72,7 +71,7 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
             parentItem.SetClipping(UE.EWidgetClipping.ClipToBounds);
         }
     }
-    setupChildSize(Item, Props) {
+    setupBoxSize(Item, Props, childProps) {
         const childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(Props);
         const width = childStyle?.width || 'auto';
         const height = childStyle?.height || 'auto';
@@ -108,13 +107,11 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
                 sizeBox.SetMaxAspectRatio((0, common_utils_1.parseAspectRatio)(aspectRatio));
                 sizeBox.SetMinAspectRatio((0, common_utils_1.parseAspectRatio)(aspectRatio));
             }
-            const Slot = sizeBox.AddChild(Item);
-            if (Slot) {
-            }
+            this.extraBoxSlot = sizeBox.AddChild(Item);
             return sizeBox;
         }
     }
-    setupChildScale(Item, Props) {
+    setupBoxScale(Item, Props) {
         const childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(Props);
         const objectFit = childStyle?.objectFit;
         if (objectFit) {
@@ -138,7 +135,7 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
                     scaleBox.SetUserSpecifiedScale(parseFloat(scale));
                 }
             }
-            scaleBox.AddChild(Item);
+            this.extraBoxSlot = scaleBox.AddChild(Item);
             return scaleBox;
         }
         else {
@@ -168,12 +165,12 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
             const color = (0, color_parser_1.parseColor)(contentColor);
             borderWidget.SetContentColorAndOpacity(new UE.LinearColor(color.r / 255.0, color.g / 255.0, color.b / 255.0, color.a));
         }
-        borderWidget.AddChild(Item);
+        this.extraBoxSlot = borderWidget.AddChild(Item);
         return borderWidget;
     }
     setupBorder(Item, Props) {
         const borderWidget = new UE.Border();
-        borderWidget.AddChild(Item);
+        this.extraBoxSlot = borderWidget.AddChild(Item);
         return borderWidget;
     }
     setupBorderAndBackground(Item, Props) {
@@ -188,17 +185,35 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
         }
         return Item;
     }
+    setupChildAlignment(props) {
+        if (props && this.extraBoxSlot) {
+            const Style = (0, common_utils_1.mergeClassStyleAndInlineStyle)(props);
+            const childAlignment = (0, common_utils_1.parseChildAlignment)(Style);
+            if (this.extraBoxSlot instanceof UE.SizeBoxSlot) {
+                this.extraBoxSlot.SetHorizontalAlignment(childAlignment.horizontal);
+                this.extraBoxSlot.SetVerticalAlignment(childAlignment.vertical);
+                this.extraBoxSlot.SetPadding(childAlignment.padding);
+            }
+            else if (this.extraBoxSlot instanceof UE.ScaleBoxSlot) {
+                this.extraBoxSlot.SetHorizontalAlignment(childAlignment.horizontal);
+                this.extraBoxSlot.SetVerticalAlignment(childAlignment.vertical);
+                this.extraBoxSlot.SetPadding(childAlignment.padding);
+            }
+            else if (this.extraBoxSlot instanceof UE.BorderSlot) {
+                this.extraBoxSlot.SetHorizontalAlignment(childAlignment.horizontal);
+                this.extraBoxSlot.SetVerticalAlignment(childAlignment.vertical);
+                this.extraBoxSlot.SetPadding(childAlignment.padding);
+            }
+        }
+    }
     appendChildItem(parentItem, childItem, childItemTypeName, childProps) {
         // 1. 设置父容器的clip属性
         // 2. 根据width, height添加size box并设置大小
         // 3. 根据objectFit添加scale box并设置缩放
         // 4. 添加background
         this.setupVisibility(parentItem);
-        // fixme@Caleb196x: 在将childItem添加到sizebox后，需要设置childItem相对于sizebox的alignment？
-        childItem = this.setupChildSize(childItem, childProps);
-        childItem = this.setupChildScale(childItem, childProps);
-        childItem = this.setupBorderAndBackground(childItem, childProps);
-        this.commonWrapper.appendChildItem(parentItem, childItem, childItemTypeName, childProps);
+        this.setupChildAlignment(childProps);
+        this.commonWrapper.appendChildItem(this.originWidget, childItem, childItemTypeName, childProps);
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
         return;

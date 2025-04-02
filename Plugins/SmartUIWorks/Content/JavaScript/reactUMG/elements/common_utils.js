@@ -10,6 +10,7 @@ exports.parseScale = parseScale;
 exports.loadTextureFromImagePath = loadTextureFromImagePath;
 exports.parseBackgroundImage = parseBackgroundImage;
 exports.parseBackgroundColor = parseBackgroundColor;
+exports.parseChildAlignment = parseChildAlignment;
 exports.parseBackgroundProps = parseBackgroundProps;
 const css_converter_1 = require("../css_converter");
 const UE = require("ue");
@@ -53,8 +54,11 @@ function convertLengthUnitToSlateUnit(length, style) {
     return 0;
 }
 function mergeClassStyleAndInlineStyle(props) {
+    if (!props) {
+        return {};
+    }
     let classNameStyles = {};
-    if (props.className) {
+    if (props?.className) {
         // Split multiple classes
         const classNames = props.className.split(' ');
         for (const className of classNames) {
@@ -68,7 +72,7 @@ function mergeClassStyleAndInlineStyle(props) {
         }
     }
     // Merge className styles with inline styles, giving precedence to inline styles
-    const mergedStyle = { ...classNameStyles, ...(props.style || {}) };
+    const mergedStyle = { ...classNameStyles, ...(props?.style || {}) };
     return mergedStyle;
 }
 /**
@@ -169,6 +173,7 @@ function loadTextureFromImagePath(imagePath) {
 }
 function parseBackgroundImage(backgroundImage, backgroundSize) {
     let brush = new UE.SlateBrush();
+    brush.DrawAs = UE.ESlateBrushDrawType.Image;
     if (typeof backgroundImage !== 'string') {
         brush.ResourceObject = backgroundImage;
         return brush;
@@ -216,6 +221,27 @@ function parseBackgroundImage(backgroundImage, backgroundSize) {
     }
     else {
         brush.ResourceObject = texture;
+    }
+    // parse backgroundSize
+    if (backgroundSize) {
+        const sizeValues = backgroundSize.split(' ');
+        if (sizeValues.length === 1) {
+            if (sizeValues[0] === 'cover' || sizeValues[0] === 'auto') {
+                brush.Tiling = UE.ESlateBrushTileType.NoTile;
+            }
+            else if (sizeValues[0] === 'contain') {
+                brush.Tiling = UE.ESlateBrushTileType.Both;
+            }
+            else {
+                brush.ImageSize.X = Number(sizeValues[0]);
+                brush.ImageSize.Y = Number(sizeValues[0]);
+            }
+        }
+        else if (sizeValues.length === 2) {
+            brush.Tiling = UE.ESlateBrushTileType.Both;
+            brush.ImageSize.X = Number(sizeValues[0]);
+            brush.ImageSize.Y = Number(sizeValues[1]);
+        }
     }
     return brush;
 }
@@ -298,6 +324,7 @@ function parseBackgroundLayer(layer) {
         }
     });
     // 处理位置/尺寸
+    // fixme@Caleb196x: 解析的有点问题
     if (positionBuffer.length > 0) {
         const slashIndex = positionBuffer.indexOf('/');
         if (slashIndex > -1) {
@@ -323,7 +350,72 @@ function parseBackground(background) {
     result['repeat'] = parseBackgroundRepeat(repeat, result['image']);
     return result;
 }
-function parseBackgroundProps(style) {
+function parseChildAlignment(childStyle) {
+    // 解析子元素在border中的对齐方式和padding
+    let alignment = {
+        horizontal: UE.EHorizontalAlignment.HAlign_Fill,
+        vertical: UE.EVerticalAlignment.VAlign_Fill,
+        padding: new UE.Margin(0, 0, 0, 0)
+    };
+    const childJustifySelf = childStyle?.justifySelf;
+    if (childJustifySelf) {
+        switch (childJustifySelf) {
+            case 'start':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Left;
+                break;
+            case 'end':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Right;
+                break;
+            case 'center':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Center;
+                break;
+            case 'stretch':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Fill;
+                break;
+            case 'left':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Left;
+                break;
+            case 'right':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Right;
+                break;
+            default:
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Center;
+                break;
+        }
+    }
+    const childAlignSelf = childStyle?.alignSelf;
+    if (childAlignSelf) {
+        switch (childAlignSelf) {
+            case 'start':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Top;
+                break;
+            case 'end':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Bottom;
+                break;
+            case 'center':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Center;
+                break;
+            case 'stretch':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Fill;
+                break;
+            case 'left':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Top;
+                break;
+            case 'right':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Bottom;
+                break;
+            default:
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Center;
+                break;
+        }
+    }
+    const childPadding = childStyle?.padding;
+    if (childPadding) {
+        alignment.padding = convertMargin(childPadding, childStyle);
+    }
+    return alignment;
+}
+function parseBackgroundProps(style, childStyle) {
     // image转换成brush image
     // repeat转换成image中的tiling模式
     // position转换成alignment和padding
@@ -332,23 +424,24 @@ function parseBackgroundProps(style) {
     if (background) {
         result = parseBackground(background);
     }
+    const backgroundColor = style?.backgroundColor;
+    if (backgroundColor) {
+        result['color'] = parseBackgroundColor(backgroundColor);
+    }
     const backgroundImage = style?.backgroundImage;
     const backgroundSize = style?.backgroundSize;
     if (backgroundImage) {
         result['image'] = parseBackgroundImage(backgroundImage, backgroundSize);
     }
     const backgroundRepeat = style?.backgroundRepeat;
-    if (backgroundRepeat) {
+    if (backgroundRepeat && result['image']) {
         result['image'] = parseBackgroundRepeat(backgroundRepeat, result['image']);
     }
-    const backgroundPosition = style?.backgroundPosition;
-    if (backgroundPosition) {
-        result['alignment'] = (0, background_position_1.parseBackgroundPosition)(backgroundPosition);
-    }
-    const backgroundColor = style?.backgroundColor;
-    if (backgroundColor) {
-        result['color'] = parseBackgroundColor(backgroundColor);
-    }
+    // const backgroundPosition = style?.backgroundPosition;
+    // if (backgroundPosition && result['image']) {
+    //     result['alignment'] = parseBackgroundPosition(backgroundPosition);
+    // }
+    result['alignment'] = parseChildAlignment(childStyle);
     return result;
 }
 //# sourceMappingURL=common_utils.js.map

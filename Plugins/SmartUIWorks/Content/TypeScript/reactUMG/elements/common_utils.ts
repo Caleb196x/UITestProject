@@ -41,8 +41,12 @@ export function convertLengthUnitToSlateUnit(length: string, style: any): number
 }
 
 export function mergeClassStyleAndInlineStyle(props: any) {
+    if (!props) {
+        return {};
+    }
+
     let classNameStyles = {};
-    if (props.className) {
+    if (props?.className) {
         // Split multiple classes
         const classNames = props.className.split(' ');
         for (const className of classNames) {
@@ -57,7 +61,7 @@ export function mergeClassStyleAndInlineStyle(props: any) {
     }
 
     // Merge className styles with inline styles, giving precedence to inline styles
-    const mergedStyle = { ...classNameStyles, ...(props.style || {}) };
+    const mergedStyle = { ...classNameStyles, ...(props?.style || {}) };
     return mergedStyle;
 }
 
@@ -377,8 +381,8 @@ function parseBackground(background: string) : any {
 export function parseChildAlignment(childStyle: any) {
     // 解析子元素在border中的对齐方式和padding
     let alignment = {
-        horizontal: UE.EHorizontalAlignment.HAlign_Center,
-        vertical: UE.EVerticalAlignment.VAlign_Center,
+        horizontal: UE.EHorizontalAlignment.HAlign_Fill,
+        vertical: UE.EVerticalAlignment.VAlign_Fill,
         padding: new UE.Margin(0, 0, 0, 0)
     }
 
@@ -398,12 +402,13 @@ export function parseChildAlignment(childStyle: any) {
                 alignment.horizontal = UE.EHorizontalAlignment.HAlign_Fill;
                 break;
             case 'left':
-                alignment.vertical = UE.EVerticalAlignment.VAlign_Top;
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Left;
                 break;
             case 'right':
-                alignment.vertical = UE.EVerticalAlignment.VAlign_Bottom;
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Right;
                 break;
             default:
+
                 alignment.horizontal = UE.EHorizontalAlignment.HAlign_Center;
                 break;
         }
@@ -425,13 +430,13 @@ export function parseChildAlignment(childStyle: any) {
                 alignment.vertical = UE.EVerticalAlignment.VAlign_Fill;
                 break;
             case 'left':
-                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Left;
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Top;
                 break;
             case 'right':
-                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Right;
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Bottom;
                 break;
             default:
-                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Center;
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Center;
                 break;
         }
     }
