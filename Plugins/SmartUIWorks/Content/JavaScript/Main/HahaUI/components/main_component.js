@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainComponent = void 0;
 const React = require("react");
 require("./style.css");
-const bg_position_img_test_1 = require("./tests/bg_position_img.test");
+const background_test_1 = require("./tests/background.test");
 class MainComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -15,7 +15,7 @@ class MainComponent extends React.Component {
     }
     // 渲染方法
     render() {
-        return React.createElement(bg_position_img_test_1.BackgroundPositionTest, null); // fixme@Caleb196x: 替换为FlexStyleTest后无法重新加载
+        return React.createElement(background_test_1.BackgroundPositionTest, null); // fixme@Caleb196x: 替换为FlexStyleTest后无法重新加载
     }
 }
 exports.MainComponent = MainComponent;
