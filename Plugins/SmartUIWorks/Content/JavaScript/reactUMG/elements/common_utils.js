@@ -174,6 +174,9 @@ function loadTextureFromImagePath(imagePath) {
 function parseBackgroundImage(backgroundImage, backgroundSize) {
     let brush = new UE.SlateBrush();
     brush.DrawAs = UE.ESlateBrushDrawType.Image;
+    if (!backgroundImage) {
+        return brush;
+    }
     if (typeof backgroundImage !== 'string') {
         brush.ResourceObject = backgroundImage;
         return brush;
@@ -398,10 +401,10 @@ function parseChildAlignment(childStyle) {
             case 'stretch':
                 alignment.vertical = UE.EVerticalAlignment.VAlign_Fill;
                 break;
-            case 'left':
+            case 'top':
                 alignment.vertical = UE.EVerticalAlignment.VAlign_Top;
                 break;
-            case 'right':
+            case 'bottom':
                 alignment.vertical = UE.EVerticalAlignment.VAlign_Bottom;
                 break;
             default:

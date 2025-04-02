@@ -177,6 +177,9 @@ export function loadTextureFromImagePath(imagePath: string) : UE.Texture2D | und
 export function parseBackgroundImage(backgroundImage: string, backgroundSize: string) : UE.SlateBrush | undefined {
     let brush = new UE.SlateBrush();
     brush.DrawAs = UE.ESlateBrushDrawType.Image;
+    if (!backgroundImage) {
+        return brush;
+    }
 
     if (typeof backgroundImage !== 'string') {
         brush.ResourceObject = backgroundImage as UE.Texture2D;
@@ -429,10 +432,10 @@ export function parseChildAlignment(childStyle: any) {
             case 'stretch':
                 alignment.vertical = UE.EVerticalAlignment.VAlign_Fill;
                 break;
-            case 'left':
+            case 'top':
                 alignment.vertical = UE.EVerticalAlignment.VAlign_Top;
                 break;
-            case 'right':
+            case 'bottom':
                 alignment.vertical = UE.EVerticalAlignment.VAlign_Bottom;
                 break;
             default:

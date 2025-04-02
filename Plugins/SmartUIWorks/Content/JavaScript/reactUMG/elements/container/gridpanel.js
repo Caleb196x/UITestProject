@@ -91,6 +91,7 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
                     gridPanel.SetRowFill(i, 0); // Default fill value
                 }
                 else {
+                    // todo@Caleb196x: 将像素值转换成fill值
                     // For fixed sizes (px, em, etc.), we set a fixed size
                     gridPanel.SetRowFill(i, rowDef.value);
                 }
@@ -111,8 +112,9 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
     }
     setupGridItemLoc(GridSlot, childProps) {
         // 优先解析gridColumn和gridRow
-        const gridColumn = childProps.style?.gridColumn;
-        const gridRow = childProps.style?.gridRow;
+        const childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(childProps);
+        const gridColumn = childStyle?.gridColumn;
+        const gridRow = childStyle?.gridRow;
         let columnStart = 0, columnSpan = 1;
         let rowStart = 0, rowSpan = 1;
         if (gridColumn) {
@@ -121,8 +123,8 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
             columnSpan = span;
         }
         else {
-            const gridColumnStart = childProps.style?.gridColumnStart;
-            const gridColumnEnd = childProps.style?.gridColumnEnd;
+            const gridColumnStart = childStyle?.gridColumnStart;
+            const gridColumnEnd = childStyle?.gridColumnEnd;
             let start = parseInt(gridColumnStart);
             let end = parseInt(gridColumnEnd);
             if (end < start) {
@@ -139,8 +141,8 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
             rowSpan = span;
         }
         else {
-            const gridRowStart = childProps.style?.gridRowStart;
-            const gridRowEnd = childProps.style?.gridRowEnd;
+            const gridRowStart = childStyle?.gridRowStart;
+            const gridRowEnd = childStyle?.gridRowEnd;
             let start = parseInt(gridRowStart);
             let end = parseInt(gridRowEnd);
             if (end < start) {

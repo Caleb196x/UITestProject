@@ -96,6 +96,7 @@ export class GridPanelWrapper extends ComponentWrapper {
                     // For auto, we use auto-sizing
                     gridPanel.SetRowFill(i, 0); // Default fill value
                 } else {
+                    // todo@Caleb196x: 将像素值转换成fill值
                     // For fixed sizes (px, em, etc.), we set a fixed size
                     gridPanel.SetRowFill(i, rowDef.value);
                 }
@@ -103,25 +104,54 @@ export class GridPanelWrapper extends ComponentWrapper {
         }
     }
 
-    private parseGridColumnOrRow(value: string) {
-        const values = value.split('/').map(v => v.trim());
-        if (values.length === 2) {
-            let start = parseInt(values[0]);
-            let end = parseInt(values[1]);
-            if (end < start) {
-                return [start, 0];
-            }
-
-            return [start, end - start];
+    private parseGridColumnOrRow(value: string, totalRows: number) {
+        let start: number = 0;
+        let span: number = 0;
+    
+        // 处理 "auto"（默认从 1 开始，占 1 行）
+        if (value === "auto") {
+            return { start, span };
         }
-
-        return [0, 1];
+    
+        const parts = value.split("/").map(part => part.trim());
+    
+        // 处理单个数字格式，例如 "2"
+        if (parts.length === 1) {
+            if (parts[0].startsWith("span")) {
+                span = parseInt(parts[0].replace("span", "").trim(), 10);
+            } else {
+                start = parseInt(parts[0], 10) - 1; // parts[0] 从 1 开始，所以需要减 1
+                span = 1;
+            }
+        }
+        // 处理 "2 / 4" 或 "2 / span 2"
+        else if (parts.length === 2) {
+            const [left, right] = parts;
+    
+            // 解析起始行
+            if (left.startsWith("span")) {
+                span = parseInt(left.replace("span", "").trim(), 10);
+            } else {
+                start = left === "auto" ? 0 : parseInt(left, 10) - 1;
+            }
+    
+            // 解析终止行或者 span
+            if (right.startsWith("span")) {
+                span = parseInt(right.replace("span", "").trim(), 10);
+            } else {
+                const end = right === "-1" ? totalRows + 1 : parseInt(right, 10);
+                span = end - start;
+            }
+        }
+    
+        return { start, span };
     }
 
     private setupGridItemLoc(GridSlot: UE.GridSlot, childProps: any) {
         // 优先解析gridColumn和gridRow
-        const gridColumn = childProps.style?.gridColumn;
-        const gridRow = childProps.style?.gridRow;
+        const childStyle = mergeClassStyleAndInlineStyle(childProps);
+        const gridColumn = childStyle?.gridColumn;
+        const gridRow = childStyle?.gridRow;
 
         let columnStart = 0, columnSpan = 1;
         let rowStart = 0, rowSpan = 1;
@@ -131,8 +161,8 @@ export class GridPanelWrapper extends ComponentWrapper {
             columnStart = start;
             columnSpan = span;
         } else {
-            const gridColumnStart = childProps.style?.gridColumnStart;
-            const gridColumnEnd = childProps.style?.gridColumnEnd;
+            const gridColumnStart = childStyle?.gridColumnStart;
+            const gridColumnEnd = childStyle?.gridColumnEnd;
             let start = parseInt(gridColumnStart);
             let end = parseInt(gridColumnEnd);
             if (end < start) {
@@ -148,8 +178,8 @@ export class GridPanelWrapper extends ComponentWrapper {
             rowStart = start;
             rowSpan = span;
         } else {
-            const gridRowStart = childProps.style?.gridRowStart;
-            const gridRowEnd = childProps.style?.gridRowEnd;
+            const gridRowStart = childStyle?.gridRowStart;
+            const gridRowEnd = childStyle?.gridRowEnd;
             let start = parseInt(gridRowStart);
             let end = parseInt(gridRowEnd);
             if (end < start) {
@@ -204,8 +234,8 @@ export class GridPanelWrapper extends ComponentWrapper {
         const vAlignActionMap = {
             'start': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
             'end': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
-            'left': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
-            'right': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
+            'top': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
+            'bottom': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
             'flex-start': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Top),
             'flex-end': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Bottom),
             'center': () => GridSlot.SetVerticalAlignment(UE.EVerticalAlignment.VAlign_Center),

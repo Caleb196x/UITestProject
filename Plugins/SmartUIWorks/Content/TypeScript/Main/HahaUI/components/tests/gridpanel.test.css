@@ -1,0 +1,38 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: 200px auto; /* 侧边栏 200px，主区域自适应 */
+    grid-template-rows: 60px auto 60px; /* 头部 60px，内容自适应，底部 60px */
+    gap: 10px; /* 单元格间距 */
+    padding: 10px;
+    background-color: #08c7d8;
+  }
+  
+  /* Grid Items */
+  .item {
+    padding: 20px;
+    font-size: 18px;
+    text-align: center;
+    background: lightblue;
+    border-radius: 5px;
+  }
+  
+  /* 指定单元格位置 */
+  .header {
+    grid-column: 1 / -1; /* 跨所有列 */
+    background: lightcoral;
+  }
+  
+  .sidebar {
+    grid-row: 2 / span 1; /* 只占据内容区 */
+    background: rgba(13, 13, 13, 0.968);
+  }
+  
+  .content {
+    background: rgb(149, 6, 3);
+  }
+  
+  .footer {
+    grid-column: 1 / -1; /* 跨所有列 */
+    background: rgb(44, 175, 11);
+  }
+  
