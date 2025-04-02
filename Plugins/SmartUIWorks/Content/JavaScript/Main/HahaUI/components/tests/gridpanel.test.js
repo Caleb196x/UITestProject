@@ -11,37 +11,37 @@ function GridPanelExample() {
             gridTemplateRows: "repeat(3, 1fr)", // 头部 60px，内容自适应，底部 60px
             gap: "10px",
             padding: "10px",
-            backgroundColor: "#f0f0f0",
-            justifySelf: 'left',
-            alignSelf: 'top',
+            backgroundColor: "#f0f0f0", width: "800px", height: "600px",
+            justifySelf: 'center',
+            alignSelf: 'center',
         },
         item: {
-            padding: "20px",
+            padding: "5px",
             fontSize: "18px",
             borderRadius: "5px",
         },
         header: {
-            gridRow: "0 / 1",
-            gridColumn: "0 / 3", // 跨所有列
+            gridRow: "1",
+            gridColumn: "1 / -1", // 跨所有列
             background: "lightcoral",
         },
         sidebar: {
-            gridRow: "1 / 1",
-            gridColumn: "0 / 1",
+            gridRow: "2",
+            gridColumn: "1 / 1",
             background: "lightgreen",
         },
         content: {
-            gridRow: "1 / 1",
-            gridColumn: "1 / 3",
+            gridRow: "2",
+            gridColumn: "2 / span 2",
             background: "blue",
         },
         footer: {
-            gridRow: "2 / 2",
-            gridColumn: "0 / 3",
+            gridRow: "3",
+            gridColumn: "1 / -1",
             background: "lightsalmon",
         },
     };
-    return (React.createElement("div", { style: { width: "400px", height: "200px" } },
+    return (React.createElement("div", null,
         React.createElement("div", { style: styles.gridContainer },
             React.createElement("div", { style: { ...styles.item, ...styles.header } }, "Header"),
             React.createElement("div", { style: { ...styles.item, ...styles.sidebar } }, "Sidebar"),

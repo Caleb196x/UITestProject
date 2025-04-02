@@ -299,11 +299,11 @@ function parseBackgroundLayer(layer) {
     ]);
 
     const state = {
-      color: 'transparent',
+      color: 'none',
       image: 'none',
-      position: '0% 0%',
-      size: 'auto',
-      repeat: 'repeat',
+      position: 'none',
+      size: 'none',
+      repeat: 'none',
       attachment: 'scroll'
     };
   
@@ -363,6 +363,10 @@ function parseBackground(background: string) : any {
     // 2. 提取出background中定义的background-position值
     // 3. 提取出background中定义的background-repeat值
     // 4. 提取出background中定义的background-image值
+    if (!background) {
+        return {};
+    }
+
     const { 
         color, 
         image, 
@@ -373,10 +377,18 @@ function parseBackground(background: string) : any {
     } = parseBackgroundLayer(background);
 
     let result = {};
-    result['color'] = parseBackgroundColor(color);
-    result['image'] = parseBackgroundImage(image, size);
-    result['position'] = parseBackgroundPosition(position);
-    result['repeat'] = parseBackgroundRepeat(repeat, result['image']);
+    if (color !== 'none') {
+        result['color'] = parseBackgroundColor(color);
+    }
+
+    if (image !== 'none') {
+        result['image'] = parseBackgroundImage(image, size);
+        result['repeat'] = parseBackgroundRepeat(repeat, result['image']);
+    }
+
+    if (position !== 'none') {
+        result['position'] = parseBackgroundPosition(position);
+    }
 
     return result;
 }

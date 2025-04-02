@@ -145,6 +145,9 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
                 }
             }
         }
+        // ensure the number legacy
+        start = start < 0 ? 0 : start;
+        span = span < 0 ? 0 : span;
         return { start, span };
     }
     setupGridItemLoc(GridSlot, childProps) {
@@ -246,7 +249,13 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
         this.setupGridItemLoc(Slot, childProps);
         this.setupGridAlignment(Slot, childProps);
         const margin = this.containerStyle?.margin;
-        Slot.SetPadding((0, common_utils_1.convertMargin)(margin, this.containerStyle));
+        if (margin) {
+            Slot.SetPadding((0, common_utils_1.convertMargin)(margin, this.containerStyle));
+        }
+        const padding = this.containerStyle?.padding;
+        if (padding) {
+            Slot.SetPadding((0, common_utils_1.convertMargin)(padding, this.containerStyle));
+        }
     }
     convertToWidget() {
         this.containerStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(this.props);

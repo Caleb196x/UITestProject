@@ -156,6 +156,9 @@ export class GridPanelWrapper extends ComponentWrapper {
             }
         }
     
+        // ensure the number legacy
+        start = start < 0 ? 0 : start;
+        span = span < 0 ? 0 : span;
         return { start, span };
     }
 
@@ -262,7 +265,14 @@ export class GridPanelWrapper extends ComponentWrapper {
         this.setupGridItemLoc(Slot, childProps);
         this.setupGridAlignment(Slot, childProps);
         const margin = this.containerStyle?.margin;
-        Slot.SetPadding(convertMargin(margin, this.containerStyle));
+        if (margin) {
+            Slot.SetPadding(convertMargin(margin, this.containerStyle));
+        }
+
+        const padding = this.containerStyle?.padding;
+        if (padding) {
+            Slot.SetPadding(convertMargin(padding, this.containerStyle));
+        }
     }
 
     override convertToWidget(): UE.Widget {
