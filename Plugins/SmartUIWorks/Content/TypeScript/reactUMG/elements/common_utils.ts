@@ -172,6 +172,8 @@ export function loadTextureFromImagePath(imagePath: string) : UE.Texture2D | und
 
 export function parseBackgroundImage(backgroundImage: string, backgroundSize: string) : UE.SlateBrush | undefined {
     let brush = new UE.SlateBrush();
+    brush.DrawAs = UE.ESlateBrushDrawType.Image;
+
     if (typeof backgroundImage !== 'string') {
         brush.ResourceObject = backgroundImage as UE.Texture2D;
         return brush;
@@ -228,6 +230,25 @@ export function parseBackgroundImage(backgroundImage: string, backgroundSize: st
         console.warn(`Failed to load texture from image path: ${imagePath}`);
     } else {
         brush.ResourceObject = texture;
+    }
+
+    // parse backgroundSize
+    if (backgroundSize) {
+        const sizeValues = backgroundSize.split(' ');
+        if (sizeValues.length === 1) {
+            if (sizeValues[0] === 'cover' || sizeValues[0] === 'auto') {
+                brush.Tiling = UE.ESlateBrushTileType.NoTile;
+            } else if (sizeValues[0] === 'contain') {
+                brush.Tiling = UE.ESlateBrushTileType.Both;
+            } else {
+                brush.ImageSize.X = Number(sizeValues[0]);
+                brush.ImageSize.Y = Number(sizeValues[0]);
+            }
+        } else if (sizeValues.length === 2) {
+            brush.Tiling = UE.ESlateBrushTileType.Both;
+            brush.ImageSize.X = Number(sizeValues[0]);
+            brush.ImageSize.Y = Number(sizeValues[1]);
+        }
     }
 
     return brush;
@@ -316,6 +337,7 @@ function parseBackgroundLayer(layer) {
     });
   
     // 处理位置/尺寸
+    // fixme@Caleb196x: 解析的有点问题
     if (positionBuffer.length > 0) {
       const slashIndex = positionBuffer.indexOf('/');
       if (slashIndex > -1) {
@@ -352,7 +374,77 @@ function parseBackground(background: string) : any {
     return result;
 }
 
-export function parseBackgroundProps(style: any): any {
+export function parseChildAlignment(childStyle: any) {
+    // 解析子元素在border中的对齐方式和padding
+    let alignment = {
+        horizontal: UE.EHorizontalAlignment.HAlign_Center,
+        vertical: UE.EVerticalAlignment.VAlign_Center,
+        padding: new UE.Margin(0, 0, 0, 0)
+    }
+
+    const childJustifySelf = childStyle?.justifySelf;
+    if (childJustifySelf) {
+        switch (childJustifySelf) {
+            case 'start':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Left;
+                break;
+            case 'end':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Right;
+                break;
+            case 'center':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Center;
+                break;
+            case 'stretch':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Fill;
+                break;
+            case 'left':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Top;
+                break;
+            case 'right':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Bottom;
+                break;
+            default:
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Center;
+                break;
+        }
+    }
+
+    const childAlignSelf = childStyle?.alignSelf;
+    if (childAlignSelf) {
+        switch (childAlignSelf) {
+            case 'start':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Top;
+                break;
+            case 'end':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Bottom;
+                break;
+            case 'center':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Center;
+                break;
+            case 'stretch':
+                alignment.vertical = UE.EVerticalAlignment.VAlign_Fill;
+                break;
+            case 'left':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Left;
+                break;
+            case 'right':
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Right;
+                break;
+            default:
+                alignment.horizontal = UE.EHorizontalAlignment.HAlign_Center;
+                break;
+        }
+    }
+
+    const childPadding = childStyle?.padding;
+    if (childPadding) {
+        alignment.padding = convertMargin(childPadding, childStyle);
+    }
+
+    return alignment;
+}
+
+export function parseBackgroundProps(style: any, childStyle?: any): any {
     // image转换成brush image
     // repeat转换成image中的tiling模式
     // position转换成alignment和padding
@@ -363,6 +455,11 @@ export function parseBackgroundProps(style: any): any {
         result = parseBackground(background);
     }
 
+    const backgroundColor = style?.backgroundColor;
+    if (backgroundColor) {
+        result['color'] = parseBackgroundColor(backgroundColor);
+    }
+
     const backgroundImage = style?.backgroundImage;
     const backgroundSize = style?.backgroundSize;
     if (backgroundImage) {
@@ -370,19 +467,15 @@ export function parseBackgroundProps(style: any): any {
     }
 
     const backgroundRepeat = style?.backgroundRepeat;
-    if (backgroundRepeat) {
+    if (backgroundRepeat && result['image']) {
         result['image'] = parseBackgroundRepeat(backgroundRepeat, result['image']);
     }
 
-    const backgroundPosition = style?.backgroundPosition;
-    if (backgroundPosition) {
-        result['alignment'] = parseBackgroundPosition(backgroundPosition);
-    }
+    // const backgroundPosition = style?.backgroundPosition;
+    // if (backgroundPosition && result['image']) {
+    //     result['alignment'] = parseBackgroundPosition(backgroundPosition);
+    // }
 
-    const backgroundColor = style?.backgroundColor;
-    if (backgroundColor) {
-        result['color'] = parseBackgroundColor(backgroundColor);
-    }
-
+    result['alignment'] = parseChildAlignment(childStyle);
     return result;
 }

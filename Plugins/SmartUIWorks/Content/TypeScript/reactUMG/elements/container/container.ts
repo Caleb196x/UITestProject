@@ -4,7 +4,7 @@ import { convertLengthUnitToSlateUnit,
     mergeClassStyleAndInlineStyle, 
     parseAspectRatio, parseBackgroundProps, 
     parseBackgroundColor, parseScale,
-    parseBackgroundImage } from '../common_utils';
+    parseBackgroundImage, parseChildAlignment } from '../common_utils';
 import { parseColor } from '../property/color_parser';
 import { WrapBoxWrapper } from './wrapbox';
 import { GridPanelWrapper } from './gridpanel';
@@ -84,7 +84,7 @@ export class ContainerWrapper extends ComponentWrapper {
         }
     }
 
-    private setupChildSize(Item: UE.Widget, Props?: any): UE.Widget {
+    private setupChildSize(Item: UE.Widget, Props?: any, childProps?: any): UE.Widget {
         const childStyle = mergeClassStyleAndInlineStyle(Props);
         const width = childStyle?.width || 'auto';
         const height = childStyle?.height || 'auto';
@@ -127,10 +127,15 @@ export class ContainerWrapper extends ComponentWrapper {
                 sizeBox.SetMinAspectRatio(parseAspectRatio(aspectRatio));
             }
 
-            const Slot = sizeBox.AddChild(Item);
+            const Slot = sizeBox.AddChild(Item) as UE.SizeBoxSlot;
             if (Slot) {
-                
+                const childStyle = mergeClassStyleAndInlineStyle(childProps);
+                const childAlignment = parseChildAlignment(childStyle);
+                Slot.SetHorizontalAlignment(childAlignment.horizontal);
+                Slot.SetVerticalAlignment(childAlignment.vertical);
+                Slot.SetPadding(childAlignment.padding);
             }
+
             return sizeBox;
         }
     }
@@ -162,7 +167,7 @@ export class ContainerWrapper extends ComponentWrapper {
         }
     }
 
-    private setupBackground(Item: UE.Widget, style?: any): UE.Widget {
+    private setupBackground(Item: UE.Widget, style?: any, childStyle?: any): UE.Widget {
 
         const parsedBackground = parseBackgroundProps(style);
         // 将background转换为image, repeat, color, position等内容
@@ -204,8 +209,9 @@ export class ContainerWrapper extends ComponentWrapper {
         return borderWidget;
     }
 
-    private setupBorderAndBackground(Item: UE.Widget, Props?: any): UE.Widget {
+    private setupBorderAndBackground(Item: UE.Widget, Props?: any, childProps?: any): UE.Widget {
         const style = mergeClassStyleAndInlineStyle(Props);
+        const childStyle = mergeClassStyleAndInlineStyle(childProps);
         const background = style?.background;
         const backgroundColor = style?.backgroundColor;
         const backgroundImage = style?.backgroundImage;
@@ -214,7 +220,7 @@ export class ContainerWrapper extends ComponentWrapper {
         const usingBackground = backgroundColor || backgroundImage || backgroundPosition || background;
         
         if (usingBackground) {
-            return this.setupBackground(Item, style);
+            return this.setupBackground(Item, style, childStyle);
         }
 
         return Item;
@@ -226,10 +232,9 @@ export class ContainerWrapper extends ComponentWrapper {
         // 3. 根据objectFit添加scale box并设置缩放
         // 4. 添加background
         this.setupVisibility(parentItem);
-        // fixme@Caleb196x: 在将childItem添加到sizebox后，需要设置childItem相对于sizebox的alignment？
-        childItem = this.setupChildSize(childItem, childProps);
-        childItem = this.setupChildScale(childItem, childProps);
-        childItem = this.setupBorderAndBackground(childItem, childProps);
+        childItem = this.setupChildSize(childItem, this.props, childProps);
+        childItem = this.setupChildScale(childItem, this.props);
+        childItem = this.setupBorderAndBackground(childItem, this.props, childProps);
         this.commonWrapper.appendChildItem(parentItem, childItem, childItemTypeName, childProps);
     }
 
