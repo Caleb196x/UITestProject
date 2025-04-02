@@ -5,6 +5,7 @@ import face from '@assets/face.png';
 import { FlexStyleTest } from './tests/flex_style.test';
 import { ColorTest } from './tests/color.test';
 import { BackgroundPositionTest } from './tests/background.test';
+import GridPanelExample from './tests/gridpanel.test';
 
 interface State {
     username: string;
@@ -23,6 +24,6 @@ export class MainComponent extends React.Component<Props, State> {
     }
       // 渲染方法
       render() {
-        return <BackgroundPositionTest />  // fixme@Caleb196x: 替换为FlexStyleTest后无法重新加载
+        return <GridPanelExample />  // fixme@Caleb196x: 替换为FlexStyleTest后无法重新加载
     }
 }

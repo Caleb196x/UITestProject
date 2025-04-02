@@ -60,9 +60,9 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
             this.commonWrapper = flexWrapper;
         }
         this.originWidget = widget;
+        widget = this.setupBorderAndBackground(widget, this.props);
         widget = this.setupBoxSize(widget, this.props);
         widget = this.setupBoxScale(widget, this.props);
-        widget = this.setupBorderAndBackground(widget, this.props);
         return widget;
     }
     setupVisibility(parentItem) {

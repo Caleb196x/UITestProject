@@ -70,10 +70,11 @@ export class ContainerWrapper extends ComponentWrapper {
         }
 
         this.originWidget = widget;
+
+        widget = this.setupBorderAndBackground(widget, this.props);
         widget = this.setupBoxSize(widget, this.props);
         widget = this.setupBoxScale(widget, this.props);
-        widget = this.setupBorderAndBackground(widget, this.props);
-
+        
         return widget;
     }
 
