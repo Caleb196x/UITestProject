@@ -5,6 +5,7 @@ import { mergeClassStyleAndInlineStyle, convertMargin } from '../common_utils';
 export class GridPanelWrapper extends ComponentWrapper {
     private containerStyle: any;
     private totalRows: number = 0;
+    private totalColumns: number = 0;
 
     constructor(type: string, props: any) {
         super();
@@ -53,7 +54,7 @@ export class GridPanelWrapper extends ComponentWrapper {
             const unit = match[2] || 'px';
             
             if (unit === 'em' || unit === 'rem') {
-                numValue = numValue * 16;
+                numValue = numValue * 16; // todo@Caleb196x: 读取font size，如果没有font size，则使用默认值16px
             }
 
             // todo@Caleb196x: 需要知道父控件的宽度和长度所占像素值，然后根据px值转换成占比值fr
@@ -72,6 +73,16 @@ export class GridPanelWrapper extends ComponentWrapper {
         // 指出的单位有fr, repeat(3, 1fr)
         if (gridTemplateColumns) {
             const columnDefinitions = this.parseGridTemplate(gridTemplateColumns);
+            this.totalColumns = columnDefinitions.length;
+            let columnFill: number[] = [];
+
+            // 思路：
+            // 所有值的单位相同的情况
+            // 1. 如果值的单位是绝对长度如px, em, rem，则通过计算每个值所在所有值的比例作为fill值；
+            // 2. 如果单位是fr，则直接使用fr值；
+            // 值的单位不同，混合使用的情况
+            // 3. 如果当前值是auto, 则使用上一个值进行计算；
+            // 4. 如果是fr和其他绝对长度单位混合，将其他绝对长度单位转换成1个fr单位，并给出警告信息；
             for (let i = 0; i < columnDefinitions.length; i++) {
                 const columnDef = columnDefinitions[i];
                 if (columnDef.type === 'fr') {
@@ -80,10 +91,10 @@ export class GridPanelWrapper extends ComponentWrapper {
                 } else if (columnDef.type === 'auto') {
                     // For auto, we use auto-sizing
                     gridPanel.SetColumnFill(i, 0); // Default fill value
-                } else{
+                } else {
                     // For fixed sizes (px, em, etc.), we set a fixed size
                     gridPanel.SetColumnFill(i, columnDef.value);
-                }
+                } 
             }
         }
 
