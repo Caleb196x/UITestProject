@@ -55,7 +55,6 @@ class UEWidget {
         }
     }
     init(type, props) {
-        console.log("UEWidget: ", type, props);
         // create react
         this.reactWrapper = (0, base_components_1.CreateReactComponentWrapper)(type, props);
         if (this.reactWrapper) {

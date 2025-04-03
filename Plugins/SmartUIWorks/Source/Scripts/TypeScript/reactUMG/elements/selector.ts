@@ -95,7 +95,7 @@ export class SelectWrapper extends ComponentWrapper {
 
     override updateWidgetProperty(widget: UE.Widget, oldProps: any, newProps: any, updateProps: Record<string, any>): boolean {
         if (this.typeName === "option") {
-            console.log("Do not update anything for option");
+            console.warn("Do not update anything for option");
             return false;
         }
 

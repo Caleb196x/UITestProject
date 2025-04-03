@@ -50,7 +50,7 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
         const justifyContent = style?.justifyContent || 'flex-start';
         const alignItems = style?.alignItems || 'stretch';
         let rowReverse = this.flexDirection === 'row-reverse';
-        const flexValue = childStyle?.flex || 0;
+        const flexValue = childStyle?.flex || 1;
         const alignSelf = childStyle?.alignSelf;
         const justifySelf = childStyle?.justifySelf;
         // Set horizontal alignment based on justifyContent
@@ -98,8 +98,8 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
             'flex-end': hEndSetVerticalAlignmentFunc,
             'start': hStartSetVerticalAlignmentFunc,
             'end': hEndSetVerticalAlignmentFunc,
-            'left': hStartSetVerticalAlignmentFunc,
-            'right': hEndSetVerticalAlignmentFunc
+            'top': hStartSetVerticalAlignmentFunc,
+            'bottom': hEndSetVerticalAlignmentFunc
         };
         const vSpaceBetweenSetAlginFunc = (verticalBoxSlot) => {
             verticalBoxSlot.SetSize(new UE.SlateChildSize(flexValue, UE.ESlateSizeRule.Fill));
@@ -146,8 +146,8 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
             'flex-end': vEndSetHorizontalAlignmentFunc,
             'start': vStartSetHorizontalAlignmentFunc,
             'end': vEndSetHorizontalAlignmentFunc,
-            'left': vStartSetHorizontalAlignmentFunc,
-            'right': vEndSetHorizontalAlignmentFunc
+            'top': vStartSetHorizontalAlignmentFunc,
+            'bottom': vEndSetHorizontalAlignmentFunc
         };
         if (this.containerType === container_1.UMGContainerType.HorizontalBox) {
             const horizontalBoxSlot = Slot;
@@ -177,7 +177,7 @@ class FlexWrapper extends common_wrapper_1.ComponentWrapper {
         }
         else if (this.containerType === container_1.UMGContainerType.VerticalBox) {
             const verticalBoxSlot = Slot;
-            if (justifyContent == 'space-between') {
+            if (justifyContent?.includes('space-between')) {
                 vSpaceBetweenSetAlginFunc(verticalBoxSlot);
             }
             const vAlignSelfValue = alignSelf?.split(' ').find(v => vAlignSelfActionMap[v]);

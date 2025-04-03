@@ -425,6 +425,10 @@ function parseChildAlignment(childStyle) {
     if (childPadding) {
         alignment.padding = convertMargin(childPadding, childStyle);
     }
+    const childMargin = childStyle?.margin;
+    if (childMargin) {
+        alignment.padding = convertMargin(childMargin, childStyle);
+    }
     return alignment;
 }
 function parseBackgroundProps(style, childStyle) {

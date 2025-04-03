@@ -62,7 +62,6 @@ class UEWidget {
     }
 
     init(type: string, props: any) {
-        console.log("UEWidget: ", type, props)
         // create react
         this.reactWrapper = CreateReactComponentWrapper(type, props);
         if (this.reactWrapper)
@@ -90,13 +89,10 @@ class UEWidget {
                 myProps[key] = val;
             }
         }
-        //console.log("UEWidget", type, JSON.stringify(myProps))
         puerts.merge(this.nativePtr, myProps);
-        //console.log(type + ' inited')
     }
   
     bind(name: string, callback: Function) {
-        console.log("bind: ", name, callback)
         let nativePtr = this.nativePtr
         let prop = nativePtr[name];
         if (typeof prop.Add === 'function') {
@@ -131,7 +127,6 @@ class UEWidget {
             if (key != 'children' && oldProp != newProp) {
                 if (key == 'Slot') {
                     this.slot = newProp;
-                    //console.log("update slot..", this.toJSON());
                     puerts.merge(this.nativeSlotPtr, newProp);
                     UE.UMGManager.SynchronizeSlotProperties(this.nativeSlotPtr)
                 } else if (typeof newProp === 'function') {
@@ -144,7 +139,6 @@ class UEWidget {
             }
         }
         if (propChange) {
-            //console.log("update props", this.toJSON(), JSON.stringify(myProps));
             puerts.merge(this.nativePtr, myProps);
             UE.UMGManager.SynchronizeWidgetProperties(this.nativePtr)
         }
@@ -168,8 +162,6 @@ class UEWidget {
     }
   
     appendChild(child: UEWidget) {
-        console.log("appendChild: ", child.type)
-        // for 'select' and 'option' tags
         if (!this.nativePtr && this.reactWrapper)
         {
             return;
@@ -188,7 +180,6 @@ class UEWidget {
         if (this.nativePtr instanceof UE.PanelWidget)
         {
             let nativeSlot = (this.nativePtr as UE.PanelWidget).AddChild(child.nativePtr);
-            //console.log("appendChild", (await this.nativePtr).toJSON(), (await child.nativePtr).toJSON());
             child.nativeSlot = nativeSlot;
         }
     }
@@ -197,12 +188,10 @@ class UEWidget {
         console.log("removeChild: ", child.type)
         child.unbindAll();
         (this.nativePtr as UE.PanelWidget).RemoveChild(child.nativePtr);
-        //console.log("removeChild", (await this.nativePtr).toJSON(), (await child.nativePtr).toJSON())
     }
   
     set nativeSlot(value: UE.PanelSlot) {
         this.nativeSlotPtr = value;
-        //console.log('setting nativeSlot', value.toJSON());
         if (this.slot) {
             puerts.merge(this.nativeSlotPtr, this.slot);
             UE.UMGManager.SynchronizeSlotProperties(this.nativeSlotPtr);

@@ -56,7 +56,7 @@ export class FlexWrapper extends ComponentWrapper {
 
         let rowReverse = this.flexDirection === 'row-reverse';
 
-        const flexValue = childStyle?.flex || 0;
+        const flexValue = childStyle?.flex || 1;
         const alignSelf = childStyle?.alignSelf;
         const justifySelf = childStyle?.justifySelf;
 
@@ -111,8 +111,8 @@ export class FlexWrapper extends ComponentWrapper {
             'flex-end': hEndSetVerticalAlignmentFunc,
             'start': hStartSetVerticalAlignmentFunc,
             'end': hEndSetVerticalAlignmentFunc,
-            'left': hStartSetVerticalAlignmentFunc,
-            'right': hEndSetVerticalAlignmentFunc
+            'top': hStartSetVerticalAlignmentFunc,
+            'bottom': hEndSetVerticalAlignmentFunc
         }
 
         const vSpaceBetweenSetAlginFunc = (verticalBoxSlot: UE.VerticalBoxSlot) => {
@@ -170,8 +170,8 @@ export class FlexWrapper extends ComponentWrapper {
             'flex-end': vEndSetHorizontalAlignmentFunc,
             'start': vStartSetHorizontalAlignmentFunc,
             'end': vEndSetHorizontalAlignmentFunc,
-            'left': vStartSetHorizontalAlignmentFunc,
-            'right': vEndSetHorizontalAlignmentFunc
+            'top': vStartSetHorizontalAlignmentFunc,
+            'bottom': vEndSetHorizontalAlignmentFunc
         }
 
         if (this.containerType === UMGContainerType.HorizontalBox) {
@@ -204,7 +204,7 @@ export class FlexWrapper extends ComponentWrapper {
         } else if (this.containerType === UMGContainerType.VerticalBox) {
             const verticalBoxSlot = Slot as UE.VerticalBoxSlot;
 
-            if (justifyContent == 'space-between') {
+            if (justifyContent?.includes('space-between')) {
                 vSpaceBetweenSetAlginFunc(verticalBoxSlot);
             }
 

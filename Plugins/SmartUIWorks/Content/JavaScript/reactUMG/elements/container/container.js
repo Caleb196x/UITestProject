@@ -5,7 +5,6 @@ const UE = require("ue");
 const common_wrapper_1 = require("../common_wrapper");
 const common_utils_1 = require("../common_utils");
 const color_parser_1 = require("../property/color_parser");
-const wrapbox_1 = require("./wrapbox");
 const gridpanel_1 = require("./gridpanel");
 const scrollbox_1 = require("./scrollbox");
 const flex_1 = require("./flex");
@@ -35,7 +34,6 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
         const overflow = this.containerStyle?.overflow || 'visible';
         const overflowX = this.containerStyle?.overflowX || 'visible';
         const overflowY = this.containerStyle?.overflowY || 'visible';
-        const flexWrap = this.containerStyle?.flexWrap || 'nowrap';
         let widget;
         // Convert to appropriate UMG container based on style
         if (overflow !== 'visible' || overflowX !== 'visible' || overflowY !== 'visible') {
@@ -49,20 +47,16 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
             widget = gridPanelWrapper.convertToWidget();
             this.commonWrapper = gridPanelWrapper;
         }
-        else if (flexWrap === 'wrap' || flexWrap === 'wrap-reverse') {
-            let wrapBoxWrapper = new wrapbox_1.WrapBoxWrapper(this.typeName, this.props);
-            widget = wrapBoxWrapper.convertToWidget();
-            this.commonWrapper = wrapBoxWrapper;
-        }
         else {
             let flexWrapper = new flex_1.FlexWrapper(this.typeName, this.props);
             widget = flexWrapper.convertToWidget();
             this.commonWrapper = flexWrapper;
         }
         this.originWidget = widget;
-        widget = this.setupBorderAndBackground(widget, this.props);
-        widget = this.setupBoxSize(widget, this.props);
-        widget = this.setupBoxScale(widget, this.props);
+        widget = this.setupWrapBox(widget);
+        widget = this.setupBorderAndBackground(widget);
+        widget = this.setupBoxSize(widget);
+        widget = this.setupBoxScale(widget);
         return widget;
     }
     setupVisibility(parentItem) {
@@ -71,8 +65,14 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
             parentItem.SetClipping(UE.EWidgetClipping.ClipToBounds);
         }
     }
-    setupBoxSize(Item, Props, childProps) {
-        const childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(Props);
+    setupBoxSize(Item, Props) {
+        let childStyle = {};
+        if (!Props) {
+            childStyle = this.containerStyle;
+        }
+        else {
+            childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(Props);
+        }
         const width = childStyle?.width || 'auto';
         const height = childStyle?.height || 'auto';
         if (width === 'auto' && height === 'auto') {
@@ -112,7 +112,13 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
         }
     }
     setupBoxScale(Item, Props) {
-        const childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(Props);
+        let childStyle = {};
+        if (!Props) {
+            childStyle = this.containerStyle;
+        }
+        else {
+            childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(Props);
+        }
         const objectFit = childStyle?.objectFit;
         if (objectFit) {
             const scaleBox = new UE.ScaleBox();
@@ -142,15 +148,57 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
             return Item;
         }
     }
+    setupWrapBox(Item, Props) {
+        let childStyle = {};
+        if (!Props) {
+            childStyle = this.containerStyle;
+        }
+        else {
+            childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(Props);
+        }
+        const flexWrap = childStyle?.flexWrap || 'nowrap';
+        if (flexWrap !== 'wrap' || flexWrap !== 'wrap-reverse') {
+            return Item;
+        }
+        const wrapBox = new UE.WrapBox();
+        const flexDirection = childStyle?.flexDirection;
+        const gap = childStyle?.gap;
+        wrapBox.Orientation =
+            (flexDirection === 'column' || flexDirection === 'column-reverse')
+                ? UE.EOrientation.Orient_Vertical : UE.EOrientation.Orient_Horizontal;
+        wrapBox.SetInnerSlotPadding((0, common_utils_1.convertGap)(gap, childStyle));
+        const justifyItemsActionMap = {
+            'flex-start': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
+            'flex-end': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
+            'start': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
+            'end': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
+            'left': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
+            'right': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
+            'center': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Center),
+            'stretch': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Fill)
+        };
+        // WrapBox中定义的justifyItems决定了子元素的对齐方式
+        const justifyItems = this.containerStyle?.justifyItems;
+        if (justifyItems) {
+            justifyItems.split(' ')
+                .filter(value => justifyItemsActionMap[value])
+                .forEach(value => justifyItemsActionMap[value]());
+        }
+        this.extraBoxSlot = wrapBox.AddChild(Item);
+        return wrapBox;
+    }
     setupBackground(Item, style) {
         const parsedBackground = (0, common_utils_1.parseBackgroundProps)(style);
         // 将background转换为image, repeat, color, position等内容
+        let useBorder = false;
         const borderWidget = new UE.Border();
         if (parsedBackground?.image) {
             borderWidget.SetBrush(parsedBackground.image);
+            useBorder = true;
         }
         if (parsedBackground?.color) {
             borderWidget.SetBrushColor(parsedBackground.color);
+            useBorder = true;
         }
         if (parsedBackground?.alignment) {
             borderWidget.SetVerticalAlignment(parsedBackground.alignment?.vertical);
@@ -165,7 +213,12 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
             const color = (0, color_parser_1.parseColor)(contentColor);
             borderWidget.SetContentColorAndOpacity(new UE.LinearColor(color.r / 255.0, color.g / 255.0, color.b / 255.0, color.a));
         }
-        this.extraBoxSlot = borderWidget.AddChild(Item);
+        if (useBorder) {
+            this.extraBoxSlot = borderWidget.AddChild(Item);
+        }
+        else {
+            return Item;
+        }
         return borderWidget;
     }
     setupBorder(Item, Props) {
@@ -174,14 +227,20 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
         return borderWidget;
     }
     setupBorderAndBackground(Item, Props) {
-        const style = (0, common_utils_1.mergeClassStyleAndInlineStyle)(Props);
-        const background = style?.background;
-        const backgroundColor = style?.backgroundColor;
-        const backgroundImage = style?.backgroundImage;
-        const backgroundPosition = style?.backgroundPosition;
+        let childStyle = {};
+        if (!Props) {
+            childStyle = this.containerStyle;
+        }
+        else {
+            childStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(Props);
+        }
+        const background = childStyle?.background;
+        const backgroundColor = childStyle?.backgroundColor;
+        const backgroundImage = childStyle?.backgroundImage;
+        const backgroundPosition = childStyle?.backgroundPosition;
         const usingBackground = backgroundColor || backgroundImage || backgroundPosition || background;
         if (usingBackground) {
-            return this.setupBackground(Item, style);
+            return this.setupBackground(Item, childStyle);
         }
         return Item;
     }
@@ -200,6 +259,11 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
                 this.extraBoxSlot.SetPadding(childAlignment.padding);
             }
             else if (this.extraBoxSlot instanceof UE.BorderSlot) {
+                this.extraBoxSlot.SetHorizontalAlignment(childAlignment.horizontal);
+                this.extraBoxSlot.SetVerticalAlignment(childAlignment.vertical);
+                this.extraBoxSlot.SetPadding(childAlignment.padding);
+            }
+            else if (this.extraBoxSlot instanceof UE.WrapBoxSlot) {
                 this.extraBoxSlot.SetHorizontalAlignment(childAlignment.horizontal);
                 this.extraBoxSlot.SetVerticalAlignment(childAlignment.vertical);
                 this.extraBoxSlot.SetPadding(childAlignment.padding);
