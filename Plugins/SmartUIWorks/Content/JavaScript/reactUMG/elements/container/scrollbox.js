@@ -127,18 +127,15 @@ class ScrollBoxWrapper extends common_wrapper_1.ComponentWrapper {
         this.containerStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(this.props);
         const overflow = this.containerStyle?.overflow;
         const flexDirection = this.containerStyle?.flexDirection || 'column';
-        let outsideBox = null;
-        outsideBox = new UE.HorizontalBox();
-        if (overflow === 'hidden' || overflow === 'clip') {
-            outsideBox.SetClipping(UE.EWidgetClipping.ClipToBounds);
-        }
         this.isScrollX = this.containerStyle?.overflowX === 'scroll'
             || this.containerStyle?.overflowX === 'auto'
             || flexDirection === 'row';
         const scrollBox = new UE.ScrollBox();
         this.setupScrollBox(scrollBox);
-        outsideBox.AddChildToHorizontalBox(scrollBox);
-        return outsideBox;
+        if (overflow === 'hidden' || overflow === 'clip') {
+            scrollBox.SetClipping(UE.EWidgetClipping.ClipToBounds);
+        }
+        return scrollBox;
     }
     updateWidgetProperty(widget, oldProps, newProps, updateProps) {
         return true;

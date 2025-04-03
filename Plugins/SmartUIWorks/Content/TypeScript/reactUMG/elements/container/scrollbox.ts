@@ -140,11 +140,6 @@ export class ScrollBoxWrapper extends ComponentWrapper {
         this.containerStyle = mergeClassStyleAndInlineStyle(this.props);
         const overflow = this.containerStyle?.overflow;
         const flexDirection = this.containerStyle?.flexDirection || 'column';
-        let outsideBox = null;
-        outsideBox = new UE.HorizontalBox();
-        if (overflow === 'hidden' || overflow === 'clip') {
-            outsideBox.SetClipping(UE.EWidgetClipping.ClipToBounds);
-        }
         
         this.isScrollX = this.containerStyle?.overflowX === 'scroll' 
                             || this.containerStyle?.overflowX === 'auto'
@@ -152,9 +147,10 @@ export class ScrollBoxWrapper extends ComponentWrapper {
 
         const scrollBox = new UE.ScrollBox();
         this.setupScrollBox(scrollBox);
-
-        outsideBox.AddChildToHorizontalBox(scrollBox);
-        return outsideBox;
+        if (overflow === 'hidden' || overflow === 'clip') {
+            scrollBox.SetClipping(UE.EWidgetClipping.ClipToBounds);
+        }
+        return scrollBox;
     }
 
     override updateWidgetProperty(widget: UE.Widget, oldProps: any, newProps: any, updateProps: Record<string, any>): boolean {
