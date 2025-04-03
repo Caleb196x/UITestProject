@@ -65,6 +65,103 @@ export class GridPanelWrapper extends ComponentWrapper {
         return { type: 'fr', value: 1 };
     }
 
+    /**
+     * Converts grid template values to fill values based on the following rules:
+     * 1. For absolute units (px, em, rem), calculate the proportion relative to total absolute values
+     * 2. For fr units, use the fr value directly
+     * 3. For auto values, use the previous value
+     * 4. For mixed units (fr + absolute), convert absolute units to fr with warning
+     */
+    private convertGridTemplatesToFills(values: {type: string, value: number}[]): number[] {
+        const fills: number[] = [];
+        let totalAbsoluteValue = 0;
+        let totalFrValue = 0;
+        let lastFillValue = 1;
+        let hasAbsoluteUnits = false;
+        let hasFrUnits = false;
+
+        // First pass: calculate totals and detect unit types
+        let replacedValues: {type: string, value: number}[] = [];
+        for (const value of values) {
+            // Replace 'auto' values with the nearest non-auto value
+            // If the first element is 'auto', we'll temporarily mark it and handle it after finding the first non-auto value
+            if (value.type === 'auto') {
+                // Find the next non-auto value if we haven't found one yet
+                let nextNonAutoIndex = replacedValues.length;
+                while (nextNonAutoIndex < values.length && values[nextNonAutoIndex].type === 'auto') {
+                    nextNonAutoIndex++;
+                }
+                
+                if (nextNonAutoIndex < values.length) {
+                    // We found a non-auto value ahead, use that
+                    replacedValues.push({...values[nextNonAutoIndex]});
+                } else {
+                    // No non-auto values ahead, use the previous non-auto value
+                    const prevNonAuto = replacedValues.findLast(v => v.type !== 'auto');
+                    if (prevNonAuto) {
+                        replacedValues.push({...prevNonAuto});
+                    } else {
+                        // If no non-auto values found at all, use default
+                        replacedValues.push({type: 'fr', value: 1});
+                    }
+                }
+            } else {
+                // For non-auto values, just add them as is
+                replacedValues.push({...value});
+            }
+        }
+
+        console.log('replacedValues: ', replacedValues);
+
+        for (const value of replacedValues) {
+            if (value.type === 'fr') {
+                totalFrValue += value.value;
+                hasFrUnits = true;
+            } else {
+                totalAbsoluteValue += value.value;
+                hasAbsoluteUnits = true;
+            }
+        }
+
+        // Mixed units case (fr + absolute)
+        if (hasFrUnits && hasAbsoluteUnits) {
+            console.warn('Mixing fr and absolute units in grid template. ' +
+                'Converting absolute units to fr equivalents, but this may lead to unexpected results.');
+            const conversionFactor = totalFrValue / totalAbsoluteValue;
+            
+            for (const value of replacedValues) {
+                if (value.type === 'fr') {
+                    fills.push(value.value);
+                    lastFillValue = value.value;
+                } else {
+                    // Convert absolute to fr equivalent
+                    const convertedValue = value.value * conversionFactor;
+                    fills.push(convertedValue);
+                    lastFillValue = convertedValue;
+                }
+            }
+        } 
+        // All fr units
+        else if (hasFrUnits && !hasAbsoluteUnits) {
+            for (const value of replacedValues) {
+                fills.push(value.value);
+                lastFillValue = value.value;
+            }
+        } 
+        // All absolute units
+        else if (!hasFrUnits && hasAbsoluteUnits) {
+            for (const value of replacedValues) {
+                // Calculate proportion of total
+                const proportion = (value.value / totalAbsoluteValue) * replacedValues.length;
+                fills.push(proportion);
+                lastFillValue = proportion;
+                
+            }
+        }
+
+        return fills;
+    }
+
     private setupGridRowAndColumns(gridPanel: UE.GridPanel) {
         const gridTemplateColumns = this.containerStyle?.gridTemplateColumns;
         const gridTemplateRows = this.containerStyle?.gridTemplateRows;
@@ -74,47 +171,18 @@ export class GridPanelWrapper extends ComponentWrapper {
         if (gridTemplateColumns) {
             const columnDefinitions = this.parseGridTemplate(gridTemplateColumns);
             this.totalColumns = columnDefinitions.length;
-            let columnFill: number[] = [];
-
-            // 思路：
-            // 所有值的单位相同的情况
-            // 1. 如果值的单位是绝对长度如px, em, rem，则通过计算每个值所在所有值的比例作为fill值；
-            // 2. 如果单位是fr，则直接使用fr值；
-            // 值的单位不同，混合使用的情况
-            // 3. 如果当前值是auto, 则使用上一个值进行计算；
-            // 4. 如果是fr和其他绝对长度单位混合，将其他绝对长度单位转换成1个fr单位，并给出警告信息；
-            for (let i = 0; i < columnDefinitions.length; i++) {
-                const columnDef = columnDefinitions[i];
-                if (columnDef.type === 'fr') {
-                    // For fr units, we use proportional sizing
-                    gridPanel.SetColumnFill(i, columnDef.value);
-                } else if (columnDef.type === 'auto') {
-                    // For auto, we use auto-sizing
-                    gridPanel.SetColumnFill(i, 0); // Default fill value
-                } else {
-                    // For fixed sizes (px, em, etc.), we set a fixed size
-                    gridPanel.SetColumnFill(i, columnDef.value);
-                } 
+            let columnFill: number[] = this.convertGridTemplatesToFills(columnDefinitions);
+            for (let i = 0; i < columnFill.length; i++) {
+                gridPanel.SetColumnFill(i, columnFill[i]);
             }
         }
 
         if (gridTemplateRows) {
             const rowDefinitions = this.parseGridTemplate(gridTemplateRows);
             this.totalRows = rowDefinitions.length;
-
-            for (let i = 0; i < rowDefinitions.length; i++) {
-                const rowDef = rowDefinitions[i];
-                if (rowDef.type === 'fr') {
-                    // For fr units, we use proportional sizing
-                    gridPanel.SetRowFill(i, rowDef.value);
-                } else if (rowDef.type === 'auto') {
-                    // For auto, we use auto-sizing
-                    gridPanel.SetRowFill(i, 0); // Default fill value
-                } else {
-                    // todo@Caleb196x: 将像素值转换成fill值
-                    // For fixed sizes (px, em, etc.), we set a fixed size
-                    gridPanel.SetRowFill(i, rowDef.value);
-                }
+            let rowFill: number[] = this.convertGridTemplatesToFills(rowDefinitions);
+            for (let i = 0; i < rowFill.length; i++) {
+                gridPanel.SetRowFill(i, rowFill[i]);
             }
         }
     }
