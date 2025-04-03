@@ -7,11 +7,11 @@ function GridPanelExample() {
     const styles = {
         gridContainer: {
             display: "grid",
-            gridTemplateColumns: "repeat(2, 3fr)", // 侧边栏 200px，主内容自适应
-            gridTemplateRows: "repeat(3, 1fr)", // 头部 60px，内容自适应，底部 60px
+            gridTemplateColumns: "100px auto", // 侧边栏 200px，主内容自适应
+            gridTemplateRows: "40px auto 20px", // 头部 60px，内容自适应，底部 60px
             gap: "10px",
             padding: "10px",
-            backgroundColor: "#f0f0f0", width: "800px", height: "600px",
+            backgroundColor: "#f0f0f0", width: "400px", height: "300px",
             justifySelf: 'center',
             alignSelf: 'center',
         },

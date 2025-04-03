@@ -245,6 +245,11 @@ export class ContainerWrapper extends ComponentWrapper {
         // 2. 根据width, height添加size box并设置大小
         // 3. 根据objectFit添加scale box并设置缩放
         // 4. 添加background
+        if (!childItem) {
+            console.warn(`childItem ${childItemTypeName} is null, can not append to container: ${this.typeName}`);
+            return;
+        }
+
         this.setupVisibility(parentItem);
         this.setupChildAlignment(childProps);
         this.commonWrapper.appendChildItem(this.originWidget, childItem, childItemTypeName, childProps);
