@@ -6,7 +6,6 @@ import { convertLengthUnitToSlateUnit,
     convertGap, parseScale,
     parseBackgroundImage, parseChildAlignment } from '../common_utils';
 import { parseColor } from '../property/color_parser';
-import { WrapBoxWrapper } from './wrapbox';
 import { GridPanelWrapper } from './gridpanel';
 import { ScrollBoxWrapper } from './scrollbox';
 import { FlexWrapper } from './flex';
