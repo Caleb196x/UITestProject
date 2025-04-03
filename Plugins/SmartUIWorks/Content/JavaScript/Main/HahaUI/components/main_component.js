@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainComponent = void 0;
 const React = require("react");
 require("./style.css");
-const scollbox_test_1 = require("./tests/scollbox.test");
+const wrapbox_test_1 = require("./tests/wrapbox.test");
 class MainComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -15,7 +15,7 @@ class MainComponent extends React.Component {
     }
     // 渲染方法
     render() {
-        return React.createElement(scollbox_test_1.ScrollBoxExample, null); // fixme@Caleb196x: 替换为FlexStyleTest后无法重新加载
+        return React.createElement(wrapbox_test_1.WrapBoxExample, null); // fixme@Caleb196x: 替换为FlexStyleTest后无法重新加载
     }
 }
 exports.MainComponent = MainComponent;

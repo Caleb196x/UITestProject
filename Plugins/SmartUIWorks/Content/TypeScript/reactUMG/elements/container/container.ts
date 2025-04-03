@@ -3,7 +3,7 @@ import { ComponentWrapper } from "../common_wrapper";
 import { convertLengthUnitToSlateUnit, 
     mergeClassStyleAndInlineStyle, 
     parseAspectRatio, parseBackgroundProps, 
-    parseBackgroundColor, parseScale,
+    convertGap, parseScale,
     parseBackgroundImage, parseChildAlignment } from '../common_utils';
 import { parseColor } from '../property/color_parser';
 import { WrapBoxWrapper } from './wrapbox';
@@ -40,7 +40,7 @@ export class ContainerWrapper extends ComponentWrapper {
         const overflow = this.containerStyle?.overflow || 'visible';
         const overflowX = this.containerStyle?.overflowX || 'visible';
         const overflowY = this.containerStyle?.overflowY || 'visible';
-        const flexWrap = this.containerStyle?.flexWrap || 'nowrap';
+        
 
         let widget: UE.Widget;
         // Convert to appropriate UMG container based on style
@@ -57,12 +57,6 @@ export class ContainerWrapper extends ComponentWrapper {
             widget = gridPanelWrapper.convertToWidget();
             this.commonWrapper = gridPanelWrapper;
 
-        } else if (flexWrap === 'wrap' || flexWrap === 'wrap-reverse') {
-
-            let wrapBoxWrapper = new WrapBoxWrapper(this.typeName, this.props);
-            widget = wrapBoxWrapper.convertToWidget();
-            this.commonWrapper = wrapBoxWrapper;
-
         } else {
             let flexWrapper = new FlexWrapper(this.typeName, this.props);
             widget = flexWrapper.convertToWidget();
@@ -71,9 +65,10 @@ export class ContainerWrapper extends ComponentWrapper {
 
         this.originWidget = widget;
 
-        widget = this.setupBorderAndBackground(widget, this.props);
-        widget = this.setupBoxSize(widget, this.props);
-        widget = this.setupBoxScale(widget, this.props);
+        widget = this.setupWrapBox(widget);
+        widget = this.setupBorderAndBackground(widget);
+        widget = this.setupBoxSize(widget);
+        widget = this.setupBoxScale(widget);
         
         return widget;
     }
@@ -85,8 +80,14 @@ export class ContainerWrapper extends ComponentWrapper {
         }
     }
 
-    private setupBoxSize(Item: UE.Widget, Props?: any, childProps?: any): UE.Widget {
-        const childStyle = mergeClassStyleAndInlineStyle(Props);
+    private setupBoxSize(Item: UE.Widget, Props?: any): UE.Widget {
+        let childStyle: any = {};
+        if (!Props) {
+            childStyle = this.containerStyle;
+        } else {
+            childStyle = mergeClassStyleAndInlineStyle(Props);
+        }
+
         const width = childStyle?.width || 'auto';
         const height = childStyle?.height || 'auto';
 
@@ -135,7 +136,13 @@ export class ContainerWrapper extends ComponentWrapper {
     }
 
     private setupBoxScale(Item: UE.Widget, Props?: any): UE.Widget {
-        const childStyle = mergeClassStyleAndInlineStyle(Props);
+        let childStyle: any = {};
+        if (!Props) {
+            childStyle = this.containerStyle;
+        } else {
+            childStyle = mergeClassStyleAndInlineStyle(Props);
+        }
+        
         const objectFit = childStyle?.objectFit;
         if (objectFit) {
             const scaleBox = new UE.ScaleBox();
@@ -160,6 +167,54 @@ export class ContainerWrapper extends ComponentWrapper {
         } else {
             return Item;
         }
+    }
+
+    private setupWrapBox(Item: UE.Widget, Props?: any): UE.Widget {
+        let childStyle: any = {};
+        if (!Props) {
+            childStyle = this.containerStyle;
+        } else {
+            childStyle = mergeClassStyleAndInlineStyle(Props);
+        }
+
+        const flexWrap = childStyle?.flexWrap || 'nowrap';
+        if (flexWrap !== 'wrap' || flexWrap !== 'wrap-reverse') {
+            return Item;
+        }
+
+        const wrapBox = new UE.WrapBox();
+        const flexDirection = childStyle?.flexDirection;
+        const gap = childStyle?.gap;
+
+
+        wrapBox.Orientation = 
+            (flexDirection === 'column'|| flexDirection === 'column-reverse')
+            ? UE.EOrientation.Orient_Vertical : UE.EOrientation.Orient_Horizontal;
+
+        wrapBox.SetInnerSlotPadding(convertGap(gap, childStyle));
+
+        const justifyItemsActionMap = {
+            'flex-start': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
+            'flex-end': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
+            'start': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
+            'end': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
+            'left': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Left),
+            'right': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Right),
+            'center': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Center),
+            'stretch': () => wrapBox.SetHorizontalAlignment(UE.EHorizontalAlignment.HAlign_Fill)
+        }
+
+        // WrapBox中定义的justifyItems决定了子元素的对齐方式
+        const justifyItems = this.containerStyle?.justifyItems;
+        if (justifyItems) {
+            justifyItems.split(' ')
+                .filter(value => justifyItemsActionMap[value])
+                .forEach(value => justifyItemsActionMap[value]());
+        }
+
+        this.extraBoxSlot = wrapBox.AddChild(Item) as UE.WrapBoxSlot;
+
+        return wrapBox;
     }
 
     private setupBackground(Item: UE.Widget, style?: any): UE.Widget {
@@ -205,16 +260,22 @@ export class ContainerWrapper extends ComponentWrapper {
     }
 
     private setupBorderAndBackground(Item: UE.Widget, Props?: any): UE.Widget {
-        const style = mergeClassStyleAndInlineStyle(Props);
-        const background = style?.background;
-        const backgroundColor = style?.backgroundColor;
-        const backgroundImage = style?.backgroundImage;
-        const backgroundPosition = style?.backgroundPosition;
+        let childStyle: any = {};
+        if (!Props) {
+            childStyle = this.containerStyle;
+        } else {
+            childStyle = mergeClassStyleAndInlineStyle(Props);
+        }
+
+        const background = childStyle?.background;
+        const backgroundColor = childStyle?.backgroundColor;
+        const backgroundImage = childStyle?.backgroundImage;
+        const backgroundPosition = childStyle?.backgroundPosition;
 
         const usingBackground = backgroundColor || backgroundImage || backgroundPosition || background;
         
         if (usingBackground) {
-            return this.setupBackground(Item, style);
+            return this.setupBackground(Item, childStyle);
         }
 
         return Item;
@@ -236,6 +297,10 @@ export class ContainerWrapper extends ComponentWrapper {
                 (this.extraBoxSlot as UE.BorderSlot).SetHorizontalAlignment(childAlignment.horizontal);
                 (this.extraBoxSlot as UE.BorderSlot).SetVerticalAlignment(childAlignment.vertical);
                 (this.extraBoxSlot as UE.BorderSlot).SetPadding(childAlignment.padding);
+            } else if (this.extraBoxSlot instanceof UE.WrapBoxSlot) {
+                (this.extraBoxSlot as UE.WrapBoxSlot).SetHorizontalAlignment(childAlignment.horizontal);
+                (this.extraBoxSlot as UE.WrapBoxSlot).SetVerticalAlignment(childAlignment.vertical);
+                (this.extraBoxSlot as UE.WrapBoxSlot).SetPadding(childAlignment.padding);
             }
         }
     }
