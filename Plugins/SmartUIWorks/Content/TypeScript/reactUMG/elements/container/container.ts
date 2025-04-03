@@ -221,12 +221,15 @@ export class ContainerWrapper extends ComponentWrapper {
         const parsedBackground = parseBackgroundProps(style);
         // 将background转换为image, repeat, color, position等内容
 
+        let useBorder = false;  
         const borderWidget = new UE.Border();
         if (parsedBackground?.image) {
             borderWidget.SetBrush(parsedBackground.image);
+            useBorder = true;
         }
         if (parsedBackground?.color) {
             borderWidget.SetBrushColor(parsedBackground.color);
+            useBorder = true;
         }
 
         if (parsedBackground?.alignment) {
@@ -247,7 +250,11 @@ export class ContainerWrapper extends ComponentWrapper {
             );
         }
 
-        this.extraBoxSlot = borderWidget.AddChild(Item) as UE.BorderSlot;
+        if (useBorder) {
+            this.extraBoxSlot = borderWidget.AddChild(Item) as UE.BorderSlot;
+        } else {
+            return Item;
+        }
 
         return borderWidget; 
     }

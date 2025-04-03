@@ -46,6 +46,7 @@ export class CanvasWrapper extends ComponentWrapper {
 
     override convertToWidget(): UE.Widget {
         this.containerStyle = mergeClassStyleAndInlineStyle(this.props);
+        // todo@Caleb196x: 添加size, scale, background等属性的解析
         return new UE.CanvasPanel();
     }
 

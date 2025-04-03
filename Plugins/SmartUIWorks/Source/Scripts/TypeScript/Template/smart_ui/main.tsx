@@ -5,7 +5,6 @@ import {$Nullable} from 'puerts';
 import {ReactUMG, Root} from 'reactUMG'
 
 export function Main(coreWidget: $Nullable<UE.SmartUICoreWidget>) : Root {
-    console.log("running smart ui main")
     ReactUMG.init(coreWidget);
     return ReactUMG.render(
         <Components.MainComponent/>

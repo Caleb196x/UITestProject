@@ -190,12 +190,15 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
     setupBackground(Item, style) {
         const parsedBackground = (0, common_utils_1.parseBackgroundProps)(style);
         // 将background转换为image, repeat, color, position等内容
+        let useBorder = false;
         const borderWidget = new UE.Border();
         if (parsedBackground?.image) {
             borderWidget.SetBrush(parsedBackground.image);
+            useBorder = true;
         }
         if (parsedBackground?.color) {
             borderWidget.SetBrushColor(parsedBackground.color);
+            useBorder = true;
         }
         if (parsedBackground?.alignment) {
             borderWidget.SetVerticalAlignment(parsedBackground.alignment?.vertical);
@@ -210,7 +213,12 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
             const color = (0, color_parser_1.parseColor)(contentColor);
             borderWidget.SetContentColorAndOpacity(new UE.LinearColor(color.r / 255.0, color.g / 255.0, color.b / 255.0, color.a));
         }
-        this.extraBoxSlot = borderWidget.AddChild(Item);
+        if (useBorder) {
+            this.extraBoxSlot = borderWidget.AddChild(Item);
+        }
+        else {
+            return Item;
+        }
         return borderWidget;
     }
     setupBorder(Item, Props) {
