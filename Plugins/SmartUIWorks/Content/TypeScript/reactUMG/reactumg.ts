@@ -107,7 +107,7 @@ class UEWidget {
             prop.Bind(callback);
             this.callbackRemovers[name] = () => {
                 prop.Unbind();
-            }
+            } 
         } else {
             console.warn("unsupport callback " + name);
         }

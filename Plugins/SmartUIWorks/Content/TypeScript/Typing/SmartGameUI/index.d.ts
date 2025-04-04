@@ -35,7 +35,8 @@ declare module "SmartGameUI" {
      * Style properties of widget
      */
     interface Style {
-        margin?: RecursivePartial<Margin>;
+        margin?: CssType.Property.Padding | undefined;
+        padding?: CssType.Property.Padding | undefined;
         cursor?: CssType.Property.Cursor | undefined; // todo@Caleb196x: 替换成React的cursor定义
         justifySelf?: CssType.Property.JustifySelf | undefined;
         alignSelf?: CssType.Property.AlignSelf | undefined;
@@ -188,7 +189,7 @@ declare module "SmartGameUI" {
 
     interface BorderProp extends CommonProps {
         backgroundColor?: CssType.Property.Color | undefined;
-        imageStyle?: ImageStyle | undefined;
+        backgroundImage?: ImageStyle | undefined;
         burshColor?: CssType.Property.Color | undefined;
      }
 
@@ -212,10 +213,10 @@ declare module "SmartGameUI" {
         useMouseStep?: boolean | undefined;
         controllerLock?: boolean | undefined;
         barThickness?: number | undefined;
-        normalBarImageStyle?: ImageStyle | undefined;
-        hoverBarImageStyle?: ImageStyle | undefined;
-        normalThumbImageStyle?: ImageStyle | undefined;
-        hoveredThumbImageStyle?: ImageStyle | undefined;
+        normalBarBackground?: ImageStyle | undefined;
+        hoverBarBackground?: ImageStyle | undefined;
+        normalThumbBackground?: ImageStyle | undefined;
+        hoveredThumbBackground?: ImageStyle | undefined;
     }
 
     class RadialSlider extends React.Component<RadialSliderProp> {
@@ -234,10 +235,10 @@ declare module "SmartGameUI" {
         useMouseStep?: boolean | undefined;
         controllerLock?: boolean | undefined;
         barThickness?: number | undefined;
-        normalBarImageStyle?: ImageStyle | undefined;
-        hoverBarImageStyle?: ImageStyle | undefined;
-        normalHandleImageStyle?: ImageStyle | undefined;
-        hoverHandleImageStyle?: ImageStyle | undefined;
+        normalBarBackground?: ImageStyle | undefined;
+        hoverBarBackground?: ImageStyle | undefined;
+        normalHandleBackground?: ImageStyle | undefined;
+        hoverHandleBackground?: ImageStyle | undefined;
     }
 
     class Slider extends React.Component<SliderProp> {
@@ -257,13 +258,13 @@ declare module "SmartGameUI" {
         enableSlider?: boolean | undefined;
         deltaValue?: number | undefined;
         sliderExponent?: number | undefined;
-        arrowImageStyle?: ImageStyle | undefined;
-        backgroundImage?: ImageStyle | undefined;
-        activeBackgroundImage?: ImageStyle | undefined;
-        hoveredBackgroundImage?: ImageStyle | undefined;
-        activeFillImage?: ImageStyle | undefined;
-        hoveredFillImage?: ImageStyle | undefined;
-        inactiveFillImage?: ImageStyle | undefined;
+        arrowBackground?: ImageStyle | undefined;
+        normalBackground?: ImageStyle | undefined;
+        activeBackground?: ImageStyle | undefined;
+        hoveredBackground?: ImageStyle | undefined;
+        activeFillBackground?: ImageStyle | undefined;
+        hoveredFillBackground?: ImageStyle | undefined;
+        inactiveFillBackground?: ImageStyle | undefined;
         textPadding?: RecursivePartial<Margin> | undefined;
         textAlign?: 'left' | 'center' | 'right' | undefined;
         // todo@Caleb196x: 添加字体样式
@@ -342,15 +343,15 @@ declare module "SmartGameUI" {
         allowDragging?: boolean | undefined;
         allowOverscroll?: boolean | undefined;
         navigationDestination?: 'into-view' | 'center' | 'top-left' | 'bottom-right' | undefined;
-        barHorizontalImage?: ImageStyle | undefined;
-        barVerticalImage?: ImageStyle | undefined;
-        normalThumbImage?: ImageStyle | undefined;
-        hoveredThumbImage?: ImageStyle | undefined;
-        draggedThumbImage?: ImageStyle | undefined;
-        verticalTopSlotImage?: ImageStyle | undefined;
-        verticalBottomSlotImage?: ImageStyle | undefined;
-        horizontalLeftSlotImage?: ImageStyle | undefined;
-        horizontalRightSlotImage?: ImageStyle | undefined;
+        barHorizontalBackground?: ImageStyle | undefined;
+        barVerticalBackground?: ImageStyle | undefined;
+        normalThumbBackground?: ImageStyle | undefined;
+        hoveredThumbBackground?: ImageStyle | undefined;
+        draggedThumbBackground?: ImageStyle | undefined;
+        verticalTopSlotBackground?: ImageStyle | undefined;
+        verticalBottomSlotBackground?: ImageStyle | undefined;
+        horizontalLeftSlotBackground?: ImageStyle | undefined;
+        horizontalRightSlotBackground?: ImageStyle | undefined;
     }
 
     class ScrollBox extends React.Component<ScrollBoxProp> {
@@ -361,10 +362,10 @@ declare module "SmartGameUI" {
         textColor?: CssType.Property.Color | undefined;
         backgroundColor?: CssType.Property.Color | undefined;
 
-        backgroundImageStyle?: ImageStyle | undefined;
-        hoveredImageStyle?: ImageStyle | undefined;
-        pressedImageStyle?: ImageStyle | undefined;
-        disabledImageStyle?: ImageStyle | undefined;
+        backgroundImage?: ImageStyle | undefined;
+        hoveredBackgroundImage?: ImageStyle | undefined;
+        pressedBackgroundImage?: ImageStyle | undefined;
+        disabledBackgroundImage?: ImageStyle | undefined;
 
         normalPadding?: CssType.Property.Padding | undefined;
         pressedPadding?: CssType.Property.Padding | undefined;
@@ -389,12 +390,12 @@ declare module "SmartGameUI" {
         pressedSound?: any | undefined;
         selectionChangeSound?: any | undefined;
 
-        background?: ImageStyle | undefined;
-        hoveredBackground?: ImageStyle | undefined;
-        pressedBackground?: ImageStyle | undefined;
-        disabledBackground?: ImageStyle | undefined;
+        backgroundImage?: ImageStyle | undefined;
+        hoveredBackgroundImage?: ImageStyle | undefined;
+        pressedBackgroundImage?: ImageStyle | undefined;
+        disabledBackgroundImage?: ImageStyle | undefined;
 
-        downArrowImage?: ImageStyle | undefined;
+        downArrowBackground?: ImageStyle | undefined;
         downArrowPadding?: CssType.Property.Padding | undefined;
         downArrowAlign?: CssType.Property.AlignSelf | undefined;
     }
