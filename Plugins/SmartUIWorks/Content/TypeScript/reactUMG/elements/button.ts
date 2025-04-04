@@ -53,7 +53,7 @@ export class ButtonWrapper extends ComponentWrapper {
         }
 
         // Handle disabled state
-        if (this.props.disabled) {
+        if (this.props?.disabled) {
             button.bIsEnabled = false;
         }
 

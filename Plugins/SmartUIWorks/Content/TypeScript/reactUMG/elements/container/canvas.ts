@@ -102,7 +102,6 @@ export class CanvasWrapper extends ComponentWrapper {
         if (width !== 'none' && height !== 'none') {
             const widthSU = convertLengthUnitToSlateUnit(width, this.containerStyle);
             const heightSU = convertLengthUnitToSlateUnit(height, this.containerStyle);
-
             canvasSlot.SetSize(new UE.Vector2D(widthSU * scale, heightSU * scale));
         } else if (width !== 'none' && height === 'none') {
 

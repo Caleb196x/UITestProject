@@ -11,7 +11,7 @@ class BackgroundPositionTest extends React.Component {
     render() {
         return (React.createElement("div", null,
             React.createElement("div", { style: { display: 'flex', flexDirection: 'column', justifySelf: 'center', alignSelf: 'center',
-                    width: '600px', height: '600px', backgroundColor: 'blanchedalmond' } },
+                    width: '600px', height: '600px', backgroundColor: 'lightblue' } },
                 React.createElement("div", { style: {
                         backgroundImage: `url(${face_png_1.default})`,
                         backgroundColor: '#45a0a0',

@@ -48,7 +48,7 @@ class ButtonWrapper extends common_wrapper_1.ComponentWrapper {
             this.setupEventHandler(button, eventName, this.props[eventName]);
         }
         // Handle disabled state
-        if (this.props.disabled) {
+        if (this.props?.disabled) {
             button.bIsEnabled = false;
         }
         this.parseStyleToWidget(button);
