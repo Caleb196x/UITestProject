@@ -51,7 +51,6 @@ class ButtonWrapper extends common_wrapper_1.ComponentWrapper {
         if (this.props?.disabled) {
             button.bIsEnabled = false;
         }
-        this.parseStyleToWidget(button);
         this.commonPropertyInitialized(button);
         return button;
     }

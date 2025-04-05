@@ -46,7 +46,7 @@ class GridPanelWrapper extends common_wrapper_1.ComponentWrapper {
         // Match numeric value and unit
         const match = value.match(/^(\d*\.?\d+)([a-z%]*)$/);
         if (match) {
-            let numValue = parseFloat(match[1]);
+            let numValue = (0, common_utils_1.safeParseFloat)(match[1]);
             const unit = match[2] || 'px';
             if (unit === 'em' || unit === 'rem') {
                 numValue = numValue * 16; // todo@Caleb196x: 读取font size，如果没有font size，则使用默认值16px

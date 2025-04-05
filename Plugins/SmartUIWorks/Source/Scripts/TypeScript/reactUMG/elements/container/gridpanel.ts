@@ -1,6 +1,6 @@
 import * as UE from 'ue';
 import { ComponentWrapper } from '../common_wrapper';
-import { mergeClassStyleAndInlineStyle, convertMargin } from '../common_utils';
+import { mergeClassStyleAndInlineStyle, convertMargin, safeParseFloat } from '../common_utils';
 
 export class GridPanelWrapper extends ComponentWrapper {
     private containerStyle: any;
@@ -47,7 +47,7 @@ export class GridPanelWrapper extends ComponentWrapper {
         // Match numeric value and unit
         const match = value.match(/^(\d*\.?\d+)([a-z%]*)$/);
         if (match) {
-            let numValue = parseFloat(match[1]);
+            let numValue = safeParseFloat(match[1]);
             const unit = match[2] || 'px';
             
             if (unit === 'em' || unit === 'rem') {

@@ -1,7 +1,11 @@
 import * as UE from 'ue';
 import { ComponentWrapper } from './common_wrapper';
+import { parseBrush } from './parser/brush_parser';
+import { parseColor } from './parser/color_parser';
+import { convertMargin } from './common_utils';
 
 export class ButtonWrapper extends ComponentWrapper {
+    private useReactButton: boolean = true;
     private readonly eventCallbacks: Record<string, Function> = {
         onClick: undefined,
         onMouseDown: undefined, 
@@ -26,6 +30,8 @@ export class ButtonWrapper extends ComponentWrapper {
         super();
         this.typeName = type;
         this.props = props;
+
+        this.useReactButton = this.typeName === 'button';
     }
 
     private setupEventHandler(button: UE.Button, eventName: string, handler: Function) {
@@ -44,9 +50,7 @@ export class ButtonWrapper extends ComponentWrapper {
         }
     }
 
-    override convertToWidget(): UE.Widget {
-        const button = new UE.Button();
-
+    private initReactButton(button: UE.Button) {
         // Setup all event handlers
         for (const eventName in this.eventMappings) {
             this.setupEventHandler(button, eventName, this.props[eventName]);
@@ -57,8 +61,78 @@ export class ButtonWrapper extends ComponentWrapper {
             button.bIsEnabled = false;
         }
 
-        this.parseStyleToWidget(button);
+        // background 
+        const buttonStyle = this.props?.style;
+        if (buttonStyle) {
+            const backgroundImage = buttonStyle?.backgroundImage;
+        }
+    }
+
+    private initNativeButton(button: UE.Button) {
+        const brushKeyMap: Record<string, string> = {
+            'background': 'Normal',
+            'hoveredBackground': 'Hovered',
+            'pressedBackground': 'Pressed',
+            'disabledBackground': 'Disabled'
+        };
+        
+        const colorKeyMap: Record<string, string> = {
+            'textColor': 'ColorAndOpacity',
+            'backgroundColor': 'BackgroundColor'
+        };
+
+        const paddingKeyMap: Record<string, string> = {
+            'normalPadding': 'NormalPadding',
+            'pressedPadding': 'PressedPadding',
+        };
+
+        const soundKeyMap: Record<string, string> = {
+            'pressedSound': 'PressedSlateSound',
+            'hoveredSound': 'HoveredSlateSound',
+        };
+        
+        const eventKeyMap: Record<string, string> = {
+            'onClick': 'OnClicked',
+            'onPressed': 'OnPressed',
+            'onReleased': 'OnReleased',
+            'onHovered': 'OnHovered',
+            'onUnhovered': 'OnUnhovered',
+        };
+        
+        for (const key in this.props) {
+            const value = this.props[key];
+            if (brushKeyMap[key]) {
+                button.WidgetStyle[brushKeyMap[key]] = parseBrush(value);
+            } else if (colorKeyMap[key]) {
+                const rgba = parseColor(value);
+                button[colorKeyMap[key]].R = rgba.r;
+                button[colorKeyMap[key]].G = rgba.g;
+                button[colorKeyMap[key]].B = rgba.b;
+                button[colorKeyMap[key]].A = rgba.a;
+
+            } else if (paddingKeyMap[key]) {
+                button[paddingKeyMap[key]] = convertMargin(value, {});
+            } else if (soundKeyMap[key]) {
+                // todo@Caleb196x: 添加sound
+            } else if (eventKeyMap[key]) {
+                button[eventKeyMap[key]].Add(value);
+            } else if (key === 'focusable') {
+                button.IsFocusable = value;
+            }
+        }
+    }
+
+    override convertToWidget(): UE.Widget {
+        const button = new UE.Button();
+        if (this.useReactButton) {
+            this.initReactButton(button);
+        } else {
+            this.initNativeButton(button);
+        }
+
         this.commonPropertyInitialized(button);
+
+        UE.UMGManager.SynchronizeWidgetProperties(button);
 
         return button;
     }
@@ -86,6 +160,7 @@ export class ButtonWrapper extends ComponentWrapper {
         }
 
         this.commonPropertyInitialized(widget);
+        UE.UMGManager.SynchronizeWidgetProperties(button);
         return propsChange;
     }
 

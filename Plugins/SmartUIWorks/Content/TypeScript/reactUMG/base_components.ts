@@ -11,6 +11,22 @@ import { ContainerWrapper } from './elements/container/container';
 import { InputWrapper } from './elements/input';
 import { ComponentWrapper } from './elements/common_wrapper';
 import { CanvasWrapper } from './elements/container/canvas';
+import { OverlayWrapper } from './elements/overlay';
+import { ScaleBoxWrapper } from './elements/scalebox';
+import { UniformGridWrapper } from './elements/uniform_grid';
+import { InvalidationBoxWrapper } from './elements/invalidation_box';
+import { RetainerBoxWrapper } from './elements/retainer_box';
+import { SafeZoneWrapper } from './elements/safezone';
+import { SizeBoxWrapper } from './elements/sizebox';
+import { BorderWrapper } from './elements/border';
+import { ExpandableAreaWrapper } from './elements/expandable_area';
+import { ThrobberWrapper } from './elements/throbber';
+import { CircularThrobberWrapper } from './elements/circular_throbber';
+import { ScrollBoxWrapper } from './elements/container/scrollbox';
+import { SpacerWrapper } from './elements/spacer';
+import { SliderWrapper } from './elements/slider';
+import { RadialSliderWrapper } from './elements/radial_slider';
+import { SpinBoxWrapper } from './elements/spinbox';
 
 const baseComponentsMap: Record<string, any> = {
     // base
@@ -53,6 +69,23 @@ const baseComponentsMap: Record<string, any> = {
     "div": ContainerWrapper,
     "view": ContainerWrapper,
     "canvas": CanvasWrapper,
+
+    "Overlay": OverlayWrapper,
+    "ScaleBox": ScaleBoxWrapper,
+    "UniformGrid": UniformGridWrapper,
+    "InvalidationBox": InvalidationBoxWrapper,
+    "RetainerBox": RetainerBoxWrapper,
+    "SafeZone": SafeZoneWrapper,
+    "SizeBox": SizeBoxWrapper,
+
+    "Border": BorderWrapper,
+    "CircularThrobber": CircularThrobberWrapper,
+    "Throbber": ThrobberWrapper,
+    "Spacer": SpacerWrapper,
+    "ExpandableArea": ExpandableAreaWrapper,
+    "RadialSlider": RadialSliderWrapper,
+    "Slider": SliderWrapper,
+    "SpinBox": SpinBoxWrapper
 };
 
 function isKeyOfRecord(key: any, record: Record<string, any>): key is keyof Record<string, any> {

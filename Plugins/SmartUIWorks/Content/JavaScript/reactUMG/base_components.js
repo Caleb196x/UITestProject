@@ -17,6 +17,14 @@ const container_1 = require("./elements/container/container");
 const input_1 = require("./elements/input");
 const common_wrapper_1 = require("./elements/common_wrapper");
 const canvas_1 = require("./elements/container/canvas");
+const overlay_1 = require("./elements/overlay");
+const scalebox_1 = require("./elements/scalebox");
+const uniform_grid_1 = require("./elements/uniform_grid");
+const invalidation_box_1 = require("./elements/invalidation_box");
+const retainer_box_1 = require("./elements/retainer_box");
+const safezone_1 = require("./elements/safezone");
+const sizebox_1 = require("./elements/sizebox");
+const border_1 = require("./elements/border");
 const baseComponentsMap = {
     // base
     "select": selector_1.SelectWrapper,
@@ -53,6 +61,14 @@ const baseComponentsMap = {
     "div": container_1.ContainerWrapper,
     "view": container_1.ContainerWrapper,
     "canvas": canvas_1.CanvasWrapper,
+    "Overlay": overlay_1.OverlayWrapper,
+    "ScaleBox": scalebox_1.ScaleBoxWrapper,
+    "UniformGrid": uniform_grid_1.UniformGridWrapper,
+    "InvalidationBox": invalidation_box_1.InvalidationBoxWrapper,
+    "RetainerBox": retainer_box_1.RetainerBoxWrapper,
+    "SafeZone": safezone_1.SafeZoneWrapper,
+    "SizeBox": sizebox_1.SizeBoxWrapper,
+    "Border": border_1.BorderWrapper,
 };
 function isKeyOfRecord(key, record) {
     return key in record;

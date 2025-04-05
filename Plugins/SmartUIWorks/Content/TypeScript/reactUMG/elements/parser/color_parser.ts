@@ -1,3 +1,5 @@
+import { safeParseFloat } from "../common_utils";
+
 type RGBA = { r: number; g: number; b: number; a: number };
 
 // 预定义颜色名称到 RGBA 的映射表（部分示例）
@@ -183,10 +185,12 @@ export function parseColor(color: string): RGBA {
 
   // 5. 处理特殊值
   if (trimmed === 'currentcolor') {
-    throw new Error('currentColor cannot be converted to static RGBA');
+    console.warn('currentColor cannot be converted to static RGBA');
+    return { r: 0, g: 0, b: 0, a: 1 };
   }
 
-  throw new Error(`Invalid color format: ${color}`);
+  console.warn(`Invalid color format: ${color}`);
+  return { r: 0, g: 0, b: 0, a: 1 };
 }
 
 // 解析十六进制颜色 (#rgb, #rrggbb, #rrggbbaa)
@@ -271,7 +275,7 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
 }
 
 // 辅助函数
-const parseComponent = (s: string) => parseFloat(s.replace('%', ''));
+const parseComponent = (s: string) => safeParseFloat(s.replace('%', ''));
 const clamp = (num: number, min: number, max: number) => Math.min(max, Math.max(min, num));
 const clampHue = (h: number) => ((h % 360) + 360) % 360;
 const clampPercentage = (n: number) => clamp(n / 100, 0, 1);

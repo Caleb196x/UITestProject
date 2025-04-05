@@ -1,6 +1,6 @@
 import * as UE from 'ue';
 import * as puerts from 'puerts'
-import { convertCssToStyles } from '../css_converter';
+import { convertCommonPropsToWidgetProps } from './parser/common_props_parser';
 
 // Base abstract class for all component wrappers
 export abstract class ComponentWrapper {
@@ -13,19 +13,10 @@ export abstract class ComponentWrapper {
         return undefined;
     }
 
-    parseStyleToWidget(widget: UE.Widget) {
-        if (this.props.hasOwnProperty('style') || this.props.hasOwnProperty('className')) {
-            // Handle style property
-            const style = this.props.style;
-            // Apply style to widget
-        }
-        return undefined;
-    }
-
     commonPropertyInitialized(widget: UE.Widget) {
-        if (this.props.hasOwnProperty('title')) {
-            widget.SetToolTipText(this.props.title as string);
-        }
+        const widgetProps = convertCommonPropsToWidgetProps(this.props);
+        puerts.merge(widget, widgetProps);
+        UE.UMGManager.SynchronizeWidgetProperties(widget);
     }
 
     appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any) {

@@ -31,7 +31,6 @@ export class ProgressBarWrapper extends ComponentWrapper {
         const { value, max } = this.props;
         
         this.updateProgressBar(progressBar, value, max);
-        this.parseStyleToWidget(progressBar);
         this.commonPropertyInitialized(progressBar);
         
         return progressBar;
@@ -49,7 +48,6 @@ export class ProgressBarWrapper extends ComponentWrapper {
 
         // Update common properties if needed
         if (hasChanged) {
-            this.parseStyleToWidget(progressBar);
             this.commonPropertyInitialized(progressBar);
         }
 

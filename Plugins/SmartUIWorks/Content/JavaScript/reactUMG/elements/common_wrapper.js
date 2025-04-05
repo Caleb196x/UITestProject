@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComponentWrapper = void 0;
+const UE = require("ue");
+const puerts = require("puerts");
+const common_props_parser_1 = require("./parser/common_props_parser");
 // Base abstract class for all component wrappers
 class ComponentWrapper {
     typeName;
@@ -8,18 +11,10 @@ class ComponentWrapper {
     convertReactEventToWidgetEvent(reactProp, originCallback) {
         return undefined;
     }
-    parseStyleToWidget(widget) {
-        if (this.props.hasOwnProperty('style') || this.props.hasOwnProperty('className')) {
-            // Handle style property
-            const style = this.props.style;
-            // Apply style to widget
-        }
-        return undefined;
-    }
     commonPropertyInitialized(widget) {
-        if (this.props.hasOwnProperty('title')) {
-            widget.SetToolTipText(this.props.title);
-        }
+        const widgetProps = (0, common_props_parser_1.convertCommonPropsToWidgetProps)(this.props);
+        puerts.merge(widget, widgetProps);
+        UE.UMGManager.SynchronizeWidgetProperties(widget);
     }
     appendChildItem(parentItem, childItem, childItemTypeName, childProps) {
         // Default empty implementation

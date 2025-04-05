@@ -43,7 +43,6 @@ export class ImageWrapper extends ComponentWrapper {
         // 4. 读取img的标签属性，例如src, width, height
         
         this.setImageBrush(image, texture);
-        this.parseStyleToWidget(image);
         this.commonPropertyInitialized(image);
 
         return image;
@@ -68,7 +67,6 @@ export class ImageWrapper extends ComponentWrapper {
 
         // Update common properties if needed
         if (hasChanged) {
-            this.parseStyleToWidget(image);
             this.commonPropertyInitialized(image);
         }
 

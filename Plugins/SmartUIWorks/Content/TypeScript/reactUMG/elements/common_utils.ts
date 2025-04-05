@@ -1,7 +1,8 @@
 import { convertCssToStyles } from '../css_converter';
 import * as UE from 'ue';
-import { parseColor } from './property/color_parser';
-import { parseBackgroundPosition } from './property/background_position';
+import { parseColor } from './parser/color_parser';
+import { parseBackgroundPosition } from './parser/background_parser';
+import * as CssType from 'csstype';
 
 /**
  * Converts CSS length values to SU (Slate Units) for Unreal Engine UMG
@@ -503,4 +504,19 @@ export function parseBackgroundProps(style: any, childStyle?: any): any {
 
     result['alignment'] = parseChildAlignment(childStyle);
     return result;
+}
+
+export function safeParseFloat(value: string | number) : number {
+    if (typeof value === 'number') {
+        return value;
+    }
+
+    if (typeof value === 'string') {
+        const num = parseFloat(value);
+        if (!isNaN(num)) {
+            return num;
+        }
+    }
+
+    return 0;
 }
