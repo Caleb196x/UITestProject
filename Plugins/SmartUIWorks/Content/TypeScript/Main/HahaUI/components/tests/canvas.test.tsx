@@ -18,7 +18,8 @@ export const CanvasUIExample = () => {
         minHeight: '200px',
         width: '600px',
         height: '300px',
-        justifySelf: 'center', alignSelf: 'top'
+        justifySelf: 'center', alignSelf: 'top',
+        aspectRatio: '16/9',
     };
 
     useEffect(() => {
@@ -52,7 +53,7 @@ export const CanvasUIExample = () => {
     return (
         <div>
 
-            <div style={Container}>
+            <div style={Container} >
                 <canvas ref={canvasRef}>
                     <span style={{color: 'red'}}>canvas test</span>
                     <span style={{offsetAnchor: 'bottom fill', left: '20px'}}>canvas center text</span>
@@ -65,11 +66,11 @@ export const CanvasUIExample = () => {
         
             <div style={{display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'space-between'}}>
-                <button onClick={handleTranslate} style={{ marginRight: '1rem' }}>
+                <button title='change canvas translation' onClick={handleTranslate} style={{ marginRight: '1rem' }}>
                     Change location
                 </button>
 
-                <button onClick={handleRotate}>
+                <button title='rotate canvas' onClick={handleRotate}>
                     Rotate 45°
                 </button>
             </div>

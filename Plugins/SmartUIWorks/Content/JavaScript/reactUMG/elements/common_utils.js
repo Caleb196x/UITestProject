@@ -12,10 +12,11 @@ exports.parseBackgroundImage = parseBackgroundImage;
 exports.parseBackgroundColor = parseBackgroundColor;
 exports.parseChildAlignment = parseChildAlignment;
 exports.parseBackgroundProps = parseBackgroundProps;
+exports.safeParseFloat = safeParseFloat;
 const css_converter_1 = require("../css_converter");
 const UE = require("ue");
-const color_parser_1 = require("./property/color_parser");
-const background_position_1 = require("./property/background_position");
+const color_parser_1 = require("./parser/color_parser");
+const background_parser_1 = require("./parser/background_parser");
 /**
  * Converts CSS length values to SU (Slate Units) for Unreal Engine UMG
  * Supported units: px, %, em, rem (relative to parent font size)
@@ -358,7 +359,7 @@ function parseBackground(background) {
         result['repeat'] = parseBackgroundRepeat(repeat, result['image']);
     }
     if (position !== 'none') {
-        result['position'] = (0, background_position_1.parseBackgroundPosition)(position);
+        result['position'] = (0, background_parser_1.parseBackgroundPosition)(position);
     }
     return result;
 }
@@ -459,5 +460,17 @@ function parseBackgroundProps(style, childStyle) {
     // }
     result['alignment'] = parseChildAlignment(childStyle);
     return result;
+}
+function safeParseFloat(value) {
+    if (typeof value === 'number') {
+        return value;
+    }
+    if (typeof value === 'string') {
+        const num = parseFloat(value);
+        if (!isNaN(num)) {
+            return num;
+        }
+    }
+    return 0;
 }
 //# sourceMappingURL=common_utils.js.map

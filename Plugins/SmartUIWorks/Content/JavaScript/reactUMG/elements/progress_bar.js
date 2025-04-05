@@ -28,7 +28,6 @@ class ProgressBarWrapper extends common_wrapper_1.ComponentWrapper {
         const progressBar = new UE.ProgressBar();
         const { value, max } = this.props;
         this.updateProgressBar(progressBar, value, max);
-        this.parseStyleToWidget(progressBar);
         this.commonPropertyInitialized(progressBar);
         return progressBar;
     }
@@ -42,7 +41,6 @@ class ProgressBarWrapper extends common_wrapper_1.ComponentWrapper {
         }
         // Update common properties if needed
         if (hasChanged) {
-            this.parseStyleToWidget(progressBar);
             this.commonPropertyInitialized(progressBar);
         }
         return hasChanged;

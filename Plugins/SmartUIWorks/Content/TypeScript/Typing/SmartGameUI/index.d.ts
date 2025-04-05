@@ -46,6 +46,7 @@ declare module "SmartGameUI" {
         maxHeight?: (string & {}) | number | undefined;
         minWidth?: (string & {}) | number | undefined;
         minHeight?: (string & {}) | number | undefined;
+        aspectRatio?: (string & {}) | number | undefined;
         transform?: CssType.Property.Transform | undefined;
         translate?: CssType.Property.Translate | undefined;
         rotate?: CssType.Property.Rotate | undefined;
@@ -130,8 +131,9 @@ declare module "SmartGameUI" {
     }
 
     interface UniformGridProp extends PanelProps {
-        cellSize?: Vector2D;
-        cellPadding?: RecursivePartial<Margin>;
+        minCellSize?: RecursivePartial<Vector2D> | undefined;
+        cellPadding?: RecursivePartial<Margin> |
+                        CssType.Property.Padding | undefined;
     }
 
     class UniformGrid extends React.Component<UniformGridProp> {
@@ -168,6 +170,21 @@ declare module "SmartGameUI" {
     class SafeZone extends React.Component<SafeZoneProp> {
         nativePtr: UE.SafeZone;
     }
+    
+    interface SizeBoxProp extends PanelProps {
+        width?: (string & {}) | number | undefined;
+        height?: (string & {}) | number | undefined;
+        minWidth?: (string & {}) | number | undefined;
+        minHeight?: (string & {}) | number | undefined;
+        maxWidth?: (string & {}) | number | undefined;
+        maxHeight?: (string & {}) | number | undefined;
+        minAspectRatio?: (string & {}) | number | undefined;
+        maxAspectRatio?: (string & {}) | number | undefined;
+    }
+
+    class SizeBox extends React.Component<SizeBoxProp> {
+        nativePtr: UE.SizeBox;
+    }
 
     interface OutlineSetting {
         cornerRadio?: RecursivePartial<Margin> | undefined;
@@ -179,66 +196,84 @@ declare module "SmartGameUI" {
     interface ImageStyle {
         image?: any | undefined;
         imageSize?: RecursivePartial<Vector2D> | undefined;
-        tintColor?: CssType.Property.Color | undefined;
-        burshColor?: CssType.Property.Color | undefined;
+        color?: CssType.Property.Color | undefined;
         drawType?: 'box' | 'border' | 'image' | 'rounded-box' | 'none' | undefined;
         tiling?: CssType.Property.BackgroundRepeat | undefined;
         outline?: OutlineSetting | undefined;
-        margin?: RecursivePartial<Margin> | undefined;
+        margin?: CssType.Property.Margin | undefined;
+        padding?: CssType.Property.Padding | undefined;
     }
 
     interface BorderProp extends CommonProps {
         backgroundColor?: CssType.Property.Color | undefined;
         backgroundImage?: ImageStyle | undefined;
-        burshColor?: CssType.Property.Color | undefined;
-     }
+        contentColor?: CssType.Property.Color | undefined;
+        contentHorizontalAlign?: 'left' | 'center' | 'right' | 'fill' | undefined;
+        contentVerticalAlign?: 'top' | 'center' | 'bottom' | 'fill' | undefined;
+        contentPadding?: CssType.Property.Padding | undefined;
+        contentMargin?: CssType.Property.Margin | undefined;
+
+        onMouseButtonDown?: () => void;
+        onMouseButtonUp?: () => void;
+        onMouseMove?: () => void;
+        onMouseDoubleClick?: () => void;
+    }
 
     class Border extends React.Component<BorderProp> {
         nativePtr: UE.Border;
     }
 
-    interface RadialSliderProp extends CommonProps {
+    interface SliderCommonProp extends CommonProps {
         value?: number | undefined;
-        defaultValue?: number | undefined;
-        startPointAngle?: number | undefined;
-        endPointAngle?: number | undefined;
-        angularOffset?: number | undefined;
-        barColor?: CssType.Property.Color | undefined;
-        progressColor?: CssType.Property.Color | undefined;
-        backgroundColor?: CssType.Property.Color | undefined;
         stepSize?: number | undefined;
-        showSliderThumb?: boolean | undefined;
-        showSliderHand?: boolean | undefined;
+
         locked?: boolean | undefined;
         useMouseStep?: boolean | undefined;
         controllerLock?: boolean | undefined;
+        focusable?: boolean | undefined;
+
+        sliderBarColor?: CssType.Property.Color | undefined;
+        sliderThumbColor?: CssType.Property.Color | undefined;
+
         barThickness?: number | undefined;
         normalBarBackground?: ImageStyle | undefined;
         hoverBarBackground?: ImageStyle | undefined;
+        disabledBarBackground?: ImageStyle | undefined;
         normalThumbBackground?: ImageStyle | undefined;
         hoveredThumbBackground?: ImageStyle | undefined;
+        disabledThumbBackground?: ImageStyle | undefined;
+
+        valueBinding?: () => number;
+        onValueChanged?: (InValue: number) => void;
+        onMouseCaptureBegin?: () => void;
+        onMouseCaptureEnd?: () => void;
+        onControllerCaptureBegin?: () => void;
+        onControllerCaptureEnd?: () => void;
+    }
+
+    interface RadialSliderProp extends SliderCommonProp {
+        defaultValue?: number | undefined;
+        thumbStartAngle?: number | undefined;
+        thumbEndPointAngle?: number | undefined;
+        thumbAngularOffset?: number | undefined;
+
+        showSliderThumb?: boolean | undefined;
+        showSliderHand?: boolean | undefined;
+
+        valueTags?: number[] | undefined;
+        sliderProgressColor?: CssType.Property.Color | undefined;
+        backgroundColor?: CssType.Property.Color | undefined;
     }
 
     class RadialSlider extends React.Component<RadialSliderProp> {
         nativePtr: UE.RadialSlider;
     }
 
-    interface SliderProp extends CommonProps {
-        value?: number | undefined;
+    interface SliderProp extends SliderCommonProp {
         minValue?: number | undefined;
         maxValue?: number | undefined;
+        indentHandle?: boolean | undefined;
         orientation?: 'horizontal' | 'vertical' | undefined;
-        barColor?: CssType.Property.Color | undefined;
-        handleColor?: CssType.Property.Color | undefined;
-        stepSize?: number | undefined;
-        locked?: boolean | undefined;
-        useMouseStep?: boolean | undefined;
-        controllerLock?: boolean | undefined;
-        barThickness?: number | undefined;
-        normalBarBackground?: ImageStyle | undefined;
-        hoverBarBackground?: ImageStyle | undefined;
-        normalHandleBackground?: ImageStyle | undefined;
-        hoverHandleBackground?: ImageStyle | undefined;
     }
 
     class Slider extends React.Component<SliderProp> {
@@ -251,13 +286,19 @@ declare module "SmartGameUI" {
         maxValue?: number | undefined;
         minSliderValue?: number | undefined;
         maxSliderValue?: number | undefined;
-
         minFractionDigits?: number | undefined;
         maxFractionDigits?: number | undefined;
         useDeltaSnap?: boolean | undefined;
         enableSlider?: boolean | undefined;
         deltaValue?: number | undefined;
         sliderExponent?: number | undefined;
+        minDesiredWidth?: number | undefined;
+        clearKeyboardFocusOnCommit?: boolean | undefined;
+        selectAllTextOnCommit?: boolean | undefined;
+
+        keyboardType?: 'number' | 'web' | 'email' | 'password' | 'alpha-numberic' | undefined;
+        textAlign?: 'left' | 'center' | 'right' | undefined;
+
         arrowBackground?: ImageStyle | undefined;
         normalBackground?: ImageStyle | undefined;
         activeBackground?: ImageStyle | undefined;
@@ -265,12 +306,12 @@ declare module "SmartGameUI" {
         activeFillBackground?: ImageStyle | undefined;
         hoveredFillBackground?: ImageStyle | undefined;
         inactiveFillBackground?: ImageStyle | undefined;
-        textPadding?: RecursivePartial<Margin> | undefined;
-        textAlign?: 'left' | 'center' | 'right' | undefined;
+        textPadding?: CssType.Property.Padding | undefined;
+        insetPadding?: CssType.Property.Padding | undefined;
         // todo@Caleb196x: 添加字体样式
         foregroundColor?: CssType.Property.Color | undefined;
-        insetPadding?: RecursivePartial<Margin> | undefined;
 
+        valueBinding?: () => number;
         onValueChanged?: (InValue: number) => void;
         onValueCommitted?: (InValue: number, CommitMethod: TextCommitType) => void;
         onBeginSliderMovement?: () => void;
@@ -285,7 +326,8 @@ declare module "SmartGameUI" {
         radius?: number | undefined;
         pieces?: number | undefined;
         period?: number | undefined;
-        imageStyle?: ImageStyle | undefined;
+        enableRadius?: boolean | undefined;
+        image?: ImageStyle | undefined;
     }
     
     class CircularThrobber extends React.Component<CircularThrobberProp> {
@@ -298,7 +340,7 @@ declare module "SmartGameUI" {
         animationHorizontal?: boolean | undefined;
         animationVertical?: boolean | undefined;
         animationOpacity?: boolean | undefined;
-        imageStyle?: ImageStyle | undefined;
+        image?: ImageStyle | undefined;
     }
 
     class Throbber extends React.Component<ThrobberProp> {
@@ -314,15 +356,20 @@ declare module "SmartGameUI" {
     }
     
     interface ExpandableAreaProp extends CommonProps {
-        isExpanded?: boolean | undefined;
+        expanded?: boolean | undefined;
         maxHeight?: number | undefined;
-        headerPadding?: RecursivePartial<Margin> | undefined;
-        areaPadding?: RecursivePartial<Margin> | undefined;
+        rolloutAnimationLasts?: number | undefined;
+        // style
+        headerPadding?: CssType.Property.Padding | undefined;
+        areaPadding?: CssType.Property.Padding | undefined;
+
         collapsedIcon?: ImageStyle | undefined;
         expandedIcon?: ImageStyle | undefined;
-        rolloutAnimationLasts?: number | undefined;
-        headerImage?: ImageStyle | undefined;
-        headerColor?: CssType.Property.Color | undefined;
+
+        borderImage?: ImageStyle | undefined;
+        borderColor?: CssType.Property.Color | undefined;
+
+        // content
         header?: React.ReactNode | undefined;
         area?: React.ReactNode | undefined;
         // todo@Caleb196x: 添加SetHeaderContent和SetAreaContent方法
@@ -331,6 +378,9 @@ declare module "SmartGameUI" {
     }
 
     class ExpandableArea extends React.Component<ExpandableAreaProp> {
+        nativePtr: UE.ExpandableArea;
+        header: React.ReactNode;
+        area: React.ReactNode;
     }
     
     interface ScrollBoxProp extends PanelProps {
@@ -355,23 +405,26 @@ declare module "SmartGameUI" {
     }
 
     class ScrollBox extends React.Component<ScrollBoxProp> {
+        nativePtr: UE.ScrollBox;
+        children: React.ReactNode;
     }
 
     interface ButtonProp extends CommonProps {
-        text?: string | undefined;
         textColor?: CssType.Property.Color | undefined;
         backgroundColor?: CssType.Property.Color | undefined;
 
-        backgroundImage?: ImageStyle | undefined;
-        hoveredBackgroundImage?: ImageStyle | undefined;
-        pressedBackgroundImage?: ImageStyle | undefined;
-        disabledBackgroundImage?: ImageStyle | undefined;
+        background?: ImageStyle | undefined;
+        hoveredBackground?: ImageStyle | undefined;
+        pressedBackground?: ImageStyle | undefined;
+        disabledBackground?: ImageStyle | undefined;
 
         normalPadding?: CssType.Property.Padding | undefined;
         pressedPadding?: CssType.Property.Padding | undefined;
 
         pressedSound?: any | undefined;
         hoveredSound?: any | undefined;
+
+        focusable?: boolean | undefined;
         // event
         onClick?: () => void;
         onPressed?: () => void;

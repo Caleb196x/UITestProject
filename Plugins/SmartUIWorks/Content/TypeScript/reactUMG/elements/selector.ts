@@ -87,7 +87,6 @@ export class SelectWrapper extends ComponentWrapper {
         this.setupChangeHandler(comboBox, onChange);
         comboBox.SelectedOption = defaultValue;
         
-        this.parseStyleToWidget(comboBox);
         this.commonPropertyInitialized(comboBox);
         
         return comboBox;

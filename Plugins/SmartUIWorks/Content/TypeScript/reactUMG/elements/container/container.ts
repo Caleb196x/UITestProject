@@ -2,10 +2,9 @@ import * as UE from 'ue';
 import { ComponentWrapper } from "../common_wrapper";
 import { convertLengthUnitToSlateUnit, 
     mergeClassStyleAndInlineStyle, 
-    parseAspectRatio, parseBackgroundProps, 
-    convertGap, parseScale,
-    parseBackgroundImage, parseChildAlignment } from '../common_utils';
-import { parseColor } from '../property/color_parser';
+    parseAspectRatio, parseBackgroundProps, safeParseFloat,
+    convertGap, parseScale, parseChildAlignment } from '../common_utils';
+import { parseColor } from '../parser/color_parser';
 import { GridPanelWrapper } from './gridpanel';
 import { ScrollBoxWrapper } from './scrollbox';
 import { FlexWrapper } from './flex';
@@ -157,7 +156,7 @@ export class ContainerWrapper extends ComponentWrapper {
                 scaleBox.SetStretch(UE.EStretch.UserSpecifiedWithClipping);
                 const scale = childStyle?.scale;
                 if (scale) {
-                    scaleBox.SetUserSpecifiedScale(parseFloat(scale));
+                    scaleBox.SetUserSpecifiedScale(safeParseFloat(scale));
                 }
             }
             

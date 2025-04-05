@@ -4,7 +4,7 @@ exports.ContainerWrapper = exports.UMGContainerType = void 0;
 const UE = require("ue");
 const common_wrapper_1 = require("../common_wrapper");
 const common_utils_1 = require("../common_utils");
-const color_parser_1 = require("../property/color_parser");
+const color_parser_1 = require("../parser/color_parser");
 const gridpanel_1 = require("./gridpanel");
 const scrollbox_1 = require("./scrollbox");
 const flex_1 = require("./flex");
@@ -138,7 +138,7 @@ class ContainerWrapper extends common_wrapper_1.ComponentWrapper {
                 scaleBox.SetStretch(UE.EStretch.UserSpecifiedWithClipping);
                 const scale = childStyle?.scale;
                 if (scale) {
-                    scaleBox.SetUserSpecifiedScale(parseFloat(scale));
+                    scaleBox.SetUserSpecifiedScale((0, common_utils_1.safeParseFloat)(scale));
                 }
             }
             this.extraBoxSlot = scaleBox.AddChild(Item);

@@ -40,7 +40,6 @@ class ImageWrapper extends common_wrapper_1.ComponentWrapper {
         // 3. 图片导入时，首先读取图片数据，调用ImportFileAsTexture2D API来创建UTexture（创建后是否能够将UTexture保存为本地uasset资产文件？）（思考如何做异步和批量导入，做性能优化）
         // 4. 读取img的标签属性，例如src, width, height
         this.setImageBrush(image, texture);
-        this.parseStyleToWidget(image);
         this.commonPropertyInitialized(image);
         return image;
     }
@@ -60,7 +59,6 @@ class ImageWrapper extends common_wrapper_1.ComponentWrapper {
         }
         // Update common properties if needed
         if (hasChanged) {
-            this.parseStyleToWidget(image);
             this.commonPropertyInitialized(image);
         }
         return hasChanged;

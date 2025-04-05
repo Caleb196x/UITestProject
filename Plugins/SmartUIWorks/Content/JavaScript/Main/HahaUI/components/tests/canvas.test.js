@@ -19,7 +19,8 @@ const CanvasUIExample = () => {
         minHeight: '200px',
         width: '600px',
         height: '300px',
-        justifySelf: 'center', alignSelf: 'top'
+        justifySelf: 'center', alignSelf: 'top',
+        aspectRatio: '16/9',
     };
     (0, react_1.useEffect)(() => {
         //const ctx = canvas.getContext('2d');
@@ -49,8 +50,8 @@ const CanvasUIExample = () => {
                 React.createElement("button", { onClick: handleColorChange, style: { offsetAnchor: 'bottom center', bottom: '-20px' } }, "Change Color"))),
         React.createElement("div", { style: { display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'space-between' } },
-            React.createElement("button", { onClick: handleTranslate, style: { marginRight: '1rem' } }, "Change location"),
-            React.createElement("button", { onClick: handleRotate }, "Rotate 45\u00B0"))));
+            React.createElement("button", { title: 'change canvas translation', onClick: handleTranslate, style: { marginRight: '1rem' } }, "Change location"),
+            React.createElement("button", { title: 'rotate canvas', onClick: handleRotate }, "Rotate 45\u00B0"))));
 };
 exports.CanvasUIExample = CanvasUIExample;
 //# sourceMappingURL=canvas.test.js.map
