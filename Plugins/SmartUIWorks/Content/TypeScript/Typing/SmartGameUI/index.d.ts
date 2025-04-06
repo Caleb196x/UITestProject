@@ -440,6 +440,7 @@ declare module "SmartGameUI" {
     type comboBoxItemSelectionType = 'key-press' | 'navigation' | 'mouse-click' | 'direct' | 'default';
     interface ComboBoxStyle {
         rowPadding?: CssType.Property.Padding | undefined;
+        contentPadding?: CssType.Property.Padding | undefined;
         pressedSound?: any | undefined;
         selectionChangeSound?: any | undefined;
 
@@ -480,7 +481,6 @@ declare module "SmartGameUI" {
     interface ComboBoxProp extends CommonProps {
         options?: string[] | undefined;
         selectedOption?: string | undefined;
-        textColor?: CssType.Property.Color | undefined;
         contentPadding?: CssType.Property.Padding | undefined;
         maxListHeight?: number | undefined;
         hasDownArrow?: boolean | undefined;
@@ -490,13 +490,15 @@ declare module "SmartGameUI" {
         itemStyle?: ComboBoxItemStyle | undefined;
         scrollBarStyle?: comboBoxScollBarStyle | undefined;
         
+        // todo@Caleb196x: 添加字体font
+
         // events
         onOpened?: () => void;
         onSelectionChanged?: (item: string, selectionType: comboBoxItemSelectionType) => void;
     }
 
     class ComboBox extends React.Component<ComboBoxProp> {
-        native: UE.ComboBoxString;
+        nativePtr: UE.ComboBoxString;
     }
 
     interface CheckboxProp extends CommonProps {
@@ -522,6 +524,7 @@ declare module "SmartGameUI" {
         hoveredSound?: any | undefined;
 
         // events
+        checkStateBinding?: () => boolean;
         onCheckStateChanged?: (InChecked: boolean) => void;
     }
 
@@ -545,6 +548,9 @@ declare module "SmartGameUI" {
         background?: ImageStyle | undefined;
         fillBackground?: ImageStyle | undefined;
         marqueeBackground?: ImageStyle | undefined;
+
+        precentBinding?: () => number;
+        fillColorBinding?: () => CssType.Property.Color;
     }
 
     class ProgressBar extends React.Component<ProgressBarProp> {

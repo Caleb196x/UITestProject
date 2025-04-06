@@ -267,7 +267,7 @@ export function parseBackgroundColor(backgroundColor: string) : UE.LinearColor {
     return new UE.LinearColor(color.r / 255.0, color.g / 255.0, color.b / 255.0, color.a);
 }
 
-function parseBackgroundRepeat(backgroundRepeat: string, image: UE.SlateBrush) : UE.SlateBrush {
+export function parseBackgroundRepeat(backgroundRepeat: string, image: UE.SlateBrush) : UE.SlateBrush {
     if (!image) {
         return image;
     }
@@ -359,7 +359,7 @@ function parseBackgroundLayer(layer) {
     return state;
 }
 
-function parseBackground(background: string) : any {
+export function parseBackground(background: string) : any {
     // 1. 提取background中定义的background-color值
     // 2. 提取出background中定义的background-position值
     // 3. 提取出background中定义的background-repeat值

@@ -2,7 +2,7 @@ import * as UE from 'ue';
 import { ComponentWrapper } from './common_wrapper';
 import { parseBrush } from './parser/brush_parser';
 import { parseColor } from './parser/color_parser';
-import { convertMargin } from './common_utils';
+import { convertMargin, parseBackgroundImage, parseBackgroundProps, parseBackgroundRepeat } from './common_utils';
 
 export class ButtonWrapper extends ComponentWrapper {
     private useReactButton: boolean = true;
@@ -64,7 +64,56 @@ export class ButtonWrapper extends ComponentWrapper {
         // background 
         const buttonStyle = this.props?.style;
         if (buttonStyle) {
+            const textColor = buttonStyle?.textColor;
+            if (textColor) {
+                const rgba = parseColor(textColor);
+                button.ColorAndOpacity.R = rgba.r;
+                button.ColorAndOpacity.G = rgba.g;
+                button.ColorAndOpacity.B = rgba.b;
+                button.ColorAndOpacity.A = rgba.a;
+            }
+
+            const background = buttonStyle?.background;
+            if (background) {
+                const result = parseBackgroundProps(background);
+                if (result?.image) {
+                    button.WidgetStyle.Normal = result.image;
+                }
+
+                if (result?.color) {
+                    const rgba = parseColor(result.color);
+                    button.BackgroundColor.R = rgba.r;
+                    button.BackgroundColor.G = rgba.g;
+                    button.BackgroundColor.B = rgba.b;
+                    button.BackgroundColor.A = rgba.a;
+                }
+            }
+
             const backgroundImage = buttonStyle?.backgroundImage;
+            let hasBackgroundImage = false;
+            if (backgroundImage) {
+                button.WidgetStyle.Normal = parseBackgroundImage(backgroundImage, buttonStyle?.backgroundSize);
+                hasBackgroundImage = true;
+            }
+            
+            const backgroundColor = buttonStyle?.backgroundColor;
+            if (backgroundColor) {
+                const rgba = parseColor(backgroundColor);
+                button.BackgroundColor.R = rgba.r;
+                button.BackgroundColor.G = rgba.g;
+                button.BackgroundColor.B = rgba.b;
+                button.BackgroundColor.A = rgba.a;
+            }
+
+            const backgroundRepeat = buttonStyle?.backgroundRepeat;
+            if (backgroundRepeat && hasBackgroundImage) {
+                button.WidgetStyle.Normal = parseBackgroundRepeat(backgroundRepeat, button.WidgetStyle.Normal);
+            }
+
+            const padding = buttonStyle?.padding;
+            if (padding) {
+                button.WidgetStyle.NormalPadding = convertMargin(padding, buttonStyle);
+            }
         }
     }
 
