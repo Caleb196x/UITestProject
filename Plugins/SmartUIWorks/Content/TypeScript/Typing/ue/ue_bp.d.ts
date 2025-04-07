@@ -121,37 +121,35 @@ declare module "ue" {
     }
 
 // __TYPE_DECL_END
-// __TYPE_DECL_START: 681D15DA4BC892AC2A3EBE8F2068216F
-    namespace Game.NewWidgetBlueprint {
-        class NewWidgetBlueprint_C extends UE.UserWidget {
+// __TYPE_DECL_START: A9A3CE564D0C419CD50299A434F02D25
+    namespace Game.Button {
+        class Button_C extends UE.UserWidget {
             constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
             UberGraphFrame: UE.PointerToUberGraphFrame;
-            NewAnimation: UE.WidgetAnimation;
-            Button_0: UE.Button;
-            CheckBox_0: UE.CheckBox;
-            ComboBoxKey_102: UE.ComboBoxKey;
-            ComboBoxString_45: UE.ComboBoxString;
-            Image_0: UE.Image;
-            MultiLineEditableText_54: UE.MultiLineEditableText;
-            RichTextBlock_51: UE.RichTextBlock;
-            RichTextBlock_63: UE.RichTextBlock;
-            Item: string;
-            BndEvt__NewWidgetBlueprint_Button_0_K2Node_ComponentBoundEvent_0_OnButtonHoverEvent__DelegateSignature() : void;
-            ExecuteUbergraph_NewWidgetBlueprint(EntryPoint: number) : void;
-            GetBrush() : UE.SlateBrush;
-            OnGenerateContentWidget(Item: string) : UE.Widget;
-            OnGenerateItemWidget(Item: string) : UE.Widget;
+            /*
+             *Called when this entry is released from the owning table and no longer represents any list item
+             */
+            BP_OnEntryReleased() : void;
+            /*
+             *Called when the expansion state of the item represented by this entry changes. Tree view entries only.
+             */
+            BP_OnItemExpansionChanged(bIsExpanded: boolean) : void;
+            /*
+             *Called when the selection state of the item represented by this entry changes.
+             */
+            BP_OnItemSelectionChanged(bIsSelected: boolean) : void;
+            ExecuteUbergraph_Button(EntryPoint: number) : void;
             static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): NewWidgetBlueprint_C;
-            static Load(InName: string): NewWidgetBlueprint_C;
+            static Find(OrigInName: string, Outer?: Object): Button_C;
+            static Load(InName: string): Button_C;
         
-            __tid_NewWidgetBlueprint_C_0__: boolean;
+            __tid_Button_C_0__: boolean;
         }
         
     }
 
 // __TYPE_DECL_END
-// __TYPE_DECL_START: 56CD371548182F4586DDDAAC8CD7C6BC
+// __TYPE_DECL_START: 9D28DCC249612395EA47738320F0F171
     namespace Game.FirstPersonArms.Animations.FirstPerson_AnimBP {
         class AnimBlueprintGeneratedConstantData extends UE.AnimBlueprintConstantData {
             constructor();
@@ -238,7 +236,7 @@ declare module "ue" {
     }
 
 // __TYPE_DECL_END
-// __TYPE_DECL_START: 56CD371548182F4586DDDAAC8CD7C6BC
+// __TYPE_DECL_START: 9D28DCC249612395EA47738320F0F171
     namespace Game.FirstPersonArms.Animations.FirstPerson_AnimBP {
         class AnimBlueprintGeneratedMutableData extends UE.AnimBlueprintMutableData {
             constructor();
@@ -255,7 +253,7 @@ declare module "ue" {
     }
 
 // __TYPE_DECL_END
-// __TYPE_DECL_START: 56CD371548182F4586DDDAAC8CD7C6BC
+// __TYPE_DECL_START: 9D28DCC249612395EA47738320F0F171
     namespace Game.FirstPersonArms.Animations.FirstPerson_AnimBP {
         class FirstPerson_AnimBP_C extends UE.AnimInstance {
             constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
@@ -362,16 +360,122 @@ declare module "ue" {
     }
 
 // __TYPE_DECL_END
-// __TYPE_DECL_START: 5A1FB13848CE5765531673AF78F3A6ED
-    namespace Game.Button {
-        class Button_C extends UE.UserWidget {
+// __TYPE_DECL_START: 9988060047F41D16DB97DBB3449A9D64
+    namespace Game.SmartUIButton {
+        class SmartUIButton_C extends UE.SmartUICoreWidget {
             constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            Button_82: UE.Button;
             static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): Button_C;
-            static Load(InName: string): Button_C;
+            static Find(OrigInName: string, Outer?: Object): SmartUIButton_C;
+            static Load(InName: string): SmartUIButton_C;
         
-            __tid_Button_C_0__: boolean;
+            __tid_SmartUIButton_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 6205C614415847559A6A56BFC077EF5E
+    namespace Game.MyTestCreateUI_123 {
+        class MyTestCreateUI_123_C extends UE.SmartUICoreWidget {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): MyTestCreateUI_123_C;
+            static Load(InName: string): MyTestCreateUI_123_C;
+        
+            __tid_MyTestCreateUI_123_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 5DE889FB47C1F608731560A518854FD1
+    namespace Game.Button1 {
+        class Button1_C extends UE.UserWidget {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            UberGraphFrame: UE.PointerToUberGraphFrame;
+            Button_0: UE.Button;
+            CanvasPanel_157: UE.CanvasPanel;
+            BndEvt__Button1_Button_0_K2Node_ComponentBoundEvent_0_OnButtonClickedEvent__DelegateSignature() : void;
+            /*
+             *Called when this entry is released from the owning table and no longer represents any list item
+             */
+            BP_OnEntryReleased() : void;
+            /*
+             *Called when the expansion state of the item represented by this entry changes. Tree view entries only.
+             */
+            BP_OnItemExpansionChanged(bIsExpanded: boolean) : void;
+            /*
+             *Called when the selection state of the item represented by this entry changes.
+             */
+            BP_OnItemSelectionChanged(bIsSelected: boolean) : void;
+            ExecuteUbergraph_Button1(EntryPoint: number) : void;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Button1_C;
+            static Load(InName: string): Button1_C;
+        
+            __tid_Button1_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 8648CEA446B52B4B77BBCAB3F85B162F
+    namespace Game.Actor3DWidget {
+        class Actor3DWidget_C extends UE.Actor {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            UberGraphFrame: UE.PointerToUberGraphFrame;
+            Widget: UE.WidgetComponent;
+            DefaultSceneRoot: UE.SceneComponent;
+            ExecuteUbergraph_Actor3DWidget(EntryPoint: number) : void;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Actor3DWidget_C;
+            static Load(InName: string): Actor3DWidget_C;
+        
+            __tid_Actor3DWidget_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 284D63AF42FEF8F7194F2F99F30710CC
+    namespace Game.NewWidgetBlueprint {
+        class NewWidgetBlueprint_C extends UE.UserWidget {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            UberGraphFrame: UE.PointerToUberGraphFrame;
+            ButtonAnimation: UE.WidgetAnimation;
+            NewAnimation: UE.WidgetAnimation;
+            Button_0: UE.Button;
+            Button_225: UE.Button;
+            CheckBox_0: UE.CheckBox;
+            CircularThrobber_136: UE.CircularThrobber;
+            ComboBoxKey_102: UE.ComboBoxKey;
+            ComboBoxString_45: UE.ComboBoxString;
+            ExpandableArea_196: UE.ExpandableArea;
+            Image_0: UE.Image;
+            Image_109: UE.Image;
+            InvalidationBox_422: UE.InvalidationBox;
+            MultiLineEditableTextBox_209: UE.MultiLineEditableTextBox;
+            RadialSlider_264: UE.RadialSlider;
+            RetainerBox_560: UE.RetainerBox;
+            RichTextBlock_63: UE.RichTextBlock;
+            ScrollBox_186: UE.ScrollBox;
+            Slider_386: UE.Slider;
+            SpinBox_134: UE.SpinBox;
+            Throbber_160: UE.Throbber;
+            Item: string;
+            BndEvt__NewWidgetBlueprint_Button_0_K2Node_ComponentBoundEvent_1_OnButtonClickedEvent__DelegateSignature() : void;
+            BndEvt__NewWidgetBlueprint_Button_225_K2Node_ComponentBoundEvent_0_OnButtonClickedEvent__DelegateSignature() : void;
+            BndEvt__NewWidgetBlueprint_SpinBox_134_K2Node_ComponentBoundEvent_2_OnSpinBoxValueCommittedEvent__DelegateSignature(InValue: number, CommitMethod: UE.ETextCommit) : void;
+            BndEvt__NewWidgetBlueprint_SpinBox_134_K2Node_ComponentBoundEvent_3_OnSpinBoxValueChangedEvent__DelegateSignature(InValue: number) : void;
+            ExecuteUbergraph_NewWidgetBlueprint(EntryPoint: number) : void;
+            GetBrush() : UE.SlateBrush;
+            OnGenerateContentWidget(Item: string) : UE.Widget;
+            OnGenerateItemWidget(Item: string) : UE.Widget;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): NewWidgetBlueprint_C;
+            static Load(InName: string): NewWidgetBlueprint_C;
+        
+            __tid_NewWidgetBlueprint_C_0__: boolean;
         }
         
     }
@@ -413,6 +517,65 @@ declare module "ue" {
             static Load(InName: string): BP_Testbutton_C;
         
             __tid_BP_Testbutton_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 7999B0334D935006BF74F0993E2F9BB6
+    namespace Game.NoesisUITest.Cube {
+        class Cube_C extends UE.Actor {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            Box: UE.BoxComponent;
+            Cube1: UE.StaticMeshComponent;
+            DefaultSceneRoot: UE.SceneComponent;
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): Cube_C;
+            static Load(InName: string): Cube_C;
+        
+            __tid_Cube_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 6F2E559248601B5EDDED7C9756D33E87
+    namespace Game.NoesisUITest.NewNoesisBlueprint {
+        class NewNoesisBlueprint_C extends UE.NoesisInstance {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): NewNoesisBlueprint_C;
+            static Load(InName: string): NewNoesisBlueprint_C;
+        
+            __tid_NewNoesisBlueprint_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 3529C04A4152F7D59691A9898568B22D
+    namespace Game.NoesisUITest.NewNoesisBlueprint1 {
+        class NewNoesisBlueprint1_C extends UE.NoesisInstance {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): NewNoesisBlueprint1_C;
+            static Load(InName: string): NewNoesisBlueprint1_C;
+        
+            __tid_NewNoesisBlueprint1_C_0__: boolean;
+        }
+        
+    }
+
+// __TYPE_DECL_END
+// __TYPE_DECL_START: 51A727F546AAF59D9FADA0B3BB7CA75A
+    namespace Game.NoesisUITest.NewTestBlueprint {
+        class NewTestBlueprint_C extends UE.Blueprint {
+            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
+            static StaticClass(): Class;
+            static Find(OrigInName: string, Outer?: Object): NewTestBlueprint_C;
+            static Load(InName: string): NewTestBlueprint_C;
+        
+            __tid_NewTestBlueprint_C_0__: boolean;
         }
         
     }
@@ -491,79 +654,6 @@ declare module "ue" {
             static Load(InName: string): View_C;
         
             __tid_View_C_0__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: AAEF31384354077A8BFCB7A6FFE787E9
-    namespace Game.Blueprints.NewUserWidget {
-        class NewUserWidget_C extends UE.UserWidget {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            Button_44: UE.Button;
-            /*
-             *Called when this entry is released from the owning table and no longer represents any list item
-             */
-            BP_OnEntryReleased() : void;
-            /*
-             *Called when the expansion state of the item represented by this entry changes. Tree view entries only.
-             */
-            BP_OnItemExpansionChanged(bIsExpanded: boolean) : void;
-            /*
-             *Called when the selection state of the item represented by this entry changes.
-             */
-            BP_OnItemSelectionChanged(bIsSelected: boolean) : void;
-            ExecuteUbergraph_NewUserWidget(EntryPoint: number) : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): NewUserWidget_C;
-            static Load(InName: string): NewUserWidget_C;
-        
-            __tid_NewUserWidget_C_0__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 25204BEC4A882F9E3D6CBF881C935329
-    namespace Game.Blueprints.Text {
-        class Text_C extends UE.UserWidget {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            EditableText_66: UE.EditableText;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): Text_C;
-            static Load(InName: string): Text_C;
-        
-            __tid_Text_C_0__: boolean;
-        }
-        
-    }
-
-// __TYPE_DECL_END
-// __TYPE_DECL_START: 8C4E8532411E956420FCD29FBF1C8AC3
-    namespace Game.Blueprints.Text2 {
-        class Text2_C extends UE.UserWidget {
-            constructor(Outer?: Object, Name?: string, ObjectFlags?: number);
-            UberGraphFrame: UE.PointerToUberGraphFrame;
-            EditableText_51: UE.EditableText;
-            /*
-             *Called when this entry is released from the owning table and no longer represents any list item
-             */
-            BP_OnEntryReleased() : void;
-            /*
-             *Called when the expansion state of the item represented by this entry changes. Tree view entries only.
-             */
-            BP_OnItemExpansionChanged(bIsExpanded: boolean) : void;
-            /*
-             *Called when the selection state of the item represented by this entry changes.
-             */
-            BP_OnItemSelectionChanged(bIsSelected: boolean) : void;
-            ExecuteUbergraph_Text2(EntryPoint: number) : void;
-            static StaticClass(): Class;
-            static Find(OrigInName: string, Outer?: Object): Text2_C;
-            static Load(InName: string): Text2_C;
-        
-            __tid_Text2_C_0__: boolean;
         }
         
     }

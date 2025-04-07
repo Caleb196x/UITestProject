@@ -7,6 +7,9 @@ interface BackgroundPositionTestProps {}
 export class BackgroundPositionTest extends React.Component<BackgroundPositionTestProps> {
     constructor(props: BackgroundPositionTestProps) {
         super(props);
+        this.state = {
+            backgroundPosition: 'top left',
+        }
     }
     
     render() {

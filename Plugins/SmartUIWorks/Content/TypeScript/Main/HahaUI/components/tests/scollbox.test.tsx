@@ -49,9 +49,6 @@ export const ScrollBoxExample: React.FC<ScrollBoxProps> = ({ width = "400px", he
                 <span>- 思路：所有值的单位相同的情况</span>
                 <span>- 思路：所有值的单位相同的情况</span>
                 <span>- 思路：所有值的单位相同的情况</span>
-                
-
-
             </div>
         </div>
     );

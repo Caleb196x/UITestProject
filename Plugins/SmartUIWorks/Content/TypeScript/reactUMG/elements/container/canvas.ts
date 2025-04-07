@@ -59,7 +59,7 @@ export class CanvasWrapper extends ComponentWrapper {
         const canvasSlot = canvasPanel.AddChildToCanvas(childItem);
         
         const mergedStyle = mergeClassStyleAndInlineStyle(childProps);
-        const positionArea = mergedStyle?.positionArea;
+        const positionAnchor = mergedStyle?.positionAnchor;
         const offsetAnchor = mergedStyle?.offsetAnchor;
 
         const width = mergedStyle?.width || 'none';
@@ -69,8 +69,8 @@ export class CanvasWrapper extends ComponentWrapper {
         const aspectRatio = mergedStyle?.aspectRatio || 'auto';
         
         let positionAnchors: any = null;
-        if (positionArea) {
-            positionAnchors = this.predefinedAnchors[positionArea];
+        if (positionAnchor) {
+            positionAnchors = this.predefinedAnchors[positionAnchor];
 
         } else if (offsetAnchor) {
             positionAnchors = this.predefinedAnchors[offsetAnchor];
@@ -91,7 +91,7 @@ export class CanvasWrapper extends ComponentWrapper {
 
         const topSU = convertLengthUnitToSlateUnit(top, this.containerStyle);
         const leftSU = convertLengthUnitToSlateUnit(left, this.containerStyle);
-        if (!(positionArea?.includes('fill')) || !(positionArea?.includes('span-all'))) {
+        if (!(positionAnchor?.includes('fill')) || !(positionAnchor?.includes('span-all'))) {
             canvasSlot.SetPosition(new UE.Vector2D(leftSU, topSU));
         } else {
             const rightSU = convertLengthUnitToSlateUnit(right, this.containerStyle);

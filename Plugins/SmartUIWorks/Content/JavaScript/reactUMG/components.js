@@ -63,3 +63,4 @@ exports.TextureImage = 'TextureImage';
 exports.TakeRecorderOverlayWidget = 'TakeRecorderOverlayWidget';
 exports.Synth2DSlider = 'Synth2DSlider';
 exports.SynthKnob = 'SynthKnob';
+exports.Spine = 'Spine';

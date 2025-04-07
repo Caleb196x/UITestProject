@@ -51,15 +51,15 @@ class CanvasWrapper extends common_wrapper_1.ComponentWrapper {
         let canvasPanel = parentItem;
         const canvasSlot = canvasPanel.AddChildToCanvas(childItem);
         const mergedStyle = (0, common_utils_1.mergeClassStyleAndInlineStyle)(childProps);
-        const positionArea = mergedStyle?.positionArea;
+        const positionAnchor = mergedStyle?.positionAnchor;
         const offsetAnchor = mergedStyle?.offsetAnchor;
         const width = mergedStyle?.width || 'none';
         const height = mergedStyle?.height || 'none';
         const scale = mergedStyle?.scale || 1.0;
         const aspectRatio = mergedStyle?.aspectRatio || 'auto';
         let positionAnchors = null;
-        if (positionArea) {
-            positionAnchors = this.predefinedAnchors[positionArea];
+        if (positionAnchor) {
+            positionAnchors = this.predefinedAnchors[positionAnchor];
         }
         else if (offsetAnchor) {
             positionAnchors = this.predefinedAnchors[offsetAnchor];
@@ -77,7 +77,7 @@ class CanvasWrapper extends common_wrapper_1.ComponentWrapper {
         const bottom = mergedStyle?.bottom || '0px';
         const topSU = (0, common_utils_1.convertLengthUnitToSlateUnit)(top, this.containerStyle);
         const leftSU = (0, common_utils_1.convertLengthUnitToSlateUnit)(left, this.containerStyle);
-        if (!(positionArea?.includes('fill')) || !(positionArea?.includes('span-all'))) {
+        if (!(positionAnchor?.includes('fill')) || !(positionAnchor?.includes('span-all'))) {
             canvasSlot.SetPosition(new UE.Vector2D(leftSU, topSU));
         }
         else {

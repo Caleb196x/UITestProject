@@ -23,10 +23,6 @@ const CanvasUIExample = () => {
         aspectRatio: '16/9',
     };
     (0, react_1.useEffect)(() => {
-        //const ctx = canvas.getContext('2d');
-        // 设置Canvas实际像素尺寸
-        // canvas.width = 400;
-        // canvas.height = 300;
         const canvas = canvasRef.current;
         const native = canvas.nativePtr;
         native.SetRenderTransformAngle(rotation);

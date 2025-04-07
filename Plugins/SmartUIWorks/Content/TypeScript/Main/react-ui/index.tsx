@@ -43,9 +43,9 @@ class Hello extends React.Component<Props, State> {
             <CanvasPanel>
                 <VerticalBox Slot={SlotOfVerticalBox}>
                     <HorizontalBox>
-                    <Button OnHovered={() => this.setState({buttonTextureIndex: 1})} OnUnhovered={() => this.setState({buttonTextureIndex: 0})} >
+                    <button onMouseEnter={() => this.setState({buttonTextureIndex: 1})} onMouseLeave={() => this.setState({buttonTextureIndex: 0})} >
                         {this.state.buttonTextureIndex == 0 ? 'normal' : 'hovered'}
-                    </Button>
+                    </button>
                     </HorizontalBox>
                     {this.state.names.map((name, idx) => <StatusBar name={name} key={idx}/>)}
                 </VerticalBox>
@@ -78,9 +78,9 @@ class Hello2 extends React.Component<Props, State> {
             <CanvasPanel>
                 <VerticalBox Slot={SlotOfVerticalBox2}>
                     <HorizontalBox>
-                    <Button OnHovered={() => this.setState({buttonTextureIndex: 1})} OnUnhovered={() => this.setState({buttonTextureIndex: 0})} >
+                    <button onMouseEnter={() => this.setState({buttonTextureIndex: 1})} onMouseLeave={() => this.setState({buttonTextureIndex: 0})} >
                         {this.state.buttonTextureIndex == 0 ? 'normal' : 'hovered'}
-                    </Button>
+                    </button>
                     </HorizontalBox>
                     {this.state.names.map((name, idx) => <StatusBar name={name} key={idx}/>)}
                 </VerticalBox>
@@ -126,11 +126,11 @@ class Login extends React.Component<Props, StateLogin>{
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
                 </HorizontalBox>
                 <HorizontalBox>
-                <Button OnClicked={() => this.handleLogin()}>
+                <button onClick={() => this.handleLogin()}>
                     {'Login'}
-                </Button>
+                </button>
                 </HorizontalBox>
-            </VerticalBox>
+            </VerticalBox>  
         </CanvasPanel>
     }
 }
@@ -173,9 +173,9 @@ class Login2 extends React.Component<Props, StateLogin>{
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
                 </HorizontalBox>
                 <HorizontalBox>
-                <Button OnClicked={() => this.handleLogin()}>
+                <button onClick={() => this.handleLogin()}>
                     {'Login'}
-                </Button>
+                </button>
                 </HorizontalBox>
             </VerticalBox>
         </CanvasPanel>

@@ -19,5 +19,9 @@ export class OverlayWrapper extends ComponentWrapper {
         let propsChange = false;
         return propsChange;
     }
+
+    override appendChildItem(parentItem: UE.Widget, childItem: UE.Widget, childItemTypeName: string, childProps?: any): void {
+        
+    }
 }
 

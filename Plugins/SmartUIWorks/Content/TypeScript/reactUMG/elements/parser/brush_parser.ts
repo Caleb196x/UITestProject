@@ -1,4 +1,4 @@
-import { ImageStyle } from 'SmartGameUI';
+import { ImageStyle } from 'reactUMG';
 import * as UE from 'ue';
 import { parseColor } from './color_parser';
 import { convertMargin, loadTextureFromImagePath } from '../common_utils';

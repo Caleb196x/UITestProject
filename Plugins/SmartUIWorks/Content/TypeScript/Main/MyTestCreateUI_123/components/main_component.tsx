@@ -63,9 +63,9 @@ export class MainComponent extends React.Component<Props, State> {
                     <EditableText Text={this.state.username} OnTextChanged={(text) => {this.setState({username: text})}} ></EditableText>
                 </HorizontalBox>
                 <HorizontalBox>
-                <Button OnClicked={() => this.handleLogin()} RenderTransform={{Translation: {X: 100, Y: 100}}}>
+                <button onClick={() => this.handleLogin()}>
                     {'Login'}
-                </Button>
+                </button>
                 <StatusBar name={'Healthy: '} initialPercent={60}></StatusBar>
                 </HorizontalBox>
                 <HorizontalBox>

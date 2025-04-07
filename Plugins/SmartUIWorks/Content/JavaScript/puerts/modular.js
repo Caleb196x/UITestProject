@@ -241,7 +241,7 @@ var global = global || (function () { return this; }());
                 script = generateEmptyCode(getSourceLengthFromBytecode(bytecode));
             }
             try {
-                if (fullPath.endsWith(".json")) {
+                if (fullPath.endsWith(".json") && fullPath.endsWith("package.json")) {
                     let packageConfigure = JSON.parse(script);
                     
                     if (fullPath.endsWith("package.json")) {
@@ -272,11 +272,14 @@ var global = global || (function () { return this; }());
                     // todo@Caleb196x: 导入性能优化x10
                     // todo@Caleb196x: 通过hash判断文件内容是否发生改变
                     // let texture = readImageAsTexture(fullPath); 
-                    console.log(fullPath);
                     m.exports = {'default': fullPath};
                 } else if (fullPath.endsWith('.css') || fullPath.endsWith('.scss')) {
                     // support import css
                     extractStyleClassFromFile(fullPath);
+                } else if (fullPath.endsWith(".json") || fullPath.endsWith('.atlas') || fullPath.endsWith('.skel')) {
+                    // support import spine
+                    console.log("fullPath: " + fullPath + " script: " + script);
+                    m.exports = {'default': fullPath};
                 }
                 else {
                     let r = executeModule(fullPath, script, debugPath, sid, isESM, bytecode);
@@ -292,6 +295,7 @@ var global = global || (function () { return this; }());
             } finally {
                 tmpModuleStorage[sid] = undefined;
             }
+
             return m.exports;
         }
 

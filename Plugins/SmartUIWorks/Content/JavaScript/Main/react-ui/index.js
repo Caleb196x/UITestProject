@@ -27,7 +27,7 @@ class Hello extends React.Component {
         return (React.createElement(reactUMG_1.CanvasPanel, null,
             React.createElement(reactUMG_1.VerticalBox, { Slot: SlotOfVerticalBox },
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement(reactUMG_1.Button, { OnHovered: () => this.setState({ buttonTextureIndex: 1 }), OnUnhovered: () => this.setState({ buttonTextureIndex: 0 }) }, this.state.buttonTextureIndex == 0 ? 'normal' : 'hovered')),
+                    React.createElement("button", { onMouseEnter: () => this.setState({ buttonTextureIndex: 1 }), onMouseLeave: () => this.setState({ buttonTextureIndex: 0 }) }, this.state.buttonTextureIndex == 0 ? 'normal' : 'hovered')),
                 this.state.names.map((name, idx) => React.createElement(ui_components_1.StatusBar, { name: name, key: idx })))));
     }
 }
@@ -53,7 +53,7 @@ class Hello2 extends React.Component {
         return (React.createElement(reactUMG_1.CanvasPanel, null,
             React.createElement(reactUMG_1.VerticalBox, { Slot: SlotOfVerticalBox2 },
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement(reactUMG_1.Button, { OnHovered: () => this.setState({ buttonTextureIndex: 1 }), OnUnhovered: () => this.setState({ buttonTextureIndex: 0 }) }, this.state.buttonTextureIndex == 0 ? 'normal' : 'hovered')),
+                    React.createElement("button", { onMouseEnter: () => this.setState({ buttonTextureIndex: 1 }), onMouseLeave: () => this.setState({ buttonTextureIndex: 0 }) }, this.state.buttonTextureIndex == 0 ? 'normal' : 'hovered')),
                 this.state.names.map((name, idx) => React.createElement(ui_components_1.StatusBar, { name: name, key: idx })))));
     }
 }
@@ -88,7 +88,7 @@ class Login extends React.Component {
                     React.createElement(reactUMG_1.TextBlock, { Text: 'Username: ' }),
                     React.createElement(reactUMG_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))));
+                    React.createElement("button", { onClick: () => this.handleLogin() }, 'Login'))));
     }
 }
 let SlotOfVerticalBoxOfLogin2 = {
@@ -122,7 +122,7 @@ class Login2 extends React.Component {
                     React.createElement(reactUMG_1.TextBlock, { Text: 'Username: ' }),
                     React.createElement(reactUMG_1.EditableText, { Text: this.state.username, OnTextChanged: (text) => { this.setState({ username: text }); } })),
                 React.createElement(reactUMG_1.HorizontalBox, null,
-                    React.createElement(reactUMG_1.Button, { OnClicked: () => this.handleLogin() }, 'Login'))));
+                    React.createElement("button", { onClick: () => this.handleLogin() }, 'Login'))));
     }
 }
 function Load() {

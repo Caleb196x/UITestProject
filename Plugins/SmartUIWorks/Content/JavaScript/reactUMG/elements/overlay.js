@@ -19,6 +19,8 @@ class OverlayWrapper extends common_wrapper_1.ComponentWrapper {
         let propsChange = false;
         return propsChange;
     }
+    appendChildItem(parentItem, childItem, childItemTypeName, childProps) {
+    }
 }
 exports.OverlayWrapper = OverlayWrapper;
 //# sourceMappingURL=overlay.js.map

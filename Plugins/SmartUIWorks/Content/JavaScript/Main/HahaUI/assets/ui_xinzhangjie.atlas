@@ -1,0 +1,83 @@
+
+ui_xinzhangjie.png
+size: 898,445
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+baod0348
+  rotate: false
+  xy: 406, 52
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+gdd_02
+  rotate: false
+  xy: 771, 178
+  size: 25, 24
+  orig: 32, 32
+  offset: 4, 4
+  index: -1
+gq_2
+  rotate: false
+  xy: 733, 13
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+jzb
+  rotate: true
+  xy: 204, 154
+  size: 48, 311
+  orig: 48, 311
+  offset: 0, 0
+  index: -1
+jzdda
+  rotate: false
+  xy: 2, 204
+  size: 798, 239
+  orig: 798, 239
+  offset: 0, 0
+  index: -1
+jzdda11
+  rotate: false
+  xy: 508, 53
+  size: 223, 88
+  orig: 223, 88
+  offset: 0, 0
+  index: -1
+jzuyun
+  rotate: false
+  xy: 517, 143
+  size: 252, 59
+  orig: 252, 59
+  offset: 0, 0
+  index: -1
+jzuyun2
+  rotate: true
+  xy: 802, 191
+  size: 252, 81
+  orig: 252, 81
+  offset: 0, 0
+  index: -1
+jzz2
+  rotate: true
+  xy: 885, 362
+  size: 81, 11
+  orig: 81, 11
+  offset: 0, 0
+  index: -1
+qc
+  rotate: false
+  xy: 2, 2
+  size: 200, 200
+  orig: 200, 200
+  offset: 0, 0
+  index: -1
+tx_gxxx
+  rotate: false
+  xy: 204, 10
+  size: 200, 142
+  orig: 200, 142
+  offset: 0, 0
+  index: -1

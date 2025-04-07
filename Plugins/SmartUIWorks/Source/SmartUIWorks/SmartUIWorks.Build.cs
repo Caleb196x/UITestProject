@@ -47,7 +47,8 @@ public class SmartUIWorks : ModuleRules
 				"InputCore",
 				"Projects",
 				"DeclarationGenerator",
-				"JsEnv"
+				"JsEnv",
+				"SpinePlugin"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

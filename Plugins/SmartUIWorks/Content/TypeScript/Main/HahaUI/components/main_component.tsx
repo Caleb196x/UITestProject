@@ -9,6 +9,7 @@ import GridPanelExample from './tests/gridpanel.test';
 import {ScrollBoxExample} from './tests/scollbox.test';
 import { WrapBoxExample } from './tests/wrapbox.test';
 import { CanvasUIExample } from './tests/canvas.test';
+import { SpineUIExample } from './tests/spine.test';
 
 interface State {
     username: string;
@@ -27,6 +28,6 @@ export class MainComponent extends React.Component<Props, State> {
     }
       // 渲染方法
       render() {
-        return <CanvasUIExample />  // fixme@Caleb196x: 替换为FlexStyleTest后无法重新加载
+        return <SpineUIExample />  // fixme@Caleb196x: 替换为FlexStyleTest后无法重新加载
     }
 }
