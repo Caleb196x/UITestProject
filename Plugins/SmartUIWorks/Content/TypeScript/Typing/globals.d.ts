@@ -29,5 +29,19 @@ declare module "*.jpeg" {
   export default value;
 }
 
+declare module "*.json" {
+  const value: string;
+  export default value;
+}
+
+declare module "*.atlas" {
+  const value: string;
+  export default value;
+}
+
+declare module "*.skel" {
+  const value: string;
+  export default value;
+}
 
 declare function getCssStyleForClass(className: string): string;

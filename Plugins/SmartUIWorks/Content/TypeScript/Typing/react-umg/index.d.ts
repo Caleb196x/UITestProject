@@ -657,22 +657,6 @@ declare module "react-umg" {
         nativePtr: UE.PostBufferUpdate;
     }
 
-    interface ProgressBarProps extends WidgetProps {
-        WidgetStyle?: RecursivePartial<UE.ProgressBarStyle>;
-        Percent?: number;
-        BarFillType?: UE.EProgressBarFillType;
-        BarFillStyle?: UE.EProgressBarFillStyle;
-        bIsMarquee?: boolean;
-        BorderPadding?: RecursivePartial<UE.Vector2D>;
-        PercentDelegate?: () => number;
-        FillColorAndOpacity?: RecursivePartial<UE.LinearColor>;
-        FillColorAndOpacityDelegate?: () => UE.LinearColor;
-    }
-
-    class ProgressBar extends React.Component<ProgressBarProps> {
-        nativePtr: UE.ProgressBar;
-    }
-
     interface RetainerBoxProps extends ContentWidgetProps {
         bRetainRender?: boolean;
         RenderOnInvalidation?: boolean;
@@ -970,6 +954,22 @@ declare module "react-umg" {
         nativePtr: UE.WrapBox;
     }
 
+    interface ProgressBarProps extends WidgetProps {
+        WidgetStyle?: RecursivePartial<UE.ProgressBarStyle>;
+        Percent?: number;
+        BarFillType?: UE.EProgressBarFillType;
+        BarFillStyle?: UE.EProgressBarFillStyle;
+        bIsMarquee?: boolean;
+        BorderPadding?: RecursivePartial<UE.Vector2D>;
+        PercentDelegate?: () => number;
+        FillColorAndOpacity?: RecursivePartial<UE.LinearColor>;
+        FillColorAndOpacityDelegate?: () => UE.LinearColor;
+    }
+
+    class ProgressBar extends React.Component<ProgressBarProps> {
+        nativePtr: UE.ProgressBar;
+    }
+
     interface LevelSequenceBurnInProps extends UserWidgetProps {
         FrameInformation?: RecursivePartial<UE.LevelSequencePlayerSnapshot>;
     }
@@ -1040,6 +1040,13 @@ declare module "react-umg" {
 
     class SinglePropertyView extends React.Component<SinglePropertyViewProps> {
         nativePtr: UE.SinglePropertyView;
+    }
+
+    interface TakeRecorderOverlayWidgetProps extends UserWidgetProps {
+    }
+
+    class TakeRecorderOverlayWidget extends React.Component<TakeRecorderOverlayWidgetProps> {
+        nativePtr: UE.TakeRecorderOverlayWidget;
     }
 
     interface EditorUtilityWidgetProps extends UserWidgetProps {
@@ -1184,13 +1191,6 @@ declare module "react-umg" {
 
     class EditorUtilityTreeView extends React.Component<EditorUtilityTreeViewProps> {
         nativePtr: UE.EditorUtilityTreeView;
-    }
-
-    interface TakeRecorderOverlayWidgetProps extends UserWidgetProps {
-    }
-
-    class TakeRecorderOverlayWidget extends React.Component<TakeRecorderOverlayWidgetProps> {
-        nativePtr: UE.TakeRecorderOverlayWidget;
     }
 
     interface RadialSliderProps extends WidgetProps {
@@ -1416,6 +1416,34 @@ declare module "react-umg" {
         nativePtr: UE.ObjectMixerEditorUWidget;
     }
 
+    interface SpineWidgetProps extends WidgetProps {
+        InitialSkin?: string;
+        TextureParameterName?: string;
+        DepthOffset?: number;
+        Color?: RecursivePartial<UE.LinearColor>;
+        Brush?: RecursivePartial<UE.SlateBrush>;
+        trackEntries?: TSet<UE.TrackEntry>;
+        bAutoPlaying?: boolean;
+    }
+
+    class SpineWidget extends React.Component<SpineWidgetProps> {
+        nativePtr: UE.SpineWidget;
+    }
+
+    interface ReactWidgetProps extends UserWidgetProps {
+    }
+
+    class ReactWidget extends React.Component<ReactWidgetProps> {
+        nativePtr: UE.ReactWidget;
+    }
+
+    interface SmartUICoreWidgetProps extends UserWidgetProps {
+    }
+
+    class SmartUICoreWidget extends React.Component<SmartUICoreWidgetProps> {
+        nativePtr: UE.SmartUICoreWidget;
+    }
+
     interface PyNativeWidgetHostProps extends NativeWidgetHostProps {
     }
 
@@ -1434,23 +1462,12 @@ declare module "react-umg" {
         nativePtr: UE.PyUserWidget;
     }
 
-    interface ReactWidgetProps extends UserWidgetProps {
-    }
-
-    class ReactWidget extends React.Component<ReactWidgetProps> {
-        nativePtr: UE.ReactWidget;
-    }
-
-    interface SmartUICoreWidgetProps extends UserWidgetProps {
-    }
-
-    class SmartUICoreWidget extends React.Component<SmartUICoreWidgetProps> {
-        nativePtr: UE.SmartUICoreWidget;
-    }
-
-    interface NewWidgetBlueprint_CProps extends UserWidgetProps {
+    interface Button_CProps extends UserWidgetProps {
         UberGraphFrame?: RecursivePartial<UE.PointerToUberGraphFrame>;
-        Item?: string;
+    }
+
+    class Button_C extends React.Component<Button_CProps> {
+        nativePtr: UE.Game.Button.Button_C;
     }
 
     interface DefaultBurnIn_CProps extends LevelSequenceBurnInProps {
@@ -1482,10 +1499,13 @@ declare module "react-umg" {
         nativePtr: UE.Engine.Sequencer.DefaultBurnIn.DefaultBurnIn_C;
     }
 
-    interface BPW_LoadingScreen_CProps extends UserWidgetProps {
-        UberGraphFrame?: RecursivePartial<UE.PointerToUberGraphFrame>;
-        DoneFadingEvent?: () => void;
+    interface HahaUI_CProps extends SmartUICoreWidgetProps {
     }
+
+    class HahaUI_C extends React.Component<HahaUI_CProps> {
+        nativePtr: UE.Game.HahaUI.HahaUI_C;
+    }
+
 
     interface Root {
         removeFromViewport() : void;

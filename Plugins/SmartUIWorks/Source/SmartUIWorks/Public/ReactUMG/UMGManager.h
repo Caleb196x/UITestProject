@@ -16,6 +16,8 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "GameFramework/PlayerController.h"
+#include "SpineSkeletonDataAsset.h"
+#include "SpineAtlasAsset.h"
 #include "UMGManager.generated.h"
 
 /**
@@ -37,4 +39,10 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Widget")
     static void SynchronizeSlotProperties(UPanelSlot* Slot);
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Widget|Spine")
+	static USpineSkeletonDataAsset* LoadSpineSkeleton(UObject* Context, const FString& SkeletonPath);
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category="Widget|Spine")
+	static USpineAtlasAsset* LoadSpineAtlas(UObject* Context, const FString& AtlasPath);
 };

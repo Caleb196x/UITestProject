@@ -23,13 +23,6 @@ export const CanvasUIExample = () => {
     };
 
     useEffect(() => {
-
-        //const ctx = canvas.getContext('2d');
-        
-        // 设置Canvas实际像素尺寸
-        // canvas.width = 400;
-        // canvas.height = 300;
-
         const canvas = canvasRef.current;
         const native = canvas.nativePtr as UE.Widget;
         native.SetRenderTransformAngle(rotation);

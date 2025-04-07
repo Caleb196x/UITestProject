@@ -25,6 +25,15 @@ const retainer_box_1 = require("./elements/retainer_box");
 const safezone_1 = require("./elements/safezone");
 const sizebox_1 = require("./elements/sizebox");
 const border_1 = require("./elements/border");
+const expandable_area_1 = require("./elements/expandable_area");
+const throbber_1 = require("./elements/throbber");
+const circular_throbber_1 = require("./elements/circular_throbber");
+const spacer_1 = require("./elements/spacer");
+const slider_1 = require("./elements/slider");
+const radial_slider_1 = require("./elements/radial_slider");
+const spinbox_1 = require("./elements/spinbox");
+const combo_box_1 = require("./elements/combo_box");
+const spine_1 = require("./elements/spine");
 const baseComponentsMap = {
     // base
     "select": selector_1.SelectWrapper,
@@ -69,6 +78,16 @@ const baseComponentsMap = {
     "SafeZone": safezone_1.SafeZoneWrapper,
     "SizeBox": sizebox_1.SizeBoxWrapper,
     "Border": border_1.BorderWrapper,
+    "CircularThrobber": circular_throbber_1.CircularThrobberWrapper,
+    "Throbber": throbber_1.ThrobberWrapper,
+    "Spacer": spacer_1.SpacerWrapper,
+    "ExpandableArea": expandable_area_1.ExpandableAreaWrapper,
+    "RadialSlider": radial_slider_1.RadialSliderWrapper,
+    "Slider": slider_1.SliderWrapper,
+    "SpinBox": spinbox_1.SpinBoxWrapper,
+    "Button": button_1.ButtonWrapper,
+    "ComboBox": combo_box_1.ComboBoxWrapper,
+    "Spine": spine_1.SpineWrapper,
 };
 function isKeyOfRecord(key, record) {
     return key in record;

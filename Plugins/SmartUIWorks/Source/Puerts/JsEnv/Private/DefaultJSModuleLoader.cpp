@@ -70,8 +70,9 @@ bool DefaultJSModuleLoader::SearchModuleInDir(
     FString Extension = FPaths::GetExtension(RequiredModule);
     bool IsJs = Extension == TEXT("js") || Extension == TEXT("mjs") || Extension == TEXT("cjs") || Extension == TEXT("json");
     bool IsImage = Extension == TEXT("jpg") || Extension == TEXT("png") || Extension == TEXT("jpeg") || Extension == TEXT("webp");
-    bool IsCss = Extension == TEXT("css") || TEXT("scss");
-    if ((IsJs || IsImage || IsCss) && SearchModuleWithExtInDir(Dir, RequiredModule, Path, AbsolutePath))
+    bool IsCss = Extension == TEXT("css") || Extension == TEXT("scss");
+    bool IsSpineAssets =  Extension == TEXT("json") ||  Extension == TEXT("skel") ||  Extension == TEXT("atlas");
+    if ((IsJs || IsImage || IsCss || IsSpineAssets) && SearchModuleWithExtInDir(Dir, RequiredModule, Path, AbsolutePath))
         return true;
     return SearchModuleWithExtInDir(Dir, RequiredModule + ".js", Path, AbsolutePath) ||
            SearchModuleWithExtInDir(Dir, RequiredModule + ".mjs", Path, AbsolutePath) ||

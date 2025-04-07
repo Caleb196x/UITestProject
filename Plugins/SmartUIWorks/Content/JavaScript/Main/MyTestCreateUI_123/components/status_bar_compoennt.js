@@ -32,9 +32,9 @@ class StatusBar extends React.Component {
     render() {
         return (React.createElement(reactUMG_1.HorizontalBox, { Slot: SlotOfProgressBar },
             React.createElement(reactUMG_1.TextBlock, { Text: `${this.props.name}(${this.state.percent.toFixed(2)})` }),
-            React.createElement(reactUMG_1.ProgressBar, { Percent: this.state.percent, Slot: SlotOfProgressBar, FillColorAndOpacity: this.color, CategoryName: `${this.props.name}` }),
-            React.createElement(reactUMG_1.Button, { OnClicked: this.onIncrement }, "+"),
-            React.createElement(reactUMG_1.Button, { OnClicked: this.onDecrement }, "-"),
+            React.createElement(reactUMG_1.ProgressBar, { precent: this.state.percent }),
+            React.createElement("button", { onClick: this.onIncrement }, "+"),
+            React.createElement("button", { onClick: this.onDecrement }, "-"),
             React.createElement(reactUMG_1.TextBlock, { Text: '热重载测试_叽叽咋咋' })));
     }
 }

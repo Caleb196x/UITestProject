@@ -82,6 +82,11 @@
 			"Name": "SmartUIEditor",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "SpinePlugin",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		}
 	]
 }

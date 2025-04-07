@@ -46,9 +46,9 @@ export class StatusBar extends React.Component<Props, State> {
         return (
             <HorizontalBox>
                 <TextBlock Text={`${this.props.name}(${this.state.percent.toFixed(2)})`}/>
-                <ProgressBar Percent={this.state.percent} Slot={SlotOfProgressBar} FillColorAndOpacity={this.color} CategoryName={`${this.props.name}`}/>
-                <Button OnClicked={this.onIncrement} >+</Button>
-                <Button OnClicked={this.onDecrement} >-</Button>
+                <ProgressBar precent={this.state.percent}/>
+                <button onClick={this.onIncrement}>+</button>
+                <button onClick={this.onDecrement}>-</button>
             </HorizontalBox>
         );
     }
