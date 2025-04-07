@@ -7,6 +7,9 @@ const face_png_1 = require("../../../assets/face.png");
 class BackgroundPositionTest extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            backgroundPosition: 'top left',
+        };
     }
     render() {
         return (React.createElement("div", null,

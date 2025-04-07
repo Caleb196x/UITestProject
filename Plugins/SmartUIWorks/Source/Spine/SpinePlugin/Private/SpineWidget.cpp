@@ -86,7 +86,7 @@ USpineWidget::USpineWidget(const FObjectInitializer &ObjectInitializer) : Super(
 	worldVertices.ensureCapacity(1024 * 2);
 
 	bAutoPlaying = true;
-	this->slateWidget = SNew(SSpineWidget);
+	slateWidget = SNew(SSpineWidget);
 }
 
 void USpineWidget::SynchronizeProperties() {
@@ -132,7 +132,6 @@ const FText USpineWidget::GetPaletteCategory() {
 void USpineWidget::Tick(float DeltaTime, bool CallDelegates) {
 	CheckState();
 
-	UE_LOG(LogTemp, Warning, TEXT("Ticking delta time %f"), DeltaTime);
 	if (state && bAutoPlaying) {
 		state->update(DeltaTime);
 		state->apply(*skeleton);

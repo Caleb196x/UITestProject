@@ -34,6 +34,7 @@ const radial_slider_1 = require("./elements/radial_slider");
 const spinbox_1 = require("./elements/spinbox");
 const combo_box_1 = require("./elements/combo_box");
 const spine_1 = require("./elements/spine");
+const checkbox_1 = require("./elements/checkbox");
 const baseComponentsMap = {
     // base
     "select": selector_1.SelectWrapper,
@@ -88,6 +89,8 @@ const baseComponentsMap = {
     "Button": button_1.ButtonWrapper,
     "ComboBox": combo_box_1.ComboBoxWrapper,
     "Spine": spine_1.SpineWrapper,
+    "ProgressBar": progress_bar_1.ProgressBarWrapper,
+    "Checkbox": checkbox_1.CheckboxWrapper,
 };
 function isKeyOfRecord(key, record) {
     return key in record;

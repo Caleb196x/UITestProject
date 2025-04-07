@@ -1574,6 +1574,7 @@ declare module "reactUMG" {
      */
     interface SpineProp extends ResourceProp {
         initSkin?: string | undefined;
+        initAnimation?: string | undefined;
         atlas?: string | undefined;
         skel?: string | undefined;
         color?: CssType.Property.Color | undefined;

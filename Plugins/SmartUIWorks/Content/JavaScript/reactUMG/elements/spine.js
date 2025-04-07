@@ -40,39 +40,25 @@ class SpineWrapper extends common_wrapper_1.ComponentWrapper {
                 atlasLoaded = true;
             }
         }
-        const onBeforeUpdateWorldTransform = this.props?.onBeforeUpdateWorldTransform;
-        if (onBeforeUpdateWorldTransform && typeof onBeforeUpdateWorldTransform === 'function') {
-            spine.BeforeUpdateWorldTransform.Add(onBeforeUpdateWorldTransform);
+        const initAnimation = this.props?.initAnimation;
+        if (initAnimation && initAnimation !== '') {
+            spine.SetAnimation(0, initAnimation, true);
         }
-        const onAfterUpdateWorldTransform = this.props?.onAfterUpdateWorldTransform;
-        if (onAfterUpdateWorldTransform && typeof onAfterUpdateWorldTransform === 'function') {
-            spine.AfterUpdateWorldTransform.Add(onAfterUpdateWorldTransform);
+        const eventKeyMap = {
+            'onAnimationStart': 'AnimationStart',
+            'onAnimationEnd': 'AnimationEnd',
+            'onAnimationComplete': 'AnimationComplete',
+            'onAnimationEvent': 'AnimationEvent',
+            'onAnimationInterrupt': 'AnimationInterrupt',
+            'onAnimationDispose': 'AnimationDispose',
+            'onBeforeUpdateWorldTransform': 'BeforeUpdateWorldTransform',
+            'onAfterUpdateWorldTransform': 'AfterUpdateWorldTransform',
+        };
+        for (const [key, value] of Object.entries(this.props)) {
+            if (eventKeyMap[key] && typeof value === 'function') {
+                spine[eventKeyMap[key]].Add(value);
+            }
         }
-        const onAnimationStart = this.props?.onAnimationStart;
-        if (onAnimationStart && typeof onAnimationStart === 'function') {
-            spine.AnimationStart.Add(onAnimationStart);
-        }
-        const onAnimationEnd = this.props?.onAnimationEnd;
-        if (onAnimationEnd && typeof onAnimationEnd === 'function') {
-            spine.AnimationEnd.Add(onAnimationEnd);
-        }
-        const onAnimationComplete = this.props?.onAnimationComplete;
-        if (onAnimationComplete && typeof onAnimationComplete === 'function') {
-            spine.AnimationComplete.Add(onAnimationComplete);
-        }
-        const onAnimationEvent = this.props?.onAnimationEvent;
-        if (onAnimationEvent && typeof onAnimationEvent === 'function') {
-            spine.AnimationEvent.Add(onAnimationEvent);
-        }
-        const onAnimationInterrupt = this.props?.onAnimationInterrupt;
-        if (onAnimationInterrupt && typeof onAnimationInterrupt === 'function') {
-            spine.AnimationInterrupt.Add(onAnimationInterrupt);
-        }
-        const onAnimationDispose = this.props?.onAnimationDispose;
-        if (onAnimationDispose && typeof onAnimationDispose === 'function') {
-            spine.AnimationDispose.Add(onAnimationDispose);
-        }
-        spine.SetAnimation(0, 'jump', true);
         UE.UMGManager.SynchronizeWidgetProperties(spine);
         return spine;
     }
