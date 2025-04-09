@@ -44,4 +44,9 @@ declare module "*.skel" {
   export default value;
 }
 
+declare module "*.riv" {
+  const value: string;
+  export default value;
+}
+
 declare function getCssStyleForClass(className: string): string;

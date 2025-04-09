@@ -31,6 +31,7 @@ import { ComboBoxWrapper } from './elements/combo_box';
 import { SpineWrapper } from './elements/spine';
 
 import { CheckboxWrapper } from './elements/checkbox';
+import { RiveWrapper } from './elements/rive';
 const baseComponentsMap: Record<string, any> = {
     // base
     "select": SelectWrapper,
@@ -94,6 +95,7 @@ const baseComponentsMap: Record<string, any> = {
     "Spine": SpineWrapper,
     "ProgressBar": ProgressBarWrapper,
     "Checkbox": CheckboxWrapper,
+    "Rive": RiveWrapper,
 };
 
 function isKeyOfRecord(key: any, record: Record<string, any>): key is keyof Record<string, any> {

@@ -18,6 +18,7 @@
 #include "GameFramework/PlayerController.h"
 #include "SpineSkeletonDataAsset.h"
 #include "SpineAtlasAsset.h"
+#include "Rive/RiveDescriptor.h"
 #include "UMGManager.generated.h"
 
 /**
@@ -40,9 +41,18 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Widget")
     static void SynchronizeSlotProperties(UPanelSlot* Slot);
 
+    /**
+     * TODO@Caleb196x: 需要对资源加载逻辑进行优化
+     * @param Context 
+     * @param SkeletonPath 
+     * @return 
+     */
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Widget|Spine")
 	static USpineSkeletonDataAsset* LoadSpineSkeleton(UObject* Context, const FString& SkeletonPath);
 
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category="Widget|Spine")
 	static USpineAtlasAsset* LoadSpineAtlas(UObject* Context, const FString& AtlasPath);
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category="Widget|Rive")
+	static URiveFile* LoadRiveFile(UObject* Context, const FString& RivePath);
 };

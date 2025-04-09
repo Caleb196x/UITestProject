@@ -276,7 +276,7 @@ var global = global || (function () { return this; }());
                 } else if (fullPath.endsWith('.css') || fullPath.endsWith('.scss')) {
                     // support import css
                     extractStyleClassFromFile(fullPath);
-                } else if (fullPath.endsWith(".json") || fullPath.endsWith('.atlas') || fullPath.endsWith('.skel')) {
+                } else if (fullPath.endsWith(".json") || fullPath.endsWith('.atlas') || fullPath.endsWith('.skel') || fullPath.endsWith('.riv')) {
                     // support import spine
                     console.log("fullPath: " + fullPath + " script: " + script);
                     m.exports = {'default': fullPath};

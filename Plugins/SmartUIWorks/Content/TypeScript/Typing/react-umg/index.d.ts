@@ -1042,157 +1042,6 @@ declare module "react-umg" {
         nativePtr: UE.SinglePropertyView;
     }
 
-    interface TakeRecorderOverlayWidgetProps extends UserWidgetProps {
-    }
-
-    class TakeRecorderOverlayWidget extends React.Component<TakeRecorderOverlayWidgetProps> {
-        nativePtr: UE.TakeRecorderOverlayWidget;
-    }
-
-    interface EditorUtilityWidgetProps extends UserWidgetProps {
-        TabDisplayName?: string;
-        HelpText?: string;
-        bAlwaysReregisterWithWindowsMenu?: boolean;
-        bAutoRunDefaultAction?: boolean;
-    }
-
-    class EditorUtilityWidget extends React.Component<EditorUtilityWidgetProps> {
-        nativePtr: UE.EditorUtilityWidget;
-    }
-
-    interface EditorUtilityButtonProps extends ButtonProps {
-    }
-
-    class EditorUtilityButton extends React.Component<EditorUtilityButtonProps> {
-        nativePtr: UE.EditorUtilityButton;
-    }
-
-    interface EditorUtilityCheckBoxProps extends CheckBoxProps {
-    }
-
-    class EditorUtilityCheckBox extends React.Component<EditorUtilityCheckBoxProps> {
-        nativePtr: UE.EditorUtilityCheckBox;
-    }
-
-    interface EditorUtilityCircularThrobberProps extends CircularThrobberProps {
-    }
-
-    class EditorUtilityCircularThrobber extends React.Component<EditorUtilityCircularThrobberProps> {
-        nativePtr: UE.EditorUtilityCircularThrobber;
-    }
-
-    interface EditorUtilityComboBoxKeyProps extends ComboBoxKeyProps {
-    }
-
-    class EditorUtilityComboBoxKey extends React.Component<EditorUtilityComboBoxKeyProps> {
-        nativePtr: UE.EditorUtilityComboBoxKey;
-    }
-
-    interface EditorUtilityComboBoxStringProps extends ComboBoxStringProps {
-    }
-
-    class EditorUtilityComboBoxString extends React.Component<EditorUtilityComboBoxStringProps> {
-        nativePtr: UE.EditorUtilityComboBoxString;
-    }
-
-    interface EditorUtilityEditableTextProps extends EditableTextProps {
-    }
-
-    class EditorUtilityEditableText extends React.Component<EditorUtilityEditableTextProps> {
-        nativePtr: UE.EditorUtilityEditableText;
-    }
-
-    interface EditorUtilityEditableTextBoxProps extends EditableTextBoxProps {
-    }
-
-    class EditorUtilityEditableTextBox extends React.Component<EditorUtilityEditableTextBoxProps> {
-        nativePtr: UE.EditorUtilityEditableTextBox;
-    }
-
-    interface EditorUtilityExpandableAreaProps extends ExpandableAreaProps {
-    }
-
-    class EditorUtilityExpandableArea extends React.Component<EditorUtilityExpandableAreaProps> {
-        nativePtr: UE.EditorUtilityExpandableArea;
-    }
-
-    interface EditorUtilityInputKeySelectorProps extends InputKeySelectorProps {
-    }
-
-    class EditorUtilityInputKeySelector extends React.Component<EditorUtilityInputKeySelectorProps> {
-        nativePtr: UE.EditorUtilityInputKeySelector;
-    }
-
-    interface EditorUtilityListViewProps extends ListViewProps {
-    }
-
-    class EditorUtilityListView extends React.Component<EditorUtilityListViewProps> {
-        nativePtr: UE.EditorUtilityListView;
-    }
-
-    interface EditorUtilityMultiLineEditableTextProps extends MultiLineEditableTextProps {
-    }
-
-    class EditorUtilityMultiLineEditableText extends React.Component<EditorUtilityMultiLineEditableTextProps> {
-        nativePtr: UE.EditorUtilityMultiLineEditableText;
-    }
-
-    interface EditorUtilityMultiLineEditableTextBoxProps extends MultiLineEditableTextBoxProps {
-    }
-
-    class EditorUtilityMultiLineEditableTextBox extends React.Component<EditorUtilityMultiLineEditableTextBoxProps> {
-        nativePtr: UE.EditorUtilityMultiLineEditableTextBox;
-    }
-
-    interface EditorUtilityProgressBarProps extends ProgressBarProps {
-    }
-
-    class EditorUtilityProgressBar extends React.Component<EditorUtilityProgressBarProps> {
-        nativePtr: UE.EditorUtilityProgressBar;
-    }
-
-    interface EditorUtilityScrollBarProps extends ScrollBarProps {
-    }
-
-    class EditorUtilityScrollBar extends React.Component<EditorUtilityScrollBarProps> {
-        nativePtr: UE.EditorUtilityScrollBar;
-    }
-
-    interface EditorUtilityScrollBoxProps extends ScrollBoxProps {
-    }
-
-    class EditorUtilityScrollBox extends React.Component<EditorUtilityScrollBoxProps> {
-        nativePtr: UE.EditorUtilityScrollBox;
-    }
-
-    interface EditorUtilitySliderProps extends SliderProps {
-    }
-
-    class EditorUtilitySlider extends React.Component<EditorUtilitySliderProps> {
-        nativePtr: UE.EditorUtilitySlider;
-    }
-
-    interface EditorUtilitySpinBoxProps extends SpinBoxProps {
-    }
-
-    class EditorUtilitySpinBox extends React.Component<EditorUtilitySpinBoxProps> {
-        nativePtr: UE.EditorUtilitySpinBox;
-    }
-
-    interface EditorUtilityThrobberProps extends ThrobberProps {
-    }
-
-    class EditorUtilityThrobber extends React.Component<EditorUtilityThrobberProps> {
-        nativePtr: UE.EditorUtilityThrobber;
-    }
-
-    interface EditorUtilityTreeViewProps extends TreeViewProps {
-    }
-
-    class EditorUtilityTreeView extends React.Component<EditorUtilityTreeViewProps> {
-        nativePtr: UE.EditorUtilityTreeView;
-    }
-
     interface RadialSliderProps extends WidgetProps {
         Value?: number;
         ValueDelegate?: () => number;
@@ -1408,6 +1257,157 @@ declare module "react-umg" {
         nativePtr: UE.SynthKnob;
     }
 
+    interface TakeRecorderOverlayWidgetProps extends UserWidgetProps {
+    }
+
+    class TakeRecorderOverlayWidget extends React.Component<TakeRecorderOverlayWidgetProps> {
+        nativePtr: UE.TakeRecorderOverlayWidget;
+    }
+
+    interface EditorUtilityWidgetProps extends UserWidgetProps {
+        TabDisplayName?: string;
+        HelpText?: string;
+        bAlwaysReregisterWithWindowsMenu?: boolean;
+        bAutoRunDefaultAction?: boolean;
+    }
+
+    class EditorUtilityWidget extends React.Component<EditorUtilityWidgetProps> {
+        nativePtr: UE.EditorUtilityWidget;
+    }
+
+    interface EditorUtilityButtonProps extends ButtonProps {
+    }
+
+    class EditorUtilityButton extends React.Component<EditorUtilityButtonProps> {
+        nativePtr: UE.EditorUtilityButton;
+    }
+
+    interface EditorUtilityCheckBoxProps extends CheckBoxProps {
+    }
+
+    class EditorUtilityCheckBox extends React.Component<EditorUtilityCheckBoxProps> {
+        nativePtr: UE.EditorUtilityCheckBox;
+    }
+
+    interface EditorUtilityCircularThrobberProps extends CircularThrobberProps {
+    }
+
+    class EditorUtilityCircularThrobber extends React.Component<EditorUtilityCircularThrobberProps> {
+        nativePtr: UE.EditorUtilityCircularThrobber;
+    }
+
+    interface EditorUtilityComboBoxKeyProps extends ComboBoxKeyProps {
+    }
+
+    class EditorUtilityComboBoxKey extends React.Component<EditorUtilityComboBoxKeyProps> {
+        nativePtr: UE.EditorUtilityComboBoxKey;
+    }
+
+    interface EditorUtilityComboBoxStringProps extends ComboBoxStringProps {
+    }
+
+    class EditorUtilityComboBoxString extends React.Component<EditorUtilityComboBoxStringProps> {
+        nativePtr: UE.EditorUtilityComboBoxString;
+    }
+
+    interface EditorUtilityEditableTextProps extends EditableTextProps {
+    }
+
+    class EditorUtilityEditableText extends React.Component<EditorUtilityEditableTextProps> {
+        nativePtr: UE.EditorUtilityEditableText;
+    }
+
+    interface EditorUtilityEditableTextBoxProps extends EditableTextBoxProps {
+    }
+
+    class EditorUtilityEditableTextBox extends React.Component<EditorUtilityEditableTextBoxProps> {
+        nativePtr: UE.EditorUtilityEditableTextBox;
+    }
+
+    interface EditorUtilityExpandableAreaProps extends ExpandableAreaProps {
+    }
+
+    class EditorUtilityExpandableArea extends React.Component<EditorUtilityExpandableAreaProps> {
+        nativePtr: UE.EditorUtilityExpandableArea;
+    }
+
+    interface EditorUtilityInputKeySelectorProps extends InputKeySelectorProps {
+    }
+
+    class EditorUtilityInputKeySelector extends React.Component<EditorUtilityInputKeySelectorProps> {
+        nativePtr: UE.EditorUtilityInputKeySelector;
+    }
+
+    interface EditorUtilityListViewProps extends ListViewProps {
+    }
+
+    class EditorUtilityListView extends React.Component<EditorUtilityListViewProps> {
+        nativePtr: UE.EditorUtilityListView;
+    }
+
+    interface EditorUtilityMultiLineEditableTextProps extends MultiLineEditableTextProps {
+    }
+
+    class EditorUtilityMultiLineEditableText extends React.Component<EditorUtilityMultiLineEditableTextProps> {
+        nativePtr: UE.EditorUtilityMultiLineEditableText;
+    }
+
+    interface EditorUtilityMultiLineEditableTextBoxProps extends MultiLineEditableTextBoxProps {
+    }
+
+    class EditorUtilityMultiLineEditableTextBox extends React.Component<EditorUtilityMultiLineEditableTextBoxProps> {
+        nativePtr: UE.EditorUtilityMultiLineEditableTextBox;
+    }
+
+    interface EditorUtilityProgressBarProps extends ProgressBarProps {
+    }
+
+    class EditorUtilityProgressBar extends React.Component<EditorUtilityProgressBarProps> {
+        nativePtr: UE.EditorUtilityProgressBar;
+    }
+
+    interface EditorUtilityScrollBarProps extends ScrollBarProps {
+    }
+
+    class EditorUtilityScrollBar extends React.Component<EditorUtilityScrollBarProps> {
+        nativePtr: UE.EditorUtilityScrollBar;
+    }
+
+    interface EditorUtilityScrollBoxProps extends ScrollBoxProps {
+    }
+
+    class EditorUtilityScrollBox extends React.Component<EditorUtilityScrollBoxProps> {
+        nativePtr: UE.EditorUtilityScrollBox;
+    }
+
+    interface EditorUtilitySliderProps extends SliderProps {
+    }
+
+    class EditorUtilitySlider extends React.Component<EditorUtilitySliderProps> {
+        nativePtr: UE.EditorUtilitySlider;
+    }
+
+    interface EditorUtilitySpinBoxProps extends SpinBoxProps {
+    }
+
+    class EditorUtilitySpinBox extends React.Component<EditorUtilitySpinBoxProps> {
+        nativePtr: UE.EditorUtilitySpinBox;
+    }
+
+    interface EditorUtilityThrobberProps extends ThrobberProps {
+    }
+
+    class EditorUtilityThrobber extends React.Component<EditorUtilityThrobberProps> {
+        nativePtr: UE.EditorUtilityThrobber;
+    }
+
+    interface EditorUtilityTreeViewProps extends TreeViewProps {
+    }
+
+    class EditorUtilityTreeView extends React.Component<EditorUtilityTreeViewProps> {
+        nativePtr: UE.EditorUtilityTreeView;
+    }
+
     interface ObjectMixerEditorUWidgetProps extends WidgetProps {
         ObjectMixerWidgetUserConfig?: RecursivePartial<UE.ObjectMixerWidgetUserConfig>;
     }
@@ -1428,6 +1428,24 @@ declare module "react-umg" {
 
     class SpineWidget extends React.Component<SpineWidgetProps> {
         nativePtr: UE.SpineWidget;
+    }
+
+    interface RiveWidgetProps extends UserWidgetProps {
+        OnRiveReady?: () => void;
+        RiveDescriptor?: RecursivePartial<UE.RiveDescriptor>;
+    }
+
+    class RiveWidget extends React.Component<RiveWidgetProps> {
+        nativePtr: UE.RiveWidget;
+    }
+
+    interface ReactRiveWidgetProps extends WidgetProps {
+        OnRiveReady?: () => void;
+        RiveDescriptor?: RecursivePartial<UE.RiveDescriptor>;
+    }
+
+    class ReactRiveWidget extends React.Component<ReactRiveWidgetProps> {
+        nativePtr: UE.ReactRiveWidget;
     }
 
     interface ReactWidgetProps extends UserWidgetProps {

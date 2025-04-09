@@ -35,6 +35,7 @@ const spinbox_1 = require("./elements/spinbox");
 const combo_box_1 = require("./elements/combo_box");
 const spine_1 = require("./elements/spine");
 const checkbox_1 = require("./elements/checkbox");
+const rive_1 = require("./elements/rive");
 const baseComponentsMap = {
     // base
     "select": selector_1.SelectWrapper,
@@ -91,6 +92,7 @@ const baseComponentsMap = {
     "Spine": spine_1.SpineWrapper,
     "ProgressBar": progress_bar_1.ProgressBarWrapper,
     "Checkbox": checkbox_1.CheckboxWrapper,
+    "Rive": rive_1.RiveWrapper,
 };
 function isKeyOfRecord(key, record) {
     return key in record;
