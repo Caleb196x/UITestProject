@@ -1594,7 +1594,11 @@ declare module "reactUMG" {
     }
 
     interface RiveProp extends CommonProps {
+        rive?: string | undefined;
+        initStateMachine?: string | undefined;
 
+        onRiveReady?: () => void;
+        onRiveNamedEvent?: (eventName: string) => void;
     }
 
     class Rive extends React.Component<RiveProp> {}

@@ -90,7 +90,10 @@ static void setVertex(FSlateVertex *vertex, float x, float y, float u, float v, 
 
 void SSpineWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
 {
-	widget->Tick(InDeltaTime);
+	if (widget && widget->skeleton && widget->Atlas)
+	{
+		widget->Tick(InDeltaTime);
+	}
 }
 
 int32 SSpineWidget::OnPaint(const FPaintArgs &Args, const FGeometry &AllottedGeometry, const FSlateRect &MyClippingRect, FSlateWindowElementList &OutDrawElements,

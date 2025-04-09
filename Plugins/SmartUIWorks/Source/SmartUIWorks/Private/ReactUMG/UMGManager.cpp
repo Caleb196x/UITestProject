@@ -7,10 +7,13 @@
  */
 
 #include "ReactUMG/UMGManager.h"
+
+#include "IRiveRendererModule.h"
 #include "LogSmartUI.h"
 #include "Engine/Engine.h"
 #include "Async/Async.h"
 #include "Kismet/KismetRenderingLibrary.h"
+#include "Rive/RiveFile.h"
 
 UReactWidget* UUMGManager::CreateReactWidget(UWorld* World)
 {
@@ -31,7 +34,6 @@ void UUMGManager::SynchronizeSlotProperties(UPanelSlot* Slot)
 {
     Slot->SynchronizeProperties();
 }
-
 
 USpineAtlasAsset* UUMGManager::LoadSpineAtlas(UObject* Context, const FString& AtlasPath)
 {
@@ -75,7 +77,7 @@ USpineSkeletonDataAsset* UUMGManager::LoadSpineSkeleton(UObject* Context, const 
     }
 
     USpineSkeletonDataAsset* SkeletonDataAsset = NewObject<USpineSkeletonDataAsset>(Context,
-            USpineSkeletonDataAsset::StaticClass(), NAME_None, RF_Transient);
+            USpineSkeletonDataAsset::StaticClass(), NAME_None, RF_Transient | RF_Public);
     
     SkeletonDataAsset->SetSkeletonDataFileName(FName(*SkeletonPath));
     SkeletonDataAsset->SetRawData(RawData);
@@ -83,3 +85,54 @@ USpineSkeletonDataAsset* UUMGManager::LoadSpineSkeleton(UObject* Context, const 
     return SkeletonDataAsset;
 }
 
+URiveFile* UUMGManager::LoadRiveFile(UObject* Context, const FString& RivePath)
+{
+    if (!IRiveRendererModule::Get().GetRenderer())
+    {
+        UE_LOG(
+            LogSmartUI,
+            Error,
+            TEXT("Unable to import the Rive file '%s': the Renderer is null"),
+            *RivePath);
+        return nullptr;
+    }
+    
+    if (!FPaths::FileExists(RivePath))
+    {
+        UE_LOG(
+            LogSmartUI,
+            Error,
+            TEXT(
+                "Unable to import the Rive file '%s': the file does not exist"),
+            *RivePath);
+        return nullptr;
+    }
+
+    TArray<uint8> FileBuffer;
+    if (!FFileHelper::LoadFileToArray(FileBuffer, *RivePath)) // load entire DNA file into the array
+    {
+        UE_LOG(
+            LogSmartUI,
+            Error,
+            TEXT(
+                "Unable to import the Rive file '%s': Could not read the file"),
+            *RivePath);
+        return nullptr;
+    }
+    
+    URiveFile* RiveFile =
+    NewObject<URiveFile>(Context, URiveFile::StaticClass(), NAME_None, RF_Transient | RF_Public);
+    check(RiveFile);
+
+    if (!RiveFile->EditorImport(RivePath, FileBuffer))
+    {
+        UE_LOG(LogSmartUI, Error,
+       TEXT("Failed to import the Rive file '%s': Could not import the "
+            "riv file"),
+        *RivePath);
+        RiveFile->ConditionalBeginDestroy();
+        return nullptr;
+    }
+
+    return RiveFile;
+}
